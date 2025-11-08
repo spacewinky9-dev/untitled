@@ -17,7 +17,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus } from '@phosphor-icons/react'
 import { IndicatorNode } from './nodes/IndicatorNode'
 import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
@@ -41,6 +41,8 @@ import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
 import { EACreationGuide } from './EACreationGuide'
 import { ContextMenuWrapper } from './ContextMenu'
+import { NewProjectDialog, ProjectConfig } from './NewProjectDialog'
+import { EditBlockLabelDialog } from './EditBlockLabelDialog'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
@@ -82,9 +84,12 @@ export function Canvas() {
   const [showProperties, setShowProperties] = useState(false)
   const [showAIBuilder, setShowAIBuilder] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
+  const [showEditLabelDialog, setShowEditLabelDialog] = useState(false)
   const [showBlockNumbers, setShowBlockNumbers] = useState(true)
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
+  const [currentProject, setCurrentProject] = useState<ProjectConfig | null>(null)
   
   const history = useHistory()
   const clipboard = useClipboard()
@@ -319,6 +324,12 @@ export function Canvas() {
     setShowProperties(true)
   }, [])
 
+  const onNodeDoubleClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    setSelectedNode(node)
+    setShowProperties(true)
+    toast.info('Double-click to open properties')
+  }, [])
+
   const onPaneClick = useCallback(() => {
     setSelectedNode(null)
   }, [])
@@ -418,20 +429,89 @@ export function Canvas() {
     setShowBlockNumbers(prev => !prev)
   }, [])
 
+  const onNewProject = useCallback((config: ProjectConfig) => {
+    if (nodes.length > 0) {
+      const confirmed = window.confirm('Creating a new project will clear the current canvas. Continue?')
+      if (!confirmed) return
+    }
+    
+    setCurrentProject(config)
+    setNodes([])
+    setEdges([])
+    setNodeIdCounter(1)
+    setCurrentStrategyId(null)
+    history.clearHistory()
+    toast.success(`New ${config.type} project created for ${config.language.toUpperCase()}`)
+  }, [nodes, setNodes, setEdges, history])
+
+  const onEditBlockLabel = useCallback((label: string | number) => {
+    if (!selectedNode) return
+    
+    history.addHistory(nodes, edges, 'Edit block label')
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === selectedNode.id
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                customLabel: label
+              }
+            }
+          : node
+      )
+    )
+    toast.success(`Block label updated to "${label}"`)
+  }, [selectedNode, nodes, edges, history, setNodes])
+
+  const onToggleNodeEnabled = useCallback(() => {
+    if (!selectedNode) return
+    
+    const isDisabled = selectedNode.data.disabled || false
+    history.addHistory(nodes, edges, isDisabled ? 'Enable block' : 'Disable block')
+    
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === selectedNode.id
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                disabled: !isDisabled
+              }
+            }
+          : node
+      )
+    )
+    toast.success(`Block ${isDisabled ? 'enabled' : 'disabled'}`)
+  }, [selectedNode, nodes, edges, history, setNodes])
+
+  const onDetachNode = useCallback(() => {
+    if (!selectedNode) return
+    
+    history.addHistory(nodes, edges, 'Detach block')
+    setEdges((eds) => eds.filter(
+      (edge) => edge.source !== selectedNode.id && edge.target !== selectedNode.id
+    ))
+    toast.success('Block detached from all connections')
+  }, [selectedNode, edges, history, setEdges])
+
   const executionMap = useMemo(() => {
     return calculateBlockNumbers(nodes, edges)
   }, [nodes, edges])
 
   const nodesWithBlockNumbers = useMemo(() => {
-    if (!showBlockNumbers) return nodes
-
     return nodes.map(node => {
       const execInfo = executionMap.get(node.id)
+      const displayLabel = node.data.customLabel !== undefined 
+        ? node.data.customLabel 
+        : (showBlockNumbers ? execInfo?.blockNumber : undefined)
+      
       return {
         ...node,
         data: {
           ...node.data,
-          blockNumber: execInfo?.blockNumber,
+          blockNumber: displayLabel,
           executionOrder: execInfo?.executionOrder
         }
       }
@@ -451,10 +531,11 @@ export function Canvas() {
         onPaste={handlePaste}
         onDelete={onDeleteSelected}
         onDuplicate={handleDuplicate}
-        onEditTitle={() => toast.info('Edit title feature coming soon')}
+        onEditTitle={() => setShowEditLabelDialog(true)}
         onResize={() => toast.info('Resize feature coming soon')}
         onToggleLock={() => toast.info('Lock feature coming soon')}
         onToggleVisibility={() => toast.info('Visibility feature coming soon')}
+        onToggleEnabled={onToggleNodeEnabled}
         onShowInfo={() => {
           if (selectedNode) {
             const execInfo = executionMap.get(selectedNode.id)
@@ -462,7 +543,7 @@ export function Canvas() {
           }
         }}
         onCreateGroup={() => toast.info('Create group feature coming soon')}
-        onBreakConnection={() => toast.info('Break connection feature coming soon')}
+        onBreakConnection={onDetachNode}
       >
         <div ref={reactFlowWrapper} className="flex-1 relative">
           <ReactFlow
@@ -474,6 +555,7 @@ export function Canvas() {
             onDrop={onDrop}
             onDragOver={onDragOver}
             onNodeClick={onNodeClick}
+            onNodeDoubleClick={onNodeDoubleClick}
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             fitView
@@ -499,6 +581,15 @@ export function Canvas() {
             
             <Panel position="top-left" className="flex gap-2">
               <EACreationGuide />
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="gap-2"
+              onClick={() => setShowNewProjectDialog(true)}
+            >
+              <FilePlus size={16} />
+              New
+            </Button>
             <Button 
               size="sm" 
               variant="default"
@@ -608,6 +699,19 @@ export function Canvas() {
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
         strategy={getCurrentStrategy()}
+      />
+
+      <NewProjectDialog
+        open={showNewProjectDialog}
+        onOpenChange={setShowNewProjectDialog}
+        onCreateProject={onNewProject}
+      />
+
+      <EditBlockLabelDialog
+        open={showEditLabelDialog}
+        onOpenChange={setShowEditLabelDialog}
+        currentLabel={selectedNode?.data.customLabel || selectedNode?.data.blockNumber}
+        onSave={onEditBlockLabel}
       />
     </div>
   )

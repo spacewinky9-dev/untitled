@@ -22,7 +22,9 @@ import {
   LockOpen,
   Eye,
   EyeSlash,
-  ArrowUUpLeft
+  ArrowUUpLeft,
+  Power,
+  LinkBreak
 } from '@phosphor-icons/react'
 
 interface ContextMenuWrapperProps {
@@ -39,6 +41,7 @@ interface ContextMenuWrapperProps {
   onResize: () => void
   onToggleLock: () => void
   onToggleVisibility: () => void
+  onToggleEnabled?: () => void
   onShowInfo: () => void
   onCreateGroup: () => void
   onBreakConnection: () => void
@@ -56,6 +59,7 @@ export function ContextMenuWrapper({
   onResize,
   onToggleLock,
   onToggleVisibility,
+  onToggleEnabled,
   onShowInfo,
   onCreateGroup,
   onBreakConnection
@@ -63,6 +67,7 @@ export function ContextMenuWrapper({
   const isNodeSelected = !!selectedNode
   const isLocked = selectedNode?.data?.locked || false
   const isHidden = selectedNode?.data?.hidden || false
+  const isDisabled = selectedNode?.data?.disabled || false
 
   return (
     <ContextMenu>
@@ -160,14 +165,23 @@ export function ContextMenuWrapper({
             
             <ContextMenuSeparator />
             
+            {onToggleEnabled && (
+              <ContextMenuItem onClick={onToggleEnabled} className="gap-2">
+                <Power size={16} />
+                {isDisabled ? 'On' : 'Off'}
+              </ContextMenuItem>
+            )}
+            
+            <ContextMenuItem onClick={onBreakConnection} className="gap-2">
+              <LinkBreak size={16} />
+              Detach
+            </ContextMenuItem>
+            
+            <ContextMenuSeparator />
+            
             <ContextMenuItem onClick={onCreateGroup} className="gap-2">
               <CirclesThreePlus size={16} />
               Create Area
-            </ContextMenuItem>
-            
-            <ContextMenuItem onClick={onBreakConnection} className="gap-2">
-              <Scissors size={16} />
-              Wait to Pass
             </ContextMenuItem>
           </>
         )}

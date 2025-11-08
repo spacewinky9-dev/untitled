@@ -18,6 +18,7 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
   const isBuy = nodeData.action === 'buy'
   const isSell = nodeData.action === 'sell'
   const isClose = nodeData.action === 'close'
+  const isDisabled = nodeData.disabled || false
   
   const inputs = nodeData.inputs || [{ id: 'input', label: 'Input' }]
   
@@ -43,6 +44,7 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
     <div className={cn(
       "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
+      isDisabled && "opacity-50",
       "border-l-4"
     )}
     style={{ 

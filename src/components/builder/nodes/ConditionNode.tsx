@@ -15,6 +15,7 @@ export interface ConditionNodeData extends Record<string, unknown> {
 
 export const ConditionNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as ConditionNodeData
+  const isDisabled = nodeData.disabled || false
   
   const outputs = nodeData.outputs || [
     { id: 'true', label: 'True', type: 'normal' as const },
@@ -29,6 +30,7 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
     <div className={cn(
       "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
+      isDisabled && "opacity-50",
       "border-l-4"
     )}
     style={{ borderLeftColor: 'oklch(0.65 0.18 145)' }}
