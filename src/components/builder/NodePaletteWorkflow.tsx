@@ -148,24 +148,32 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   }
 
   const nodeCounts = useMemo(() => {
-    const counts: Record<EventCategory, number> = {
+    const counts: Partial<Record<EventCategory, number>> = {
       ontick: 0,
       oninit: 0,
       ontimer: 0,
+      ontrade: 0,
+      onchart: 0,
+      ondeinit: 0,
       all: 0
     }
 
     const allNodes = [...NODE_DEFINITIONS, ...INDICATOR_DEFINITIONS]
     
     allNodes.forEach(node => {
-      counts.all++
+      counts.all!++
       if (!node.eventContext || node.eventContext.length === 0) {
-        counts.ontick++
-        counts.oninit++
-        counts.ontimer++
+        counts.ontick!++
+        counts.oninit!++
+        counts.ontimer!++
+        counts.ontrade!++
+        counts.onchart!++
+        counts.ondeinit!++
       } else {
         node.eventContext.forEach(ctx => {
-          if (ctx !== 'all') counts[ctx]++
+          if (ctx !== 'all' && counts[ctx] !== undefined) {
+            counts[ctx]!++
+          }
         })
       }
     })

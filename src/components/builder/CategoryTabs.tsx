@@ -6,15 +6,16 @@ import {
   ArrowsClockwise,
   ChartLine,
   Function,
-  Waveform
+  CurrencyCircleDollar,
+  ChartLineUp,
+  Stop
 } from '@phosphor-icons/react'
-
-export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'all'
+import type { EventCategory } from '@/constants/node-categories'
 
 interface CategoryTabsProps {
   activeCategory: EventCategory
   onCategoryChange: (category: EventCategory) => void
-  nodeCounts?: Record<EventCategory, number>
+  nodeCounts?: Partial<Record<EventCategory, number>>
 }
 
 const CATEGORY_CONFIG = [
@@ -22,25 +23,43 @@ const CATEGORY_CONFIG = [
     id: 'all' as EventCategory,
     label: 'All Nodes',
     icon: Function,
-    description: 'Show all available nodes'
+    description: 'Show all available nodes for all events'
   },
   {
     id: 'ontick' as EventCategory,
     label: 'OnTick',
     icon: ChartLine,
-    description: 'Executes on every price tick'
+    description: 'Executes on every price tick - main strategy logic'
   },
   {
     id: 'oninit' as EventCategory,
     label: 'OnInit',
     icon: ArrowsClockwise,
-    description: 'Executes once when EA starts'
+    description: 'Executes once when EA starts - initialization logic'
   },
   {
     id: 'ontimer' as EventCategory,
     label: 'OnTimer',
     icon: Timer,
-    description: 'Executes at timed intervals'
+    description: 'Executes at timed intervals - periodic tasks'
+  },
+  {
+    id: 'ontrade' as EventCategory,
+    label: 'OnTrade',
+    icon: CurrencyCircleDollar,
+    description: 'Executes when a trade event occurs'
+  },
+  {
+    id: 'onchart' as EventCategory,
+    label: 'OnChart',
+    icon: ChartLineUp,
+    description: 'Executes on chart events - visual updates'
+  },
+  {
+    id: 'ondeinit' as EventCategory,
+    label: 'OnDeinit',
+    icon: Stop,
+    description: 'Executes when EA stops - cleanup logic'
   }
 ]
 

@@ -1,6 +1,6 @@
-export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced'
+export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced' | 'money_management' | 'graphical' | 'messaging' | 'file_ops' | 'terminal' | 'custom'
 
-export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'all'
+export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'ontrade' | 'onchart' | 'ondeinit' | 'all'
 
 export interface PinDefinition {
   id: string
@@ -98,18 +98,66 @@ export const NODE_CATEGORIES: Array<{
     borderColor: 'border-yellow-500'
   },
   {
+    id: 'money_management',
+    label: 'Money Management',
+    description: 'Position sizing, Martingale, Fibonacci, Risk % and more',
+    executionOrder: 8,
+    color: 'oklch(0.70 0.18 120)',
+    borderColor: 'border-emerald-500'
+  },
+  {
     id: 'advanced',
     label: 'Advanced Trade',
     description: 'Advanced trade management (trailing, break-even, partial close)',
-    executionOrder: 8,
+    executionOrder: 9,
     color: 'oklch(0.60 0.15 300)',
     borderColor: 'border-pink-500'
+  },
+  {
+    id: 'graphical',
+    label: 'Graphical Objects',
+    description: 'Draw arrows, lines, text, Fibonacci on chart',
+    executionOrder: 10,
+    color: 'oklch(0.65 0.15 250)',
+    borderColor: 'border-indigo-500'
+  },
+  {
+    id: 'messaging',
+    label: 'Messaging',
+    description: 'Send notifications to email, website, smartphone',
+    executionOrder: 11,
+    color: 'oklch(0.68 0.14 200)',
+    borderColor: 'border-sky-500'
+  },
+  {
+    id: 'file_ops',
+    label: 'File Operations',
+    description: 'Read and write data to files',
+    executionOrder: 12,
+    color: 'oklch(0.62 0.16 30)',
+    borderColor: 'border-amber-500'
+  },
+  {
+    id: 'terminal',
+    label: 'Terminal Variables',
+    description: 'Access terminal and account information',
+    executionOrder: 13,
+    color: 'oklch(0.66 0.12 270)',
+    borderColor: 'border-violet-500'
+  },
+  {
+    id: 'custom',
+    label: 'Custom Blocks',
+    description: 'Create and use custom reusable blocks',
+    executionOrder: 14,
+    color: 'oklch(0.64 0.14 340)',
+    borderColor: 'border-rose-500'
   },
   {
     id: 'action',
     label: 'Actions',
     description: 'Trade execution actions',
-    executionOrder: 9,
+    executionOrder: 15,
     color: 'oklch(0.55 0.20 25)',
     borderColor: 'border-bearish'
   }
@@ -468,7 +516,8 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     label: 'OnInit',
     description: 'Strategy initialization event - runs once at start',
     icon: 'Play',
-    defaultParameters: {}
+    defaultParameters: {},
+    eventContext: ['oninit', 'all']
   },
   {
     id: 'on_tick',
@@ -477,7 +526,8 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     label: 'OnTick',
     description: 'Tick event - runs on every price update',
     icon: 'Activity',
-    defaultParameters: {}
+    defaultParameters: {},
+    eventContext: ['ontick', 'all']
   },
   {
     id: 'on_timer',
@@ -488,7 +538,8 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     icon: 'Clock',
     defaultParameters: {
       intervalSeconds: 60
-    }
+    },
+    eventContext: ['ontimer', 'all']
   },
   {
     id: 'on_trade',
@@ -497,7 +548,18 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     label: 'OnTrade',
     description: 'Trade event - runs when trade is opened/closed',
     icon: 'CurrencyCircleDollar',
-    defaultParameters: {}
+    defaultParameters: {},
+    eventContext: ['ontrade', 'all']
+  },
+  {
+    id: 'on_chart',
+    type: 'event',
+    category: 'event',
+    label: 'OnChart',
+    description: 'Chart event - runs on chart events for visual updates',
+    icon: 'ChartLineUp',
+    defaultParameters: {},
+    eventContext: ['onchart', 'all']
   },
   {
     id: 'on_deinit',
@@ -506,7 +568,8 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     label: 'OnDeinit',
     description: 'Deinitialization event - runs once at shutdown',
     icon: 'Stop',
-    defaultParameters: {}
+    defaultParameters: {},
+    eventContext: ['ondeinit', 'all']
   },
   {
     id: 'mtf_indicator',
@@ -1285,6 +1348,579 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     defaultParameters: {
       code: '// Custom logic here'
     }
+  },
+  {
+    id: 'trailing_stop_advanced',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Advanced Trailing',
+    description: 'Trail stop loss, take profit, or pending orders (MT4 compatible)',
+    icon: 'TrendUp',
+    defaultParameters: {
+      trailType: 'stop_loss',
+      activationPips: 20,
+      trailPips: 15,
+      stepPips: 5,
+      trailMode: 'pips'
+    },
+    eventContext: ['ontick', 'ontimer', 'all']
+  },
+  {
+    id: 'trail_group',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Trail Group',
+    description: 'Trail multiple trades collectively (MT4 group trailing)',
+    icon: 'Stack',
+    defaultParameters: {
+      groupName: 'group1',
+      trailPips: 15,
+      stepPips: 5
+    },
+    eventContext: ['ontick', 'ontimer', 'all']
+  },
+  {
+    id: 'global_constant',
+    type: 'variable',
+    category: 'variable',
+    label: 'Global Constant',
+    description: 'Project input parameter (constant value)',
+    icon: 'Lock',
+    defaultParameters: {
+      name: 'LotSize',
+      value: 0.01,
+      valueType: 'number',
+      description: 'Initial lot size'
+    },
+    eventContext: ['all']
+  },
+  {
+    id: 'global_variable',
+    type: 'variable',
+    category: 'variable',
+    label: 'Global Variable',
+    description: 'Global variable accessible across events',
+    icon: 'Database',
+    defaultParameters: {
+      name: 'myGlobalVar',
+      initialValue: 0,
+      valueType: 'number'
+    },
+    eventContext: ['all']
+  },
+  {
+    id: 'risk_percent',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Risk %',
+    description: 'Calculate lot size based on account risk percentage',
+    icon: 'Percent',
+    defaultParameters: {
+      riskPercent: 2.0,
+      stopLossPips: 20,
+      maxLot: 10.0,
+      minLot: 0.01
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'fibonacci_lots',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Fibonacci Sequence',
+    description: 'Fibonacci-based position sizing',
+    icon: 'ChartLineUp',
+    defaultParameters: {
+      baseLot: 0.01,
+      sequence: [1, 1, 2, 3, 5, 8, 13],
+      resetOnWin: true,
+      maxSequenceIndex: 6
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'martingale',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Martingale',
+    description: 'Fully customizable Martingale system',
+    icon: 'ArrowsClockwise',
+    defaultParameters: {
+      baseLot: 0.01,
+      multiplier: 2.0,
+      maxLevels: 5,
+      resetOnWin: true,
+      resetOnProfit: 0,
+      maxLot: 10.0
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'anti_martingale',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Anti-Martingale',
+    description: 'Increase size on wins, decrease on losses',
+    icon: 'TrendUp',
+    defaultParameters: {
+      baseLot: 0.01,
+      multiplier: 1.5,
+      maxLevels: 5,
+      resetOnLoss: true
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'custom_sequence',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Custom Sequence',
+    description: 'Custom lot size sequence (e.g., 0.01, 0.02, 0.05, 0.1)',
+    icon: 'ListNumbers',
+    defaultParameters: {
+      sequence: [0.01, 0.02, 0.05, 0.1, 0.2],
+      resetOnWin: true,
+      loopSequence: false
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'recovery_zones',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Recovery Zones',
+    description: 'Zone recovery money management',
+    icon: 'ShieldCheck',
+    defaultParameters: {
+      zoneSize: 20,
+      lotsPerZone: 0.01,
+      maxZones: 5,
+      recoveryTarget: 0
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'fixed_ratio',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Fixed Ratio',
+    description: 'Fixed ratio money management (Ryan Jones)',
+    icon: 'Equals',
+    defaultParameters: {
+      delta: 100,
+      startingLot: 0.01,
+      increment: 0.01
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'kelly_criterion',
+    type: 'money_management',
+    category: 'money_management',
+    label: 'Kelly Criterion',
+    description: 'Kelly Criterion optimal f calculation',
+    icon: 'MathOperations',
+    defaultParameters: {
+      winRate: 60,
+      avgWin: 100,
+      avgLoss: 50,
+      kellyFraction: 0.25,
+      maxRisk: 5
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'dynamic_value_check',
+    type: 'condition',
+    category: 'condition',
+    label: 'Dynamic Value Check',
+    description: 'Check dynamic values from indicators easily',
+    icon: 'Lightning',
+    defaultParameters: {
+      source: 'indicator',
+      indicatorId: '',
+      operator: 'gt',
+      threshold: 0,
+      shiftBars: 0
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'indicator_buffer',
+    type: 'variable',
+    category: 'variable',
+    label: 'Indicator Buffer',
+    description: 'Get indicator value from specific bar (shift)',
+    icon: 'ChartLine',
+    defaultParameters: {
+      indicatorId: '',
+      buffer: 0,
+      shift: 0
+    },
+    eventContext: ['ontick', 'all']
+  },
+  {
+    id: 'draw_arrow',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw Arrow',
+    description: 'Draw arrow on chart (up/down signals)',
+    icon: 'ArrowUp',
+    defaultParameters: {
+      arrowType: 'up',
+      color: 'blue',
+      barShift: 0,
+      price: 0,
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_line',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw Line',
+    description: 'Draw trend line on chart',
+    icon: 'LineSegment',
+    defaultParameters: {
+      startBar: 0,
+      startPrice: 0,
+      endBar: 10,
+      endPrice: 0,
+      color: 'yellow',
+      style: 'solid',
+      width: 1,
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_hline',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw H-Line',
+    description: 'Draw horizontal line at price level',
+    icon: 'Minus',
+    defaultParameters: {
+      price: 0,
+      color: 'white',
+      style: 'solid',
+      width: 1,
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_vline',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw V-Line',
+    description: 'Draw vertical line at time',
+    icon: 'DividerVertical',
+    defaultParameters: {
+      barShift: 0,
+      color: 'white',
+      style: 'solid',
+      width: 1,
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_text',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw Text',
+    description: 'Draw text label on chart',
+    icon: 'TextT',
+    defaultParameters: {
+      text: 'Label',
+      barShift: 0,
+      price: 0,
+      fontSize: 10,
+      color: 'white',
+      anchor: 'center',
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_fibonacci',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw Fibonacci',
+    description: 'Draw Fibonacci retracement levels',
+    icon: 'ChartLine',
+    defaultParameters: {
+      startBar: 0,
+      startPrice: 0,
+      endBar: 20,
+      endPrice: 0,
+      levels: [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0],
+      color: 'gold',
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'draw_rectangle',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Draw Rectangle',
+    description: 'Draw rectangle zone on chart',
+    icon: 'Rectangle',
+    defaultParameters: {
+      startBar: 0,
+      startPrice: 0,
+      endBar: 10,
+      endPrice: 0,
+      color: 'blue',
+      fillColor: 'blue',
+      opacity: 0.3,
+      windowIndex: 0
+    },
+    eventContext: ['ontick', 'onchart', 'all']
+  },
+  {
+    id: 'delete_object',
+    type: 'graphical',
+    category: 'graphical',
+    label: 'Delete Object',
+    description: 'Delete graphical object from chart',
+    icon: 'Trash',
+    defaultParameters: {
+      objectName: '',
+      deleteAll: false
+    },
+    eventContext: ['ontick', 'onchart', 'ondeinit', 'all']
+  },
+  {
+    id: 'send_email',
+    type: 'messaging',
+    category: 'messaging',
+    label: 'Send Email',
+    description: 'Send email notification',
+    icon: 'EnvelopeSimple',
+    defaultParameters: {
+      subject: 'Trade Alert',
+      body: 'Signal triggered',
+      attachScreenshot: false
+    },
+    eventContext: ['ontick', 'ontrade', 'all']
+  },
+  {
+    id: 'send_notification',
+    type: 'messaging',
+    category: 'messaging',
+    label: 'Push Notification',
+    description: 'Send push notification to smartphone (MT4/MT5)',
+    icon: 'DeviceMobile',
+    defaultParameters: {
+      message: 'Trade Alert',
+      includeSymbol: true,
+      includePrice: true
+    },
+    eventContext: ['ontick', 'ontrade', 'all']
+  },
+  {
+    id: 'webhook',
+    type: 'messaging',
+    category: 'messaging',
+    label: 'Webhook',
+    description: 'Send HTTP request to website/webhook',
+    icon: 'Globe',
+    defaultParameters: {
+      url: 'https://example.com/webhook',
+      method: 'POST',
+      payload: '{"event": "signal"}',
+      headers: '{}'
+    },
+    eventContext: ['ontick', 'ontrade', 'all']
+  },
+  {
+    id: 'telegram_message',
+    type: 'messaging',
+    category: 'messaging',
+    label: 'Telegram Message',
+    description: 'Send message to Telegram bot',
+    icon: 'PaperPlaneTilt',
+    defaultParameters: {
+      botToken: '',
+      chatId: '',
+      message: 'Trade Alert',
+      parseMode: 'HTML'
+    },
+    eventContext: ['ontick', 'ontrade', 'all']
+  },
+  {
+    id: 'write_file',
+    type: 'file_ops',
+    category: 'file_ops',
+    label: 'Write to File',
+    description: 'Write data to file (CSV, TXT)',
+    icon: 'FloppyDisk',
+    defaultParameters: {
+      fileName: 'data.csv',
+      content: '',
+      append: true,
+      addTimestamp: true
+    },
+    eventContext: ['ontick', 'ontrade', 'ondeinit', 'all']
+  },
+  {
+    id: 'read_file',
+    type: 'file_ops',
+    category: 'file_ops',
+    label: 'Read from File',
+    description: 'Read data from file',
+    icon: 'FileText',
+    defaultParameters: {
+      fileName: 'data.csv',
+      lineNumber: -1
+    },
+    eventContext: ['oninit', 'ontick', 'all']
+  },
+  {
+    id: 'file_exists',
+    type: 'condition',
+    category: 'condition',
+    label: 'File Exists',
+    description: 'Check if file exists',
+    icon: 'FileSearch',
+    defaultParameters: {
+      fileName: 'data.csv'
+    },
+    eventContext: ['oninit', 'ontick', 'all']
+  },
+  {
+    id: 'delete_file',
+    type: 'file_ops',
+    category: 'file_ops',
+    label: 'Delete File',
+    description: 'Delete file from disk',
+    icon: 'Trash',
+    defaultParameters: {
+      fileName: 'data.csv'
+    },
+    eventContext: ['ondeinit', 'all']
+  },
+  {
+    id: 'terminal_company',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Broker Name',
+    description: 'Get broker company name',
+    icon: 'Bank',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'terminal_name',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Terminal Name',
+    description: 'Get terminal name and version',
+    icon: 'Desktop',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'account_number',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Account Number',
+    description: 'Get account number',
+    icon: 'IdentificationCard',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'account_name',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Account Name',
+    description: 'Get account holder name',
+    icon: 'User',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'account_leverage',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Account Leverage',
+    description: 'Get account leverage',
+    icon: 'ChartLineUp',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'account_currency',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Account Currency',
+    description: 'Get account currency',
+    icon: 'CurrencyDollar',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'server_time',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Server Time',
+    description: 'Get server time',
+    icon: 'Clock',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'is_demo',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Is Demo Account',
+    description: 'Check if running on demo account',
+    icon: 'TestTube',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'is_connected',
+    type: 'terminal',
+    category: 'terminal',
+    label: 'Is Connected',
+    description: 'Check if terminal is connected to server',
+    icon: 'WifiHigh',
+    defaultParameters: {},
+    eventContext: ['all']
+  },
+  {
+    id: 'create_custom_block',
+    type: 'custom',
+    category: 'custom',
+    label: 'Create Custom Block',
+    description: 'Create reusable custom block from selected nodes',
+    icon: 'Package',
+    defaultParameters: {
+      blockName: 'My Custom Block',
+      description: '',
+      inputs: [],
+      outputs: []
+    },
+    eventContext: ['all']
+  },
+  {
+    id: 'use_custom_block',
+    type: 'custom',
+    category: 'custom',
+    label: 'Use Custom Block',
+    description: 'Use previously created custom block',
+    icon: 'Cube',
+    defaultParameters: {
+      blockId: '',
+      blockName: ''
+    },
+    eventContext: ['all']
   }
 ]
 
@@ -1294,4 +1930,19 @@ export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
 
 export function getNodeDefinition(id: string): NodeDefinition | undefined {
   return NODE_DEFINITIONS.find(node => node.id === id)
+}
+
+export function getNodesByEventContext(eventContext: EventCategory): NodeDefinition[] {
+  if (eventContext === 'all') {
+    return NODE_DEFINITIONS
+  }
+  return NODE_DEFINITIONS.filter(node => 
+    !node.eventContext || 
+    node.eventContext.includes(eventContext) || 
+    node.eventContext.includes('all')
+  )
+}
+
+export function countNodesByEventContext(eventContext: EventCategory): number {
+  return getNodesByEventContext(eventContext).length
 }

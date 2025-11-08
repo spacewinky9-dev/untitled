@@ -27,6 +27,12 @@ import { MTFNode } from './nodes/MTFNode'
 import { PatternNode } from './nodes/PatternNode'
 import { VariableNode } from './nodes/VariableNode'
 import { AdvancedNode } from './nodes/AdvancedNode'
+import { MoneyManagementNode } from './nodes/MoneyManagementNode'
+import { GraphicalNode } from './nodes/GraphicalNode'
+import { MessagingNode } from './nodes/MessagingNode'
+import { FileOpsNode } from './nodes/FileOpsNode'
+import { TerminalNode } from './nodes/TerminalNode'
+import { CustomBlockNode } from './nodes/CustomBlockNode'
 import { NodePaletteWorkflow } from './NodePaletteWorkflow'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
@@ -51,7 +57,13 @@ export function Canvas() {
     mtf: MTFNode,
     pattern: PatternNode,
     variable: VariableNode,
-    advanced: AdvancedNode
+    advanced: AdvancedNode,
+    money_management: MoneyManagementNode,
+    graphical: GraphicalNode,
+    messaging: MessagingNode,
+    file_ops: FileOpsNode,
+    terminal: TerminalNode,
+    custom: CustomBlockNode
   }), [])
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
