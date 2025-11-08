@@ -1,3 +1,22 @@
+export interface StrategyNode {
+  id: string
+  type: string
+  position: { x: number; y: number }
+  data: {
+    label: string
+    parameters?: Record<string, any>
+    [key: string]: any
+  }
+}
+
+export interface StrategyEdge {
+  id: string
+  source: string
+  target: string
+  sourceHandle?: string | null
+  targetHandle?: string | null
+}
+
 export interface Strategy {
   id: string
   name: string
@@ -5,8 +24,8 @@ export interface Strategy {
   version: string
   createdAt: string
   updatedAt: string
-  nodes: any[]
-  edges: any[]
+  nodes: StrategyNode[]
+  edges: StrategyEdge[]
   settings?: StrategySettings
   metadata?: StrategyMetadata
 }

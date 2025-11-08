@@ -52,6 +52,7 @@ export interface PerformanceMetrics {
   losingTrades: number
   winRate: number
   totalProfit: number
+  totalReturn: number
   grossProfit: number
   grossLoss: number
   profitFactor: number
@@ -63,6 +64,8 @@ export interface PerformanceMetrics {
   sortinoRatio: number
   expectancy: number
   recoveryFactor: number
+  maxConsecutiveWins: number
+  maxConsecutiveLosses: number
 }
 
 export interface TradeStatistics {

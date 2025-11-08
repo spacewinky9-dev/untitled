@@ -206,7 +206,16 @@ export function Canvas() {
       version: '1.0.0',
       createdAt: existingStrategy?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      nodes: nodes,
+      nodes: nodes.map(n => ({
+        id: n.id,
+        type: n.type || 'default',
+        position: n.position,
+        data: {
+          label: (n.data as any).label || n.type || 'Node',
+          parameters: (n.data as any).parameters,
+          ...n.data
+        }
+      })),
       edges: edges
     }
 
