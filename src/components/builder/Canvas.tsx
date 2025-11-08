@@ -16,15 +16,16 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export } from '@phosphor-icons/react'
 import { IndicatorNode } from './nodes/IndicatorNode'
 import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
 import { LogicNode } from './nodes/LogicNode'
 import { RiskNode } from './nodes/RiskNode'
-import { NodePaletteCollapsible } from './NodePaletteCollapsible'
+import { NodePalette } from './NodePalette'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
+import { ExportDialog } from './ExportDialog'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { Strategy } from '@/types/strategy'
@@ -50,6 +51,7 @@ export function Canvas() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [showProperties, setShowProperties] = useState(false)
   const [showAIBuilder, setShowAIBuilder] = useState(false)
+  const [showExportDialog, setShowExportDialog] = useState(false)
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
 
@@ -202,9 +204,41 @@ export function Canvas() {
     toast.success('AI-generated strategy loaded! You can now modify it manually.')
   }, [setNodes, setEdges])
 
+  const getCurrentStrategy = useCallback((): Strategy => {
+    const existingStrategy = strategies?.find(s => s.id === currentStrategyId)
+    
+    return {
+      id: currentStrategyId || `strategy-${Date.now()}`,
+      name: existingStrategy?.name || 'Untitled Strategy',
+      description: '',
+      version: '1.0.0',
+      createdAt: existingStrategy?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      nodes: nodes.map(n => ({
+        id: n.id,
+        type: n.type || 'default',
+        position: n.position,
+        data: {
+          label: (n.data as any).label || n.type || 'Node',
+          parameters: (n.data as any).parameters,
+          ...n.data
+        }
+      })),
+      edges: edges
+    }
+  }, [nodes, edges, currentStrategyId, strategies])
+
+  const onExport = useCallback(() => {
+    if (nodes.length === 0) {
+      toast.error('No nodes to export. Build a strategy first!')
+      return
+    }
+    setShowExportDialog(true)
+  }, [nodes])
+
   return (
     <div className="w-full h-full flex">
-      <NodePaletteCollapsible onNodeAdd={onNodeAdd} />
+      <NodePalette onNodeAdd={onNodeAdd} />
       
       <div ref={reactFlowWrapper} className="flex-1 relative">
         <ReactFlow
@@ -259,6 +293,15 @@ export function Canvas() {
             </Button>
             <Button 
               size="sm" 
+              variant="outline" 
+              className="gap-2"
+              onClick={onExport}
+            >
+              <Export size={16} />
+              Export MQL
+            </Button>
+            <Button 
+              size="sm" 
               variant="default" 
               className="gap-2 bg-bullish text-bullish-foreground hover:bg-bullish/90"
             >
@@ -301,6 +344,12 @@ export function Canvas() {
         open={showAIBuilder}
         onOpenChange={setShowAIBuilder}
         onStrategyGenerated={onAIStrategyGenerated}
+      />
+
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        strategy={getCurrentStrategy()}
       />
     </div>
   )

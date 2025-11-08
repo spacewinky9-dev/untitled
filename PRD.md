@@ -3,7 +3,7 @@
 
 ---
 
-A next-generation visual trading bot builder that empowers traders to design, test, and deploy automated Forex strategies without writing code—surpassing FXDreema in power, flexibility, and user experience.
+A next-generation visual trading bot builder that empowers traders to design, test, and deploy automated Forex strategies without writing code—surpassing FXDreema in power, flexibility, and user experience. Features include AI-powered strategy generation, full MQL4/MQL5 export, and an intuitive workflow-based node organization system.
 
 ---
 
@@ -27,13 +27,13 @@ A next-generation visual trading bot builder that empowers traders to design, te
 
 ### 1. Visual Strategy Builder (Core Feature)
 
-**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system. Enhanced with collapsible categorized node library inspired by FXDreema, organizing indicators into subcategories (Moving Averages, Oscillators, Volatility, etc.) for easier discovery.
+**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system. Enhanced with workflow-ordered categorized node library, organizing nodes by their logical execution order (1. Indicators → 2. Conditions → 3. Logic → 4. Risk Management → 5. Actions). Categories are collapsible with color-coded workflow badges, showing 6 nodes initially with "Show More" expansion, making discovery intuitive and progressive.
 
-**Purpose:** Democratizes algorithmic trading by making strategy creation visual and intuitive rather than requiring programming knowledge, while maintaining the power and flexibility of coded solutions.
+**Purpose:** Democratizes algorithmic trading by making strategy creation visual and intuitive rather than requiring programming knowledge, while maintaining the power and flexibility of coded solutions. The workflow-based organization guides users through proper strategy construction.
 
 **Trigger:** User opens the app or clicks "New Strategy" from the dashboard.
 
-**Progression:** Empty canvas loads → User browses categorized node palette (can expand/collapse categories) → User drags nodes from palette to canvas or clicks to add at center → User connects nodes by dragging from output ports to input ports → User configures each node's detailed parameters in properties panel → User validates strategy (checking for logic errors) → User saves strategy with name and description → Strategy appears in library.
+**Progression:** Empty canvas loads → User browses workflow-ordered node palette (color-coded by execution order) → User expands desired category → User sees initial 6 nodes with "Show More" option → User drags nodes from palette to canvas or clicks to add at center → User connects nodes by dragging from output ports to input ports → User configures each node's detailed parameters in properties panel → User validates strategy (checking for logic errors) → User exports to MQL4/MQL5 → User saves strategy with name and description → Strategy appears in library.
 
 **Success Criteria:**
 - Users can create a complete trading strategy in under 5 minutes
@@ -41,7 +41,9 @@ A next-generation visual trading bot builder that empowers traders to design, te
 - All node connections follow valid data types and logic
 - Strategies can be saved and reloaded without loss of configuration
 - Canvas supports zoom, pan, and handles 50+ nodes without performance degradation
-- Collapsible categories make it easy to find specific node types
+- Workflow-ordered categories with color coding guide proper strategy flow
+- Show More functionality prevents overwhelming users while maintaining full access
+- MQL4/MQL5 export generates working, production-ready Expert Advisor code
 
 ### 1a. AI Strategy Builder (New Feature)
 
@@ -61,6 +63,27 @@ A next-generation visual trading bot builder that empowers traders to design, te
 - Users can immediately edit AI-generated strategies manually
 - Generation completes in under 10 seconds
 - Clear error messages when AI cannot interpret the prompt
+
+### 1b. MQL4/MQL5 Export (New Feature)
+
+**Functionality:** One-click export of visual strategies to production-ready MetaTrader 4 (MQL4) or MetaTrader 5 (MQL5) Expert Advisor code. The system analyzes the node graph, generates appropriate indicator calculations, condition logic, risk management, and trade execution code with proper error handling and helper functions.
+
+**Purpose:** Enables traders to deploy their visually-built strategies directly on MetaTrader platforms, the industry-standard forex trading software, without manual coding.
+
+**Trigger:** User clicks "Export MQL" button in canvas toolbar.
+
+**Progression:** User clicks Export button → Export dialog opens → User enters Expert Advisor name and magic number → User selects MQL4 or MQL5 tab → System generates complete code → User reviews code in syntax-highlighted viewer → User clicks Copy or Download → Code is copied to clipboard or downloaded as .mq4/.mq5 file → User can compile and run in MetaTrader.
+
+**Success Criteria:**
+- Generated code compiles without errors in MetaTrader
+- All indicators from nodes are correctly implemented
+- Condition logic properly evaluates to trigger actions
+- Risk management parameters (stop loss, take profit, position sizing) are correctly applied
+- Trade execution functions use proper MetaTrader API calls
+- Code includes helpful comments and clear structure
+- Both MQL4 and MQL5 versions generate correctly
+- Helper functions for order management and validation are included
+- Magic number system prevents interference with other EAs
 
 ### 2. Technical Indicator Library
 
