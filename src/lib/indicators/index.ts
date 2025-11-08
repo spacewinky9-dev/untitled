@@ -1,6 +1,7 @@
 import { OHLCV } from '@/types/market-data'
 import { calculateSMA } from './sma'
 import { calculateEMA } from './ema'
+import { calculateWMA } from './wma'
 import { calculateRSI } from './rsi'
 import { calculateMACD, MACDResult } from './macd'
 import { calculateBollingerBands, BollingerBandsResult } from './bollinger-bands'
@@ -37,6 +38,15 @@ export const INDICATOR_REGISTRY: Record<string, IndicatorDefinition> = {
     description: 'Weighted average giving more weight to recent prices',
     outputs: ['value'],
     calculate: (data, params) => calculateEMA(data, params.period || 20, params.source || 'close')
+  },
+
+  wma: {
+    id: 'wma',
+    name: 'Weighted Moving Average',
+    category: 'trend',
+    description: 'Linearly weighted moving average',
+    outputs: ['value'],
+    calculate: (data, params) => calculateWMA(data, params.period || 20, params.source || 'close')
   },
   
   rsi: {

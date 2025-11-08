@@ -1,12 +1,15 @@
 import { Strategy, StrategyNode, StrategyEdge } from '@/types/strategy'
 import { OHLCV } from '@/types/market-data'
 import { getIndicator, IndicatorOutput } from '@/lib/indicators'
+import { ConditionEvaluator, ConditionContext, PatternMatcher, CandlestickPattern } from './condition-evaluator'
+import { ExecutionVisualizer, NodeStateManager } from './execution-visualizer'
 
 export interface ExecutionContext {
   bar: OHLCV
   index: number
   balance: number
   openPositions: Trade[]
+  allBars: OHLCV[]
 }
 
 export interface Trade {
@@ -43,15 +46,33 @@ export class StrategyExecutor {
   private edges: StrategyEdge[]
   private indicatorCache: Map<string, any>
   private nodeValues: Map<string, any>
+  private visualizer: ExecutionVisualizer
+  private stateManager: NodeStateManager
+  private enableVisualization: boolean
 
-  constructor(private strategy: Strategy) {
+  constructor(private strategy: Strategy, enableVisualization: boolean = false) {
     this.nodes = new Map(strategy.nodes.map(n => [n.id, n]))
     this.edges = strategy.edges
     this.indicatorCache = new Map()
     this.nodeValues = new Map()
+    this.visualizer = new ExecutionVisualizer()
+    this.stateManager = new NodeStateManager(this.visualizer)
+    this.enableVisualization = enableVisualization
+  }
+
+  getVisualizer(): ExecutionVisualizer {
+    return this.visualizer
+  }
+
+  getStateManager(): NodeStateManager {
+    return this.stateManager
   }
 
   async execute(data: OHLCV[], initialBalance: number): Promise<ExecutionResult> {
+    if (this.enableVisualization) {
+      this.visualizer.reset()
+    }
+
     this.preCalculateIndicators(data)
 
     const trades: Trade[] = []
@@ -61,7 +82,11 @@ export class StrategyExecutor {
 
     for (let i = 0; i < data.length; i++) {
       const bar = data[i]
-      const context: ExecutionContext = { bar, index: i, balance, openPositions }
+      const context: ExecutionContext = { bar, index: i, balance, openPositions, allBars: data }
+
+      if (this.enableVisualization) {
+        this.visualizer.startBar(i, bar.time)
+      }
 
       this.evaluateNodes(context)
 
@@ -104,13 +129,32 @@ export class StrategyExecutor {
   private preCalculateIndicators(data: OHLCV[]): void {
     for (const node of this.nodes.values()) {
       if (node.type === 'indicator') {
-        const indicatorType = node.data.parameters?.indicatorType
+        const startTime = Date.now()
+        
+        if (this.enableVisualization) {
+          this.stateManager.updateNodeState(node.id, 'calculating', null)
+        }
+
+        const indicatorType = node.data.parameters?.indicatorType || node.data.label?.toLowerCase()
         if (!indicatorType) continue
 
         const indicator = getIndicator(indicatorType)
         if (indicator) {
-          const result = indicator.calculate(data, node.data.parameters || {})
-          this.indicatorCache.set(node.id, result)
+          try {
+            const result = indicator.calculate(data, node.data.parameters || {})
+            this.indicatorCache.set(node.id, result)
+            
+            if (this.enableVisualization) {
+              const calculationTime = Date.now() - startTime
+              this.stateManager.updateNodeState(node.id, 'success', result, { calculationTime })
+            }
+          } catch (error) {
+            if (this.enableVisualization) {
+              this.stateManager.updateNodeState(node.id, 'failed', null, { 
+                calculationTime: Date.now() - startTime 
+              })
+            }
+          }
         }
       }
     }
@@ -164,39 +208,71 @@ export class StrategyExecutor {
   private evaluateConditionNode(node: StrategyNode, context: ExecutionContext): boolean {
     const operator = node.data.parameters?.operator || 'gt'
     const threshold = node.data.parameters?.threshold
+    const thresholdHigh = node.data.parameters?.thresholdHigh
+    const thresholdLow = node.data.parameters?.thresholdLow
+    const pattern = node.data.parameters?.pattern as CandlestickPattern | undefined
+
+    if (pattern) {
+      const result = PatternMatcher.matchPattern(pattern, context.allBars, context.index)
+      
+      if (this.enableVisualization) {
+        this.stateManager.updateNodeState(node.id, result ? 'triggered' : 'inactive', result)
+      }
+      
+      return result
+    }
 
     const inputValues = this.getInputValues(node.id, context)
-    if (inputValues.length < 2 && threshold === undefined) return false
-
-    const inputA = inputValues[0] ?? NaN
-    const inputB = threshold !== undefined ? threshold : (inputValues[1] ?? NaN)
-
-    if (isNaN(inputA) || isNaN(inputB)) return false
-
-    switch (operator) {
-      case 'gt':
-        return inputA > inputB
-      case 'lt':
-        return inputA < inputB
-      case 'eq':
-        return Math.abs(inputA - inputB) < 0.0001
-      case 'gte':
-        return inputA >= inputB
-      case 'lte':
-        return inputA <= inputB
-      case 'cross_above':
-        if (context.index === 0) return false
-        const prevA = this.getInputValueAtIndex(node.id, 0, context.index - 1)
-        const prevB = threshold !== undefined ? threshold : this.getInputValueAtIndex(node.id, 1, context.index - 1)
-        return prevA <= prevB && inputA > inputB
-      case 'cross_below':
-        if (context.index === 0) return false
-        const prevA2 = this.getInputValueAtIndex(node.id, 0, context.index - 1)
-        const prevB2 = threshold !== undefined ? threshold : this.getInputValueAtIndex(node.id, 1, context.index - 1)
-        return prevA2 >= prevB2 && inputA < inputB
-      default:
-        return false
+    if (inputValues.length < 2 && threshold === undefined) {
+      if (this.enableVisualization) {
+        this.stateManager.updateNodeState(node.id, 'failed', false)
+      }
+      return false
     }
+
+    const currentValue = inputValues[0] ?? NaN
+    const comparisonValue = threshold !== undefined ? threshold : (inputValues[1] ?? NaN)
+
+    if (isNaN(currentValue) || (threshold === undefined && isNaN(comparisonValue))) {
+      if (this.enableVisualization) {
+        this.stateManager.updateNodeState(node.id, 'inactive', false)
+      }
+      return false
+    }
+
+    let previousValue: number | undefined
+    let previousComparisonValue: number | undefined
+    
+    if (context.index > 0 && (operator === 'cross_above' || operator === 'cross_below' || operator === 'cross')) {
+      previousValue = this.getInputValueAtIndex(node.id, 0, context.index - 1)
+      previousComparisonValue = threshold !== undefined ? threshold : this.getInputValueAtIndex(node.id, 1, context.index - 1)
+    }
+
+    const conditionContext: ConditionContext = {
+      currentValue,
+      comparisonValue,
+      previousValue,
+      previousComparisonValue,
+      bar: context.bar,
+      previousBar: context.index > 0 ? context.allBars[context.index - 1] : undefined,
+      index: context.index
+    }
+
+    const result = ConditionEvaluator.evaluate(
+      { operator, threshold, thresholdHigh, thresholdLow },
+      conditionContext
+    )
+
+    if (this.enableVisualization) {
+      this.stateManager.updateNodeState(
+        node.id,
+        result ? 'triggered' : 'inactive',
+        result,
+        { inputs: [currentValue, comparisonValue] }
+      )
+    }
+
+    return result
   }
 
   private evaluateLogicNode(node: StrategyNode, context: ExecutionContext): boolean {
@@ -207,23 +283,48 @@ export class StrategyExecutor {
       return typeof val === 'boolean' ? val : false
     })
 
+    let result: boolean
     switch (operator) {
       case 'AND':
-        return values.length > 0 && values.every(v => v)
+        result = values.length > 0 && values.every(v => v)
+        break
       case 'OR':
-        return values.some(v => v)
+        result = values.some(v => v)
+        break
       case 'NOT':
-        return !values[0]
+        result = !values[0]
+        break
       case 'XOR':
-        return values.filter(v => v).length === 1
+        result = values.filter(v => v).length === 1
+        break
       default:
-        return false
+        result = false
     }
+
+    if (this.enableVisualization) {
+      this.stateManager.updateNodeState(
+        node.id,
+        result ? 'triggered' : 'inactive',
+        result,
+        { inputs: values }
+      )
+    }
+
+    return result
   }
 
   private evaluateActionNode(node: StrategyNode, context: ExecutionContext): boolean {
     const inputs = this.getConnectedInputNodeIds(node.id)
     const triggered = inputs.some(id => this.nodeValues.get(id) === true)
+    
+    if (this.enableVisualization) {
+      this.stateManager.updateNodeState(
+        node.id,
+        triggered ? 'triggered' : 'inactive',
+        triggered
+      )
+    }
+    
     return triggered
   }
 
