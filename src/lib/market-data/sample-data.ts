@@ -127,3 +127,7 @@ export const SAMPLE_DATA = {
   GBPUSD: generateRangingData('GBPUSD', 2000, 1.3000, 0.0050, 0.0005),
   USDJPY: generateSampleData('USDJPY', 2000, 110.00, 0.05)
 }
+
+export function getSampleData(symbol: string): OHLCV[] {
+  return SAMPLE_DATA[symbol as keyof typeof SAMPLE_DATA] || SAMPLE_DATA.EURUSD
+}

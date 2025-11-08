@@ -6,6 +6,8 @@ import { calculateMACD, MACDResult } from './macd'
 import { calculateBollingerBands, BollingerBandsResult } from './bollinger-bands'
 import { calculateATR } from './atr'
 import { calculateStochastic, StochasticResult } from './stochastic'
+import { ADX } from './adx'
+import { CCI, WilliamsR, ParabolicSAR, OBV, VWAP } from './advanced'
 
 export type IndicatorOutput = number[] | MACDResult | BollingerBandsResult | StochasticResult
 
@@ -96,6 +98,60 @@ export const INDICATOR_REGISTRY: Record<string, IndicatorDefinition> = {
       params.dPeriod || 3,
       params.smooth || 3
     )
+  },
+
+  adx: {
+    id: 'adx',
+    name: 'Average Directional Index',
+    category: 'trend',
+    description: 'Measures trend strength (0-100). Above 25 indicates strong trend.',
+    outputs: ['value'],
+    calculate: (data, params) => ADX.calculate(data, params) as number[]
+  },
+
+  cci: {
+    id: 'cci',
+    name: 'Commodity Channel Index',
+    category: 'momentum',
+    description: 'Measures deviation from average price. Above +100 is overbought, below -100 is oversold.',
+    outputs: ['value'],
+    calculate: (data, params) => CCI.calculate(data, params) as number[]
+  },
+
+  williamsr: {
+    id: 'williamsr',
+    name: 'Williams %R',
+    category: 'momentum',
+    description: 'Momentum indicator ranging from 0 to -100. Below -80 is oversold, above -20 is overbought.',
+    outputs: ['value'],
+    calculate: (data, params) => WilliamsR.calculate(data, params) as number[]
+  },
+
+  sar: {
+    id: 'sar',
+    name: 'Parabolic SAR',
+    category: 'trend',
+    description: 'Stop and Reverse indicator that provides potential reversal points.',
+    outputs: ['value'],
+    calculate: (data, params) => ParabolicSAR.calculate(data, params) as number[]
+  },
+
+  obv: {
+    id: 'obv',
+    name: 'On-Balance Volume',
+    category: 'volume',
+    description: 'Cumulative volume indicator that shows money flow.',
+    outputs: ['value'],
+    calculate: (data, params) => OBV.calculate(data, params) as number[]
+  },
+
+  vwap: {
+    id: 'vwap',
+    name: 'Volume Weighted Average Price',
+    category: 'volume',
+    description: 'Average price weighted by volume, resets daily.',
+    outputs: ['value'],
+    calculate: (data, params) => VWAP.calculate(data, params) as number[]
   }
 }
 
