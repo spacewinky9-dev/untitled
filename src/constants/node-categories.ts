@@ -1,5 +1,16 @@
 export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced'
 
+export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'all'
+
+export interface PinDefinition {
+  id: string
+  label: string
+  type: 'input' | 'output'
+  dataType: 'number' | 'boolean' | 'signal' | 'any'
+  description?: string
+  optional?: boolean
+}
+
 export interface NodeDefinition {
   id: string
   type: string
@@ -9,6 +20,9 @@ export interface NodeDefinition {
   icon: string
   defaultParameters?: Record<string, any>
   executionOrder?: number
+  eventContext?: EventCategory[]
+  inputs?: PinDefinition[]
+  outputs?: PinDefinition[]
 }
 
 export const NODE_CATEGORIES: Array<{

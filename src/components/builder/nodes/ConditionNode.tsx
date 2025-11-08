@@ -5,55 +5,66 @@ import { cn } from '@/lib/utils'
 
 export interface ConditionNodeData extends Record<string, unknown> {
   label: string
-  operator: string
+  operator?: string
+  inputs?: Array<{ id: string; label: string }>
+  outputs?: Array<{ id: string; label: string }>
 }
 
 export const ConditionNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as ConditionNodeData
   
+  const inputs = nodeData.inputs || [
+    { id: 'input-a', label: 'Input A' },
+    { id: 'input-b', label: 'Input B' }
+  ]
+  
+  const outputs = nodeData.outputs || [{ id: 'result', label: 'Result' }]
+  
   return (
     <div className={cn(
-      "px-4 py-3 rounded-lg border-2 bg-card min-w-[180px] transition-all",
+      "px-3 py-2 rounded-md border-2 bg-card min-w-[130px] transition-all",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
       "border-l-4"
     )}
     style={{ borderLeftColor: 'oklch(0.65 0.18 145)' }}
     >
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-a"
-        style={{ top: '35%' }}
-        className="w-3 h-3 !bg-accent border-2 !border-accent"
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input-b"
-        style={{ top: '65%' }}
-        className="w-3 h-3 !bg-accent border-2 !border-accent"
-      />
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          style={{ top: `${((idx + 1) * 100) / (inputs.length + 1)}%` }}
+          className="w-2.5 h-2.5 !bg-accent border-2 !border-accent"
+        />
+      ))}
       
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1.5 rounded bg-bullish/20">
-          <GitBranch size={16} weight="bold" className="text-bullish" />
+      <div className="flex items-start gap-1.5">
+        <div className="flex-shrink-0 p-1 rounded bg-bullish/20">
+          <GitBranch size={12} weight="bold" className="text-bullish" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm text-foreground truncate">
+          <div className="font-semibold text-xs text-foreground truncate">
             {nodeData.label}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {nodeData.operator}
-          </div>
+          {nodeData.operator && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              {nodeData.operator}
+            </div>
+          )}
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="result"
-        className="w-3 h-3 !bg-bullish border-2 !border-bullish"
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          style={{ top: `${((idx + 1) * 100) / (outputs.length + 1)}%` }}
+          className="w-2.5 h-2.5 !bg-bullish border-2 !border-bullish"
+        />
+      ))}
     </div>
   )
 })

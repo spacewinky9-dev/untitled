@@ -1,53 +1,41 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { CirclesThree, ProhibitInset } from '@phosphor-icons/react'
-import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+
+export interface LogicNodeData extends Record<string, unknown> {
+  label: string
+  operator?: string
+}
 
 export const LogicNode = memo(({ data, selected }: NodeProps) => {
-  const operator = (data.operator as string) || (typeof data.label === 'string' ? data.label.toUpperCase() : 'AND')
+  const nodeData = data as LogicNodeData
+  const operator = nodeData.operator || (typeof nodeData.label === 'string' ? nodeData.label.toUpperCase() : 'AND')
   
   const getIcon = () => {
     if (operator === 'NOT') {
-      return <ProhibitInset size={20} />
+      return <ProhibitInset size={12} />
     }
-    return <CirclesThree size={20} />
+    return <CirclesThree size={12} />
   }
 
   const inputCount = operator === 'NOT' ? 1 : 2
 
   return (
-    <Card className={`
-      min-w-[160px] border-2 transition-all
-      ${selected 
-        ? 'border-primary shadow-lg shadow-primary/20' 
-        : 'border-purple-500 hover:border-purple-400'
-      }
-    `}>
-      <div className="bg-purple-500/20 border-b-2 border-purple-500 px-3 py-2 flex items-center gap-2">
-        <div className="text-purple-400">
-          {getIcon()}
-        </div>
-        <div className="flex-1">
-          <div className="text-xs font-medium text-purple-400">Logic</div>
-          <div className="text-sm font-semibold text-foreground">{String(data.label)}</div>
-        </div>
-      </div>
-      
-      <div className="p-3 space-y-2">
-        <div className="flex items-center justify-center">
-          <div className="text-2xl font-bold text-purple-400">
-            {operator}
-          </div>
-        </div>
-      </div>
-
+    <div className={cn(
+      "px-3 py-2 rounded-md border-2 bg-card min-w-[120px] transition-all",
+      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
+      "border-l-4"
+    )}
+    style={{ borderLeftColor: 'oklch(0.60 0.12 280)' }}
+    >
       {inputCount >= 1 && (
         <Handle
           type="target"
           position={Position.Left}
           id="input-a"
-          style={{ top: '35%', background: '#a855f7' }}
-          className="w-3 h-3 border-2 border-purple-400"
+          style={{ top: '35%' }}
+          className="w-2.5 h-2.5 !bg-primary border-2 !border-primary"
         />
       )}
       
@@ -56,19 +44,32 @@ export const LogicNode = memo(({ data, selected }: NodeProps) => {
           type="target"
           position={Position.Left}
           id="input-b"
-          style={{ top: '65%', background: '#a855f7' }}
-          className="w-3 h-3 border-2 border-purple-400"
+          style={{ top: '65%' }}
+          className="w-2.5 h-2.5 !bg-primary border-2 !border-primary"
         />
       )}
+      
+      <div className="flex items-center gap-1.5">
+        <div className="flex-shrink-0 p-1 rounded bg-primary/20">
+          {getIcon()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-xs text-foreground truncate">
+            {nodeData.label}
+          </div>
+          <div className="text-[10px] text-primary font-bold uppercase mt-0.5">
+            {operator}
+          </div>
+        </div>
+      </div>
       
       <Handle
         type="source"
         position={Position.Right}
         id="result"
-        style={{ background: '#a855f7' }}
-        className="w-3 h-3 border-2 border-purple-400"
+        className="w-2.5 h-2.5 !bg-primary border-2 !border-primary"
       />
-    </Card>
+    </div>
   )
 })
 

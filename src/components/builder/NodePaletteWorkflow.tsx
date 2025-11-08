@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -40,8 +40,10 @@ import {
   type NodeCategory, 
   type NodeDefinition,
   type IndicatorNodeDefinition,
-  type IndicatorSubcategory
+  type IndicatorSubcategory,
+  type EventCategory
 } from '@/constants/node-categories'
+import { CategoryTabs } from './CategoryTabs'
 import { cn } from '@/lib/utils'
 
 const iconMap: Record<string, any> = {
@@ -72,7 +74,8 @@ const INITIAL_SHOW_COUNT = 6
 
 export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set(['indicator']))
+  const [activeEventCategory, setActiveEventCategory] = useState<EventCategory>('all')
+  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set(['event', 'indicator']))
   const [openSubcategories, setOpenSubcategories] = useState<Set<string>>(new Set(['moving_averages']))
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
@@ -113,7 +116,14 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   }
 
   const getFilteredNodes = (category: NodeCategory) => {
-    const nodes = NODE_DEFINITIONS.filter(node => node.category === category)
+    let nodes = NODE_DEFINITIONS.filter(node => node.category === category)
+    
+    if (activeEventCategory !== 'all') {
+      nodes = nodes.filter(node => 
+        !node.eventContext || node.eventContext.includes(activeEventCategory)
+      )
+    }
+    
     if (!searchQuery) return nodes
     return nodes.filter(node => 
       node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -122,13 +132,46 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   }
 
   const getFilteredIndicators = (subcategory: IndicatorSubcategory) => {
-    const indicators = INDICATOR_DEFINITIONS.filter(ind => ind.subcategory === subcategory)
+    let indicators = INDICATOR_DEFINITIONS.filter(ind => ind.subcategory === subcategory)
+    
+    if (activeEventCategory !== 'all') {
+      indicators = indicators.filter(ind => 
+        !ind.eventContext || ind.eventContext.includes(activeEventCategory)
+      )
+    }
+    
     if (!searchQuery) return indicators
     return indicators.filter(ind => 
       ind.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ind.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }
+
+  const nodeCounts = useMemo(() => {
+    const counts: Record<EventCategory, number> = {
+      ontick: 0,
+      oninit: 0,
+      ontimer: 0,
+      all: 0
+    }
+
+    const allNodes = [...NODE_DEFINITIONS, ...INDICATOR_DEFINITIONS]
+    
+    allNodes.forEach(node => {
+      counts.all++
+      if (!node.eventContext || node.eventContext.length === 0) {
+        counts.ontick++
+        counts.oninit++
+        counts.ontimer++
+      } else {
+        node.eventContext.forEach(ctx => {
+          if (ctx !== 'all') counts[ctx]++
+        })
+      }
+    })
+
+    return counts
+  }, [])
 
   const getCategoryConfig = (categoryId: NodeCategory) => {
     return NODE_CATEGORIES.find(cat => cat.id === categoryId)
@@ -140,7 +183,7 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
       <Card
         key={node.id}
         className={cn(
-          "p-3 cursor-pointer hover:bg-accent/50 transition-colors border-l-4 group relative",
+          "p-2.5 cursor-pointer hover:bg-accent/50 transition-colors border-l-4 group relative",
           "hover:shadow-md"
         )}
         style={{ borderLeftColor: categoryColor }}
@@ -153,17 +196,17 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
       >
         <div className="flex items-start gap-2">
           {Icon && (
-            <div className="p-1.5 rounded bg-card-foreground/5 shrink-0">
-              <Icon size={16} weight="duotone" />
+            <div className="p-1 rounded bg-card-foreground/5 shrink-0">
+              <Icon size={14} weight="duotone" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm">{node.label}</div>
-            <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+            <div className="font-medium text-xs">{node.label}</div>
+            <div className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
               {node.description}
             </div>
           </div>
-          <Plus size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          <Plus size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </div>
       </Card>
     )
@@ -195,28 +238,38 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
 
   return (
     <div className="h-full flex flex-col bg-card border-r border-border">
-      <div className="p-4 border-b border-border space-y-3">
+      <CategoryTabs 
+        activeCategory={activeEventCategory}
+        onCategoryChange={setActiveEventCategory}
+        nodeCounts={nodeCounts}
+      />
+      
+      <div className="p-3 border-b border-border space-y-2">
         <div>
-          <h3 className="font-semibold text-sm mb-1">Node Library</h3>
-          <p className="text-xs text-muted-foreground">Drag nodes to canvas or click to add</p>
+          <h3 className="font-semibold text-xs mb-0.5">Node Library</h3>
+          <p className="text-[10px] text-muted-foreground">Drag nodes to canvas or click to add</p>
         </div>
         <div className="relative">
-          <MagnifyingGlass className="absolute left-2.5 top-2.5 text-muted-foreground" size={16} />
+          <MagnifyingGlass className="absolute left-2 top-2 text-muted-foreground" size={14} />
           <Input
             placeholder="Search nodes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 text-sm"
+            className="pl-8 h-8 text-xs"
           />
         </div>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-3 space-y-2">
+        <div className="p-2 space-y-1.5">
           {sortedCategories.map((categoryConfig) => {
             const isOpen = openCategories.has(categoryConfig.id)
             const categoryNodes = getFilteredNodes(categoryConfig.id)
             const indicatorNodes = categoryConfig.id === 'indicator' ? INDICATOR_DEFINITIONS : []
+
+            if (activeEventCategory !== 'all' && categoryNodes.length === 0 && categoryConfig.id !== 'indicator') {
+              return null
+            }
 
             return (
               <Collapsible
@@ -227,13 +280,13 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                 <Card className="overflow-hidden">
                   <CollapsibleTrigger className="w-full">
                     <div 
-                      className="p-3 flex items-center justify-between hover:bg-accent/30 transition-colors border-l-4"
+                      className="p-2.5 flex items-center justify-between hover:bg-accent/30 transition-colors border-l-4"
                       style={{ borderLeftColor: categoryConfig.color }}
                     >
                       <div className="flex items-center gap-2">
                         <Badge 
                           variant="outline" 
-                          className="text-xs font-mono w-6 h-6 flex items-center justify-center p-0"
+                          className="text-[10px] font-mono w-5 h-5 flex items-center justify-center p-0"
                           style={{ 
                             borderColor: categoryConfig.color,
                             color: categoryConfig.color
@@ -242,21 +295,21 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                           {categoryConfig.executionOrder}
                         </Badge>
                         <div className="text-left">
-                          <div className="font-medium text-sm">{categoryConfig.label}</div>
-                          <div className="text-xs text-muted-foreground">{categoryConfig.description}</div>
+                          <div className="font-medium text-xs">{categoryConfig.label}</div>
+                          <div className="text-[10px] text-muted-foreground">{categoryConfig.description}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
                           {categoryConfig.id === 'indicator' ? indicatorNodes.length : categoryNodes.length}
                         </Badge>
-                        {isOpen ? <CaretDown size={16} /> : <CaretRight size={16} />}
+                        {isOpen ? <CaretDown size={14} /> : <CaretRight size={14} />}
                       </div>
                     </div>
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
-                    <div className="p-3 pt-0 space-y-2">
+                    <div className="p-2 pt-0 space-y-1.5">
                       {categoryConfig.id === 'indicator' ? (
                         <>
                           {INDICATOR_SUBCATEGORIES.map((subcat) => {
@@ -275,19 +328,19 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                                   <CollapsibleTrigger className="w-full">
                                     <div className="p-2 flex items-center justify-between hover:bg-accent/20 transition-colors">
                                       <div className="text-left">
-                                        <div className="font-medium text-xs">{subcat.label}</div>
-                                        <div className="text-[10px] text-muted-foreground">{subcat.description}</div>
+                                        <div className="font-medium text-[11px]">{subcat.label}</div>
+                                        <div className="text-[9px] text-muted-foreground">{subcat.description}</div>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                        <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">
                                           {subcatNodes.length}
                                         </Badge>
-                                        {isSubOpen ? <CaretDown size={14} /> : <CaretRight size={14} />}
+                                        {isSubOpen ? <CaretDown size={12} /> : <CaretRight size={12} />}
                                       </div>
                                     </div>
                                   </CollapsibleTrigger>
                                   <CollapsibleContent>
-                                    <div className="p-2 pt-0">
+                                    <div className="p-1.5 pt-0">
                                       {renderNodeList(subcatNodes, `${categoryConfig.id}-${subcat.id}`, categoryConfig.color)}
                                     </div>
                                   </CollapsibleContent>

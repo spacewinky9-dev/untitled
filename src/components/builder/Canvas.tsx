@@ -31,6 +31,7 @@ import { NodePaletteWorkflow } from './NodePaletteWorkflow'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
+import { EACreationGuide } from './EACreationGuide'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { Strategy } from '@/types/strategy'
@@ -284,6 +285,7 @@ export function Canvas() {
           />
           
           <Panel position="top-left" className="flex gap-2">
+            <EACreationGuide />
             <Button 
               size="sm" 
               variant="default"
