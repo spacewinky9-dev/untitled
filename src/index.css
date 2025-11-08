@@ -25,11 +25,38 @@
 }
 
 .react-flow__edge-path {
-  @apply stroke-accent stroke-2;
+  @apply stroke-2;
+  stroke: #10b981;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  @apply stroke-primary;
+  stroke-width: 3px;
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -10;
+  }
 }
 
 .react-flow__handle {
-  @apply bg-accent border-accent;
+  @apply border-2;
+  width: 14px;
+  height: 14px;
+}
+
+.react-flow__handle-top {
+  top: -8px;
+}
+
+.react-flow__handle-bottom {
+  bottom: -8px;
 }
 
 :root {

@@ -891,6 +891,15 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     defaultParameters: {}
   },
   {
+    id: 'pass',
+    type: 'pass',
+    category: 'logic',
+    label: 'Pass',
+    description: 'Empty block that does nothing - use to connect single blocks',
+    icon: 'Circle',
+    defaultParameters: {}
+  },
+  {
     id: 'buy',
     type: 'action',
     category: 'action',

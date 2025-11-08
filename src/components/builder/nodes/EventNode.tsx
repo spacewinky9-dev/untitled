@@ -8,7 +8,7 @@ export interface EventNodeData extends Record<string, unknown> {
   label: string
   eventType: 'on_init' | 'on_tick' | 'on_timer' | 'on_trade' | 'on_chart' | 'on_deinit'
   parameters?: Record<string, any>
-  blockNumber?: number
+  blockNumber?: number | string
   executionOrder?: number
 }
 
@@ -31,22 +31,22 @@ export const EventNode = memo(({ data, selected }: NodeProps) => {
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-lg border-2 bg-card min-w-[140px] transition-all relative",
+      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
       "border-l-4 border-l-purple-500"
     )}>
       {nodeData.blockNumber !== undefined && (
         <Badge 
           variant="secondary" 
-          className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px] font-mono font-bold bg-purple-500 text-white border-2 border-background"
+          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-purple-500 text-white border-2 border-background"
         >
           {nodeData.blockNumber}
         </Badge>
       )}
       
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2 mb-1">
         <div className="flex-shrink-0 p-1 rounded bg-purple-500/20">
-          <Icon size={12} weight="bold" className="text-purple-400" />
+          <Icon size={14} weight="bold" className="text-purple-400" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-xs text-foreground truncate">
@@ -58,12 +58,23 @@ export const EventNode = memo(({ data, selected }: NodeProps) => {
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="w-2.5 h-2.5 !bg-purple-500 border-2 !border-purple-500"
-      />
+      <div className="flex justify-center pt-1">
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="output"
+          className="!w-3.5 !h-3.5 !rounded-full !border-2"
+          style={{ 
+            backgroundColor: '#a855f7',
+            borderColor: '#a855f7',
+            position: 'relative',
+            bottom: 'auto',
+            left: 'auto',
+            transform: 'none',
+            marginTop: 4
+          }}
+        />
+      </div>
     </div>
   )
 })

@@ -1,34 +1,28 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { Function } from '@phosphor-icons/react'
+import { Circle } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-export interface IndicatorNodeData extends Record<string, unknown> {
+export interface PassNodeData extends Record<string, unknown> {
   label: string
-  indicatorType?: string
-  parameters?: Record<string, any>
-  inputs?: Array<{ id: string; label: string }>
-  outputs?: Array<{ id: string; label: string }>
   blockNumber?: number | string
   executionOrder?: number
 }
 
-export const IndicatorNode = memo(({ data, selected }: NodeProps) => {
-  const nodeData = data as IndicatorNodeData
+export const PassNode = memo(({ data, selected }: NodeProps) => {
+  const nodeData = data as PassNodeData
   
   return (
     <div className={cn(
-      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4"
-    )}
-    style={{ borderLeftColor: 'oklch(0.70 0.15 210)' }}
-    >
+      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[120px] transition-all relative shadow-md",
+      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border border-dashed",
+      "border-l-4 border-l-gray-500"
+    )}>
       {nodeData.blockNumber !== undefined && (
         <Badge 
           variant="secondary" 
-          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-accent text-black border-2 border-background"
+          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-gray-500 text-white border-2 border-background"
         >
           {nodeData.blockNumber}
         </Badge>
@@ -47,23 +41,16 @@ export const IndicatorNode = memo(({ data, selected }: NodeProps) => {
       />
       
       <div className="flex items-start gap-1.5 mb-1">
-        <div className="flex-shrink-0 p-1 rounded bg-accent/20">
-          <Function size={14} weight="bold" className="text-accent" />
+        <div className="flex-shrink-0 p-1 rounded bg-muted">
+          <Circle size={14} weight="regular" className="text-muted-foreground" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-xs text-foreground truncate">
             {nodeData.label}
           </div>
-          {nodeData.indicatorType && (
-            <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-              {nodeData.indicatorType}
-            </div>
-          )}
-          {nodeData.parameters?.period && (
-            <div className="text-[10px] text-muted-foreground/80 mt-0.5">
-              Period: {nodeData.parameters.period}
-            </div>
-          )}
+          <div className="text-[10px] text-muted-foreground mt-0.5 truncate italic">
+            Empty block
+          </div>
         </div>
       </div>
       
@@ -88,4 +75,4 @@ export const IndicatorNode = memo(({ data, selected }: NodeProps) => {
   )
 })
 
-IndicatorNode.displayName = 'IndicatorNode'
+PassNode.displayName = 'PassNode'

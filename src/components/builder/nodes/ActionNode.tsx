@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { TrendUp, TrendDown, X } from '@phosphor-icons/react'
+import { TrendUp, TrendDown, X, Warning } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -8,7 +8,8 @@ export interface ActionNodeData extends Record<string, unknown> {
   label: string
   action: 'buy' | 'sell' | 'close' | 'alert'
   inputs?: Array<{ id: string; label: string }>
-  blockNumber?: number
+  outputs?: Array<{ id: string; label: string; type: 'normal' | 'inverted' | 'error' }>
+  blockNumber?: number | string
   executionOrder?: number
 }
 
@@ -18,16 +19,29 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
   const isSell = nodeData.action === 'sell'
   const isClose = nodeData.action === 'close'
   
-  const inputs = nodeData.inputs || [
-    { id: 'trigger', label: 'Trigger' },
-    { id: 'lots', label: 'Lots' },
-    { id: 'sl', label: 'SL' },
-    { id: 'tp', label: 'TP' }
+  const inputs = nodeData.inputs || [{ id: 'input', label: 'Input' }]
+  
+  const outputs = nodeData.outputs || [
+    { id: 'success', label: 'Success', type: 'normal' as const },
+    { id: 'error', label: 'Error', type: 'error' as const }
   ]
+  
+  const getHandleColor = (type: 'normal' | 'inverted' | 'error') => {
+    switch (type) {
+      case 'normal':
+        return '#10b981'
+      case 'inverted':
+        return '#f59e0b'
+      case 'error':
+        return '#ef4444'
+      default:
+        return '#10b981'
+    }
+  }
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-md border-2 bg-card min-w-[140px] transition-all relative",
+      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
       "border-l-4"
     )}
@@ -38,7 +52,7 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
       {nodeData.blockNumber !== undefined && (
         <Badge 
           variant="secondary" 
-          className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px] font-mono font-bold border-2 border-background"
+          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold border-2 border-background"
           style={{ 
             backgroundColor: isBuy ? 'oklch(0.65 0.18 145)' : isSell ? 'oklch(0.55 0.20 25)' : 'oklch(0.60 0.20 40)',
             color: 'white'
@@ -48,30 +62,31 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
         </Badge>
       )}
       
-      {inputs.map((input, idx) => (
-        <Handle
-          key={input.id}
-          type="target"
-          position={Position.Left}
-          id={input.id}
-          className="w-2.5 h-2.5 !bg-accent border-2 !border-accent"
-          style={{ top: `${((idx + 1) * 100) / (inputs.length + 1)}%` }}
-        />
-      ))}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="input"
+        className="!w-4 !h-4 !bg-white !border-2 !border-gray-400 !rounded-full"
+        style={{ 
+          top: -8,
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      />
       
-      <div className="flex items-start gap-1.5">
+      <div className="flex items-start gap-1.5 mb-1">
         <div className={cn(
           "flex-shrink-0 p-1 rounded",
           isBuy ? "bg-bullish/20" : isSell ? "bg-bearish/20" : "bg-muted"
         )}>
           {isBuy ? (
-            <TrendUp size={12} weight="bold" className="text-bullish" />
+            <TrendUp size={14} weight="bold" className="text-bullish" />
           ) : isSell ? (
-            <TrendDown size={12} weight="bold" className="text-bearish" />
+            <TrendDown size={14} weight="bold" className="text-bearish" />
           ) : isClose ? (
-            <X size={12} weight="bold" className="text-muted-foreground" />
+            <X size={14} weight="bold" className="text-muted-foreground" />
           ) : (
-            <TrendUp size={12} weight="bold" className="text-muted-foreground" />
+            <TrendUp size={14} weight="bold" className="text-muted-foreground" />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -85,6 +100,28 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
             {nodeData.action}
           </div>
         </div>
+      </div>
+      
+      <div className="flex gap-2 justify-center pt-1">
+        {outputs.map((output, idx) => (
+          <div key={output.id} className="relative flex flex-col items-center">
+            <Handle
+              type="source"
+              position={Position.Bottom}
+              id={output.id}
+              className="!w-3.5 !h-3.5 !rounded-full !border-2"
+              style={{ 
+                backgroundColor: getHandleColor(output.type),
+                borderColor: getHandleColor(output.type),
+                position: 'relative',
+                bottom: 'auto',
+                left: 'auto',
+                transform: 'none',
+                marginTop: 4
+              }}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )

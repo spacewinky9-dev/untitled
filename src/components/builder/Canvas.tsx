@@ -24,6 +24,7 @@ import { ActionNode } from './nodes/ActionNode'
 import { LogicNode } from './nodes/LogicNode'
 import { RiskNode } from './nodes/RiskNode'
 import { EventNode } from './nodes/EventNode'
+import { PassNode } from './nodes/PassNode'
 import { MTFNode } from './nodes/MTFNode'
 import { PatternNode } from './nodes/PatternNode'
 import { VariableNode } from './nodes/VariableNode'
@@ -59,6 +60,7 @@ export function Canvas() {
     logic: LogicNode,
     risk: RiskNode,
     event: EventNode,
+    pass: PassNode,
     mtf: MTFNode,
     pattern: PatternNode,
     variable: VariableNode,
