@@ -900,6 +900,377 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
       pips: 15,
       step: 5
     }
+  },
+  {
+    id: 'money_management',
+    type: 'risk',
+    category: 'risk',
+    label: 'Money Management',
+    description: 'Advanced position sizing (Martingale, Anti-Martingale, Recovery, etc.)',
+    icon: 'CurrencyDollar',
+    defaultParameters: {
+      method: 'risk_percent',
+      riskPercent: 1,
+      maxLotSize: 10,
+      minLotSize: 0.01
+    }
+  },
+  {
+    id: 'buy_limit',
+    type: 'action',
+    category: 'action',
+    label: 'Buy Limit',
+    description: 'Place buy limit pending order',
+    icon: 'ArrowDown',
+    defaultParameters: {
+      lots: 0.01,
+      pips: 20
+    }
+  },
+  {
+    id: 'sell_limit',
+    type: 'action',
+    category: 'action',
+    label: 'Sell Limit',
+    description: 'Place sell limit pending order',
+    icon: 'ArrowUp',
+    defaultParameters: {
+      lots: 0.01,
+      pips: 20
+    }
+  },
+  {
+    id: 'buy_stop',
+    type: 'action',
+    category: 'action',
+    label: 'Buy Stop',
+    description: 'Place buy stop pending order',
+    icon: 'ArrowUp',
+    defaultParameters: {
+      lots: 0.01,
+      pips: 20
+    }
+  },
+  {
+    id: 'sell_stop',
+    type: 'action',
+    category: 'action',
+    label: 'Sell Stop',
+    description: 'Place sell stop pending order',
+    icon: 'ArrowDown',
+    defaultParameters: {
+      lots: 0.01,
+      pips: 20
+    }
+  },
+  {
+    id: 'modify_pending',
+    type: 'action',
+    category: 'action',
+    label: 'Modify Pending',
+    description: 'Modify pending order parameters',
+    icon: 'PencilSimple',
+    defaultParameters: {}
+  },
+  {
+    id: 'delete_pending',
+    type: 'action',
+    category: 'action',
+    label: 'Delete Pending',
+    description: 'Delete pending order',
+    icon: 'Trash',
+    defaultParameters: {}
+  },
+  {
+    id: 'for_each_trade',
+    type: 'logic',
+    category: 'logic',
+    label: 'For Each Trade',
+    description: 'Loop through all open trades',
+    icon: 'ArrowsClockwise',
+    defaultParameters: {
+      filterByGroup: false,
+      groupName: ''
+    }
+  },
+  {
+    id: 'for_each_pending',
+    type: 'logic',
+    category: 'logic',
+    label: 'For Each Pending',
+    description: 'Loop through all pending orders',
+    icon: 'ListDashes',
+    defaultParameters: {}
+  },
+  {
+    id: 'for_each_symbol',
+    type: 'logic',
+    category: 'logic',
+    label: 'For Each Symbol',
+    description: 'Loop through multiple currency pairs',
+    icon: 'Stack',
+    defaultParameters: {
+      symbols: ['EURUSD', 'GBPUSD']
+    }
+  },
+  {
+    id: 'repeat_n',
+    type: 'logic',
+    category: 'logic',
+    label: 'Repeat N Times',
+    description: 'Repeat logic N times',
+    icon: 'Repeat',
+    defaultParameters: {
+      count: 3
+    }
+  },
+  {
+    id: 'math_add',
+    type: 'variable',
+    category: 'variable',
+    label: 'Add',
+    description: 'Add two or more numbers',
+    icon: 'Plus',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_subtract',
+    type: 'variable',
+    category: 'variable',
+    label: 'Subtract',
+    description: 'Subtract numbers',
+    icon: 'Minus',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_multiply',
+    type: 'variable',
+    category: 'variable',
+    label: 'Multiply',
+    description: 'Multiply numbers',
+    icon: 'X',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_divide',
+    type: 'variable',
+    category: 'variable',
+    label: 'Divide',
+    description: 'Divide numbers',
+    icon: 'Divide',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_modulus',
+    type: 'variable',
+    category: 'variable',
+    label: 'Modulus',
+    description: 'Remainder after division',
+    icon: 'Percent',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_power',
+    type: 'variable',
+    category: 'variable',
+    label: 'Power',
+    description: 'Raise to power',
+    icon: 'MathOperations',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_sqrt',
+    type: 'variable',
+    category: 'variable',
+    label: 'Square Root',
+    description: 'Calculate square root',
+    icon: 'MathOperations',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_abs',
+    type: 'variable',
+    category: 'variable',
+    label: 'Absolute Value',
+    description: 'Get absolute value',
+    icon: 'MathOperations',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_min',
+    type: 'variable',
+    category: 'variable',
+    label: 'Minimum',
+    description: 'Find minimum value',
+    icon: 'CaretDown',
+    defaultParameters: {}
+  },
+  {
+    id: 'math_max',
+    type: 'variable',
+    category: 'variable',
+    label: 'Maximum',
+    description: 'Find maximum value',
+    icon: 'CaretUp',
+    defaultParameters: {}
+  },
+  {
+    id: 'account_balance',
+    type: 'variable',
+    category: 'variable',
+    label: 'Account Balance',
+    description: 'Get current account balance',
+    icon: 'CurrencyDollar',
+    defaultParameters: {}
+  },
+  {
+    id: 'account_equity',
+    type: 'variable',
+    category: 'variable',
+    label: 'Account Equity',
+    description: 'Get current account equity',
+    icon: 'Wallet',
+    defaultParameters: {}
+  },
+  {
+    id: 'account_margin',
+    type: 'variable',
+    category: 'variable',
+    label: 'Free Margin',
+    description: 'Get available margin',
+    icon: 'ChartLineUp',
+    defaultParameters: {}
+  },
+  {
+    id: 'account_profit',
+    type: 'variable',
+    category: 'variable',
+    label: 'Account Profit',
+    description: 'Get total floating profit/loss',
+    icon: 'TrendUp',
+    defaultParameters: {}
+  },
+  {
+    id: 'symbol_bid',
+    type: 'variable',
+    category: 'variable',
+    label: 'Symbol Bid',
+    description: 'Get current bid price',
+    icon: 'ChartLine',
+    defaultParameters: {
+      symbol: 'EURUSD'
+    }
+  },
+  {
+    id: 'symbol_ask',
+    type: 'variable',
+    category: 'variable',
+    label: 'Symbol Ask',
+    description: 'Get current ask price',
+    icon: 'ChartLine',
+    defaultParameters: {
+      symbol: 'EURUSD'
+    }
+  },
+  {
+    id: 'symbol_spread',
+    type: 'variable',
+    category: 'variable',
+    label: 'Symbol Spread',
+    description: 'Get current spread in pips',
+    icon: 'ArrowsOutLineHorizontal',
+    defaultParameters: {
+      symbol: 'EURUSD'
+    }
+  },
+  {
+    id: 'trades_count',
+    type: 'condition',
+    category: 'condition',
+    label: 'Trades Count',
+    description: 'Check number of open trades',
+    icon: 'Hash',
+    defaultParameters: {
+      operator: 'lt',
+      value: 5
+    }
+  },
+  {
+    id: 'trade_exists',
+    type: 'condition',
+    category: 'condition',
+    label: 'Trade Exists',
+    description: 'Check if trade exists',
+    icon: 'Check',
+    defaultParameters: {
+      groupName: ''
+    }
+  },
+  {
+    id: 'pending_exists',
+    type: 'condition',
+    category: 'condition',
+    label: 'Pending Exists',
+    description: 'Check if pending order exists',
+    icon: 'Clock',
+    defaultParameters: {}
+  },
+  {
+    id: 'time_filter',
+    type: 'condition',
+    category: 'condition',
+    label: 'Time Filter',
+    description: 'Filter by time of day and day of week',
+    icon: 'Clock',
+    defaultParameters: {
+      startHour: 0,
+      endHour: 23,
+      allowedDays: [1, 2, 3, 4, 5]
+    }
+  },
+  {
+    id: 'spread_filter',
+    type: 'condition',
+    category: 'condition',
+    label: 'Spread Filter',
+    description: 'Check if spread is acceptable',
+    icon: 'ArrowsOutLineHorizontal',
+    defaultParameters: {
+      maxSpreadPips: 2.0
+    }
+  },
+  {
+    id: 'print',
+    type: 'action',
+    category: 'action',
+    label: 'Print',
+    description: 'Print message to console/log',
+    icon: 'Terminal',
+    defaultParameters: {
+      message: 'Debug message'
+    }
+  },
+  {
+    id: 'comment',
+    type: 'action',
+    category: 'action',
+    label: 'Comment',
+    description: 'Display text on chart',
+    icon: 'ChatText',
+    defaultParameters: {
+      text: 'Chart comment'
+    }
+  },
+  {
+    id: 'custom_code',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Custom Code',
+    description: 'Execute custom MQL4/MQL5 code',
+    icon: 'Code',
+    defaultParameters: {
+      code: '// Custom logic here'
+    }
   }
 ]
 

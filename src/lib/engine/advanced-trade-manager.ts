@@ -356,6 +356,18 @@ export class AdvancedTradeManager {
     this.partialCloses.clear()
     this.highWaterMarks.clear()
   }
+  
+  getPositionsByGroup(groupName: string): TradePosition[] {
+    return this.getGroupPositions(groupName)
+  }
+  
+  getPositionsBySymbol(symbol: string): TradePosition[] {
+    return this.getAllPositions().filter(p => p.symbol === symbol)
+  }
+  
+  getPositionsByType(type: 'buy' | 'sell'): TradePosition[] {
+    return this.getAllPositions().filter(p => p.type === type)
+  }
 }
 
 export const advancedTradeManager = new AdvancedTradeManager()
