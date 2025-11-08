@@ -1,4 +1,4 @@
-export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk'
+export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced'
 
 export interface NodeDefinition {
   id: string
@@ -20,6 +20,14 @@ export const NODE_CATEGORIES: Array<{
   borderColor: string
 }> = [
   {
+    id: 'event',
+    label: 'Events',
+    description: 'Strategy lifecycle events (OnInit, OnTick, OnTimer, etc.)',
+    executionOrder: 0,
+    color: 'oklch(0.80 0.10 320)',
+    borderColor: 'border-purple-500'
+  },
+  {
     id: 'indicator',
     label: 'Indicators',
     description: 'Technical analysis indicators',
@@ -28,10 +36,26 @@ export const NODE_CATEGORIES: Array<{
     borderColor: 'border-accent'
   },
   {
+    id: 'mtf',
+    label: 'Multi-Timeframe',
+    description: 'Multi-timeframe analysis nodes',
+    executionOrder: 2,
+    color: 'oklch(0.65 0.12 180)',
+    borderColor: 'border-cyan-500'
+  },
+  {
+    id: 'pattern',
+    label: 'Patterns',
+    description: 'Chart patterns and formations',
+    executionOrder: 3,
+    color: 'oklch(0.70 0.18 90)',
+    borderColor: 'border-green-500'
+  },
+  {
     id: 'condition',
     label: 'Conditions',
     description: 'Comparison and condition checks',
-    executionOrder: 2,
+    executionOrder: 4,
     color: 'oklch(0.65 0.18 145)',
     borderColor: 'border-bullish'
   },
@@ -39,23 +63,39 @@ export const NODE_CATEGORIES: Array<{
     id: 'logic',
     label: 'Logic',
     description: 'Boolean logic operations',
-    executionOrder: 3,
+    executionOrder: 5,
     color: 'oklch(0.60 0.12 280)',
     borderColor: 'border-primary'
+  },
+  {
+    id: 'variable',
+    label: 'Variables',
+    description: 'Variables and data storage',
+    executionOrder: 6,
+    color: 'oklch(0.68 0.10 40)',
+    borderColor: 'border-orange-500'
   },
   {
     id: 'risk',
     label: 'Risk Management',
     description: 'Position sizing and risk controls',
-    executionOrder: 4,
+    executionOrder: 7,
     color: 'oklch(0.75 0.15 60)',
     borderColor: 'border-yellow-500'
+  },
+  {
+    id: 'advanced',
+    label: 'Advanced Trade',
+    description: 'Advanced trade management (trailing, break-even, partial close)',
+    executionOrder: 8,
+    color: 'oklch(0.60 0.15 300)',
+    borderColor: 'border-pink-500'
   },
   {
     id: 'action',
     label: 'Actions',
     description: 'Trade execution actions',
-    executionOrder: 5,
+    executionOrder: 9,
     color: 'oklch(0.55 0.20 25)',
     borderColor: 'border-bearish'
   }
@@ -407,6 +447,279 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
 
 export const NODE_DEFINITIONS: NodeDefinition[] = [
   ...INDICATOR_DEFINITIONS,
+  {
+    id: 'on_init',
+    type: 'event',
+    category: 'event',
+    label: 'OnInit',
+    description: 'Strategy initialization event - runs once at start',
+    icon: 'Play',
+    defaultParameters: {}
+  },
+  {
+    id: 'on_tick',
+    type: 'event',
+    category: 'event',
+    label: 'OnTick',
+    description: 'Tick event - runs on every price update',
+    icon: 'Activity',
+    defaultParameters: {}
+  },
+  {
+    id: 'on_timer',
+    type: 'event',
+    category: 'event',
+    label: 'OnTimer',
+    description: 'Timer event - runs at specified intervals',
+    icon: 'Clock',
+    defaultParameters: {
+      intervalSeconds: 60
+    }
+  },
+  {
+    id: 'on_trade',
+    type: 'event',
+    category: 'event',
+    label: 'OnTrade',
+    description: 'Trade event - runs when trade is opened/closed',
+    icon: 'CurrencyCircleDollar',
+    defaultParameters: {}
+  },
+  {
+    id: 'on_deinit',
+    type: 'event',
+    category: 'event',
+    label: 'OnDeinit',
+    description: 'Deinitialization event - runs once at shutdown',
+    icon: 'Stop',
+    defaultParameters: {}
+  },
+  {
+    id: 'mtf_indicator',
+    type: 'mtf',
+    category: 'mtf',
+    label: 'MTF Indicator',
+    description: 'Multi-timeframe indicator value',
+    icon: 'ChartLine',
+    defaultParameters: {
+      timeframe: 'H1',
+      indicator: 'sma',
+      period: 20
+    }
+  },
+  {
+    id: 'mtf_condition',
+    type: 'mtf',
+    category: 'mtf',
+    label: 'MTF Condition',
+    description: 'Multi-timeframe condition check',
+    icon: 'Equalizer',
+    defaultParameters: {
+      timeframe: 'H1',
+      condition: 'trend_up'
+    }
+  },
+  {
+    id: 'higher_timeframe_trend',
+    type: 'mtf',
+    category: 'mtf',
+    label: 'HTF Trend',
+    description: 'Higher timeframe trend direction',
+    icon: 'TrendUp',
+    defaultParameters: {
+      timeframe: 'H4'
+    }
+  },
+  {
+    id: 'candlestick_pattern',
+    type: 'pattern',
+    category: 'pattern',
+    label: 'Candlestick Pattern',
+    description: 'Detect candlestick patterns (engulfing, doji, hammer, etc.)',
+    icon: 'Barcode',
+    defaultParameters: {
+      pattern: 'bullish_engulfing'
+    }
+  },
+  {
+    id: 'chart_pattern',
+    type: 'pattern',
+    category: 'pattern',
+    label: 'Chart Pattern',
+    description: 'Detect chart patterns (head & shoulders, triangles, etc.)',
+    icon: 'ChartLine',
+    defaultParameters: {
+      pattern: 'double_bottom'
+    }
+  },
+  {
+    id: 'support_resistance',
+    type: 'pattern',
+    category: 'pattern',
+    label: 'Support/Resistance',
+    description: 'Detect support and resistance levels',
+    icon: 'LineSegment',
+    defaultParameters: {
+      lookback: 20,
+      threshold: 0.001
+    }
+  },
+  {
+    id: 'divergence',
+    type: 'pattern',
+    category: 'pattern',
+    label: 'Divergence',
+    description: 'Detect price/indicator divergence',
+    icon: 'ArrowsOutCardinal',
+    defaultParameters: {
+      indicator: 'rsi',
+      type: 'bullish'
+    }
+  },
+  {
+    id: 'set_variable',
+    type: 'variable',
+    category: 'variable',
+    label: 'Set Variable',
+    description: 'Store value in a variable',
+    icon: 'Database',
+    defaultParameters: {
+      variableName: 'myVar',
+      value: 0
+    }
+  },
+  {
+    id: 'get_variable',
+    type: 'variable',
+    category: 'variable',
+    label: 'Get Variable',
+    description: 'Retrieve value from a variable',
+    icon: 'FileSearch',
+    defaultParameters: {
+      variableName: 'myVar'
+    }
+  },
+  {
+    id: 'counter',
+    type: 'variable',
+    category: 'variable',
+    label: 'Counter',
+    description: 'Increment/decrement counter variable',
+    icon: 'NumberCircleOne',
+    defaultParameters: {
+      counterName: 'count',
+      operation: 'increment'
+    }
+  },
+  {
+    id: 'array',
+    type: 'variable',
+    category: 'variable',
+    label: 'Array',
+    description: 'Array operations (push, pop, get)',
+    icon: 'Stack',
+    defaultParameters: {
+      arrayName: 'data',
+      operation: 'push'
+    }
+  },
+  {
+    id: 'break_even',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Break Even',
+    description: 'Move stop loss to break even after profit target',
+    icon: 'Equals',
+    defaultParameters: {
+      profitPips: 20,
+      lockPips: 0
+    }
+  },
+  {
+    id: 'partial_close',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Partial Close',
+    description: 'Close partial position at profit levels',
+    icon: 'ChartLineUp',
+    defaultParameters: {
+      profitPips: 30,
+      closePercent: 50
+    }
+  },
+  {
+    id: 'trailing_stop',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Trailing Stop',
+    description: 'Advanced trailing stop with activation level',
+    icon: 'ShieldCheck',
+    defaultParameters: {
+      activationPips: 20,
+      trailingPips: 15,
+      stepPips: 5
+    }
+  },
+  {
+    id: 'trade_group',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Trade Group',
+    description: 'Group trades for collective management',
+    icon: 'Stack',
+    defaultParameters: {
+      groupName: 'group1',
+      maxTrades: 3
+    }
+  },
+  {
+    id: 'scale_in',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Scale In',
+    description: 'Add to position at specific levels',
+    icon: 'ArrowsIn',
+    defaultParameters: {
+      addPips: 10,
+      maxPositions: 3,
+      multiplier: 1.0
+    }
+  },
+  {
+    id: 'scale_out',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Scale Out',
+    description: 'Exit position in multiple stages',
+    icon: 'ArrowsOut',
+    defaultParameters: {
+      exitLevels: [20, 40, 60],
+      portions: [33, 33, 34]
+    }
+  },
+  {
+    id: 'hedging',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Hedging',
+    description: 'Open hedge position to protect profits',
+    icon: 'ShieldChevron',
+    defaultParameters: {
+      triggerPips: 30,
+      hedgeRatio: 1.0
+    }
+  },
+  {
+    id: 'time_stop',
+    type: 'advanced',
+    category: 'advanced',
+    label: 'Time Stop',
+    description: 'Close trade after specified time',
+    icon: 'HourglassLow',
+    defaultParameters: {
+      durationMinutes: 60
+    }
+  },
   {
     id: 'comparison',
     type: 'condition',

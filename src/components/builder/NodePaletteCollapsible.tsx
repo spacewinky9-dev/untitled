@@ -118,11 +118,16 @@ export function NodePaletteCollapsible({ onNodeAdd }: NodePaletteCollapsibleProp
   }
 
   const categoryColors: Record<NodeCategory, string> = {
+    event: 'border-l-purple-500',
     indicator: 'border-l-accent',
+    mtf: 'border-l-cyan-500',
+    pattern: 'border-l-green-500',
     condition: 'border-l-blue-500',
-    logic: 'border-l-purple-500',
-    action: 'border-l-bullish',
-    risk: 'border-l-yellow-500'
+    logic: 'border-l-primary',
+    variable: 'border-l-orange-500',
+    risk: 'border-l-yellow-500',
+    advanced: 'border-l-pink-500',
+    action: 'border-l-bullish'
   }
 
   return (

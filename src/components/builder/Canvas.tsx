@@ -22,6 +22,11 @@ import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
 import { LogicNode } from './nodes/LogicNode'
 import { RiskNode } from './nodes/RiskNode'
+import { EventNode } from './nodes/EventNode'
+import { MTFNode } from './nodes/MTFNode'
+import { PatternNode } from './nodes/PatternNode'
+import { VariableNode } from './nodes/VariableNode'
+import { AdvancedNode } from './nodes/AdvancedNode'
 import { NodePaletteWorkflow } from './NodePaletteWorkflow'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
@@ -40,7 +45,12 @@ export function Canvas() {
     condition: ConditionNode,
     action: ActionNode,
     logic: LogicNode,
-    risk: RiskNode
+    risk: RiskNode,
+    event: EventNode,
+    mtf: MTFNode,
+    pattern: PatternNode,
+    variable: VariableNode,
+    advanced: AdvancedNode
   }), [])
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null)

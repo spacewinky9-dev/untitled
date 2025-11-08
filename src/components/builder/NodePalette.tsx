@@ -89,11 +89,16 @@ export function NodePalette({ onNodeAdd }: NodePaletteProps) {
 
   const getWorkflowOrder = (category: NodeCategory): number => {
     const order: Record<NodeCategory, number> = {
+      event: 0,
       indicator: 1,
-      condition: 2,
-      logic: 3,
-      risk: 4,
-      action: 5
+      mtf: 2,
+      pattern: 3,
+      condition: 4,
+      logic: 5,
+      variable: 6,
+      risk: 7,
+      advanced: 8,
+      action: 9
     }
     return order[category]
   }
@@ -206,11 +211,16 @@ function CategorySection({
   onNodeAdd
 }: CategorySectionProps) {
   const categoryColors: Record<NodeCategory, string> = {
+    event: 'border-purple-500 bg-purple-500/10',
     indicator: 'border-accent bg-accent/10',
+    mtf: 'border-cyan-500 bg-cyan-500/10',
+    pattern: 'border-green-500 bg-green-500/10',
     condition: 'border-blue-500 bg-blue-500/10',
-    logic: 'border-purple-500 bg-purple-500/10',
-    action: 'border-bullish bg-bullish/10',
-    risk: 'border-yellow-500 bg-yellow-500/10'
+    logic: 'border-primary bg-primary/10',
+    variable: 'border-orange-500 bg-orange-500/10',
+    risk: 'border-yellow-500 bg-yellow-500/10',
+    advanced: 'border-pink-500 bg-pink-500/10',
+    action: 'border-bullish bg-bullish/10'
   }
 
   const workflowBadgeColors: Record<number, string> = {
@@ -275,11 +285,16 @@ function NodeCard({ node, onDragStart, onClick }: NodeCardProps) {
   const Icon = iconMap[node.icon] || ChartLine
 
   const categoryColors: Record<NodeCategory, string> = {
+    event: 'bg-purple-500/20 border-purple-500 text-purple-400',
     indicator: 'bg-accent/20 border-accent text-accent',
+    mtf: 'bg-cyan-500/20 border-cyan-500 text-cyan-400',
+    pattern: 'bg-green-500/20 border-green-500 text-green-400',
     condition: 'bg-blue-500/20 border-blue-500 text-blue-400',
-    logic: 'bg-purple-500/20 border-purple-500 text-purple-400',
-    action: 'bg-bullish/20 border-bullish text-bullish',
-    risk: 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+    logic: 'bg-primary/20 border-primary text-primary',
+    variable: 'bg-orange-500/20 border-orange-500 text-orange-400',
+    risk: 'bg-yellow-500/20 border-yellow-500 text-yellow-400',
+    advanced: 'bg-pink-500/20 border-pink-500 text-pink-400',
+    action: 'bg-bullish/20 border-bullish text-bullish'
   }
 
   return (

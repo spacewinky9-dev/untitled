@@ -3,6 +3,11 @@ import { OHLCV } from '@/types/market-data'
 import { getIndicator, IndicatorOutput } from '@/lib/indicators'
 import { ConditionEvaluator, ConditionContext, PatternMatcher, CandlestickPattern } from './condition-evaluator'
 import { ExecutionVisualizer, NodeStateManager } from './execution-visualizer'
+import { PatternDetector } from './pattern-detector'
+import { MultiTimeframeAnalyzer, Timeframe } from './mtf-analyzer'
+import { AdvancedTradeManager } from './advanced-trade-manager'
+import { EventSystem } from './event-system'
+import { VariableStorage } from './variable-storage'
 
 export interface ExecutionContext {
   bar: OHLCV
@@ -10,6 +15,8 @@ export interface ExecutionContext {
   balance: number
   openPositions: Trade[]
   allBars: OHLCV[]
+  variables: VariableStorage
+  currentEvent?: string
 }
 
 export interface Trade {
@@ -49,6 +56,11 @@ export class StrategyExecutor {
   private visualizer: ExecutionVisualizer
   private stateManager: NodeStateManager
   private enableVisualization: boolean
+  private patternDetector: PatternDetector
+  private mtfAnalyzer: MultiTimeframeAnalyzer
+  private tradeManager: AdvancedTradeManager
+  private eventSystem: EventSystem
+  private variables: VariableStorage
 
   constructor(private strategy: Strategy, enableVisualization: boolean = false) {
     this.nodes = new Map(strategy.nodes.map(n => [n.id, n]))
@@ -58,6 +70,11 @@ export class StrategyExecutor {
     this.visualizer = new ExecutionVisualizer()
     this.stateManager = new NodeStateManager(this.visualizer)
     this.enableVisualization = enableVisualization
+    this.patternDetector = new PatternDetector()
+    this.mtfAnalyzer = new MultiTimeframeAnalyzer()
+    this.tradeManager = new AdvancedTradeManager()
+    this.eventSystem = new EventSystem()
+    this.variables = new VariableStorage()
   }
 
   getVisualizer(): ExecutionVisualizer {
@@ -82,7 +99,14 @@ export class StrategyExecutor {
 
     for (let i = 0; i < data.length; i++) {
       const bar = data[i]
-      const context: ExecutionContext = { bar, index: i, balance, openPositions, allBars: data }
+      const context: ExecutionContext = { 
+        bar, 
+        index: i, 
+        balance, 
+        openPositions, 
+        allBars: data,
+        variables: this.variables
+      }
 
       if (this.enableVisualization) {
         this.visualizer.startBar(i, bar.time)
