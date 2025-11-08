@@ -8,9 +8,13 @@ import { calculateBollingerBands, BollingerBandsResult } from './bollinger-bands
 import { calculateATR } from './atr'
 import { calculateStochastic, StochasticResult } from './stochastic'
 import { ADX } from './adx'
-import { CCI, WilliamsR, ParabolicSAR, OBV, VWAP } from './advanced'
+import { CCI, WilliamsR, ParabolicSAR as ParabolicSARAdvanced, OBV, VWAP } from './advanced'
+import { calculateCCI } from './cci'
+import { calculateParabolicSAR } from './parabolic-sar'
+import { calculateIchimoku, IchimokuOutput } from './ichimoku'
+import { calculatePivotPoints, PivotPoints, PivotType } from './pivot-points'
 
-export type IndicatorOutput = number[] | MACDResult | BollingerBandsResult | StochasticResult
+export type IndicatorOutput = number[] | MACDResult | BollingerBandsResult | StochasticResult | IchimokuOutput | PivotPoints[]
 
 export interface IndicatorDefinition {
   id: string
@@ -125,7 +129,7 @@ export const INDICATOR_REGISTRY: Record<string, IndicatorDefinition> = {
     category: 'momentum',
     description: 'Measures deviation from average price. Above +100 is overbought, below -100 is oversold.',
     outputs: ['value'],
-    calculate: (data, params) => CCI.calculate(data, params) as number[]
+    calculate: (data, params) => calculateCCI(data, params.period || 20)
   },
 
   williamsr: {
@@ -143,7 +147,7 @@ export const INDICATOR_REGISTRY: Record<string, IndicatorDefinition> = {
     category: 'trend',
     description: 'Stop and Reverse indicator that provides potential reversal points.',
     outputs: ['value'],
-    calculate: (data, params) => ParabolicSAR.calculate(data, params) as number[]
+    calculate: (data, params) => calculateParabolicSAR(data, params.acceleration || 0.02, params.maximum || 0.2)
   },
 
   obv: {
@@ -162,6 +166,29 @@ export const INDICATOR_REGISTRY: Record<string, IndicatorDefinition> = {
     description: 'Average price weighted by volume, resets daily.',
     outputs: ['value'],
     calculate: (data, params) => VWAP.calculate(data, params) as number[]
+  },
+
+  ichimoku: {
+    id: 'ichimoku',
+    name: 'Ichimoku Cloud',
+    category: 'trend',
+    description: 'Comprehensive trend system with multiple lines and cloud.',
+    outputs: ['tenkan', 'kijun', 'senkouA', 'senkouB', 'chikou'],
+    calculate: (data, params) => calculateIchimoku(
+      data,
+      params.tenkanPeriod || 9,
+      params.kijunPeriod || 26,
+      params.senkouPeriod || 52
+    )
+  },
+
+  pivot_points: {
+    id: 'pivot_points',
+    name: 'Pivot Points',
+    category: 'trend',
+    description: 'Support and resistance levels calculated from previous period.',
+    outputs: ['pivot', 'r1', 'r2', 'r3', 's1', 's2', 's3'],
+    calculate: (data, params) => calculatePivotPoints(data, (params.type || 'classic') as PivotType)
   }
 }
 
