@@ -617,9 +617,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
           >
             <Background 
               variant={BackgroundVariant.Dots}
-              gap={16}
+              gap={20}
               size={1}
-              color="oklch(0.30 0.02 250)"
+              color="oklch(0.35 0.015 260)"
             />
             
             <Controls 
@@ -629,8 +629,8 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
             
             <MiniMap 
               className="bg-card border border-border"
-              nodeColor={() => 'oklch(0.35 0.12 250)'}
-              maskColor="oklch(0.15 0.01 250 / 0.8)"
+              nodeColor={() => 'oklch(0.55 0.18 50)'}
+              maskColor="oklch(0.25 0.01 260 / 0.85)"
             />
             
             <Panel position="top-left" className="flex gap-2">

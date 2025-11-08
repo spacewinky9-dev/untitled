@@ -31,49 +31,48 @@ export const EventNode = memo(({ data, selected }: NodeProps) => {
   
   return (
     <div className={cn(
-      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-purple-500"
+      "px-4 py-3 rounded-xl border-2 bg-[oklch(0.35_0.015_260)] min-w-[160px] transition-all relative shadow-lg",
+      selected ? "border-[#f59e0b] shadow-xl shadow-[#f59e0b]/30" : "border-[oklch(0.40_0.015_260)]"
     )}>
       {nodeData.blockNumber !== undefined && (
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-purple-500 text-white border-2 border-background"
+        <div 
+          className="absolute -top-3 left-3 h-6 px-2 flex items-center justify-center rounded-md text-[11px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)]"
+          style={{ backgroundColor: '#a855f7' }}
         >
           {nodeData.blockNumber}
-        </Badge>
+        </div>
       )}
       
-      <div className="flex items-start gap-2 mb-1">
-        <div className="flex-shrink-0 p-1 rounded bg-purple-500/20">
-          <Icon size={14} weight="bold" className="text-purple-400" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-            Event Handler
-          </div>
+      <div className="flex items-center gap-2 mb-2">
+        <div className="font-semibold text-sm text-foreground">
+          {nodeData.label}
         </div>
       </div>
       
-      <div className="flex justify-center pt-1">
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="output"
-          className="!w-3.5 !h-3.5 !rounded-full !border-2"
-          style={{ 
-            backgroundColor: '#a855f7',
-            borderColor: '#a855f7',
-            position: 'relative',
-            bottom: 'auto',
-            left: 'auto',
-            transform: 'none',
-            marginTop: 4
-          }}
-        />
+      <div className="text-[11px] text-purple-400 mb-2">
+        Event Handler
+      </div>
+      
+      <div className="flex justify-center pt-2">
+        <div className="relative flex flex-col items-center gap-1">
+          <div className="text-[10px] text-muted-foreground">
+            Output
+          </div>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output"
+            className="!w-[14px] !h-[14px] !rounded-full !border-2 !border-[oklch(0.25_0.01_260)]"
+            style={{ 
+              backgroundColor: '#f97316',
+              position: 'relative',
+              bottom: 'auto',
+              left: 'auto',
+              transform: 'none',
+              marginTop: 0
+            }}
+          />
+        </div>
       </div>
     </div>
   )

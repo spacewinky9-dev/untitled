@@ -25,12 +25,12 @@
 }
 
 .react-flow__edge-path {
-  @apply stroke-2;
-  stroke: #10b981;
+  stroke: #f59e0b;
+  stroke-width: 2.5px;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  @apply stroke-primary;
+  stroke: #fbbf24;
   stroke-width: 3px;
 }
 
@@ -46,9 +46,10 @@
 }
 
 .react-flow__handle {
-  @apply border-2;
-  width: 14px;
-  height: 14px;
+  border: 2px solid #9ca3af;
+  width: 16px;
+  height: 16px;
+  background: white;
 }
 
 .react-flow__handle-top {
@@ -60,26 +61,26 @@
 }
 
 :root {
-  --background: oklch(0.15 0.01 250);
+  --background: oklch(0.25 0.01 260);
   --foreground: oklch(0.95 0 0);
   
-  --card: oklch(0.20 0.02 250);
+  --card: oklch(0.30 0.015 260);
   --card-foreground: oklch(0.95 0 0);
   
-  --popover: oklch(0.20 0.02 250);
+  --popover: oklch(0.30 0.015 260);
   --popover-foreground: oklch(0.95 0 0);
   
-  --primary: oklch(0.35 0.12 250);
-  --primary-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.55 0.18 50);
+  --primary-foreground: oklch(0.10 0 0);
   
-  --secondary: oklch(0.25 0.02 250);
+  --secondary: oklch(0.35 0.02 260);
   --secondary-foreground: oklch(0.95 0 0);
   
-  --muted: oklch(0.30 0.01 250);
+  --muted: oklch(0.35 0.01 260);
   --muted-foreground: oklch(0.65 0 0);
   
-  --accent: oklch(0.70 0.15 210);
-  --accent-foreground: oklch(0.10 0.01 250);
+  --accent: oklch(0.75 0.15 85);
+  --accent-foreground: oklch(0.10 0 0);
   
   --destructive: oklch(0.55 0.20 25);
   --destructive-foreground: oklch(0.98 0 0);
@@ -90,9 +91,9 @@
   --bearish: oklch(0.55 0.20 25);
   --bearish-foreground: oklch(0.98 0 0);
   
-  --border: oklch(0.30 0.02 250);
-  --input: oklch(0.30 0.02 250);
-  --ring: oklch(0.35 0.12 250);
+  --border: oklch(0.35 0.02 260);
+  --input: oklch(0.35 0.02 260);
+  --ring: oklch(0.55 0.18 50);
   
   --radius: 0.5rem;
 }

@@ -18,76 +18,71 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
   const isDisabled = nodeData.disabled || false
   
   const outputs = nodeData.outputs || [
-    { id: 'true', label: 'True', type: 'normal' as const },
-    { id: 'false', label: 'False', type: 'inverted' as const }
+    { id: 'true', label: 'Normal', type: 'normal' as const },
+    { id: 'false', label: 'Inverted', type: 'inverted' as const }
   ]
   
   const getHandleColor = (type: 'normal' | 'inverted') => {
-    return type === 'normal' ? '#10b981' : '#f59e0b'
+    return type === 'normal' ? '#f97316' : '#facc15'
   }
   
   return (
     <div className={cn(
-      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      isDisabled && "opacity-50",
-      "border-l-4"
-    )}
-    style={{ borderLeftColor: 'oklch(0.65 0.18 145)' }}
-    >
+      "px-4 py-3 rounded-xl border-2 bg-[oklch(0.35_0.015_260)] min-w-[160px] transition-all relative shadow-lg",
+      selected ? "border-[#f59e0b] shadow-xl shadow-[#f59e0b]/30" : "border-[oklch(0.40_0.015_260)]",
+      isDisabled && "opacity-50"
+    )}>
       {nodeData.blockNumber !== undefined && (
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-bullish text-black border-2 border-background"
+        <div 
+          className="absolute -top-3 left-3 h-6 px-2 flex items-center justify-center rounded-md text-[11px] font-mono font-bold text-black border-2 border-[oklch(0.25_0.01_260)]"
+          style={{ backgroundColor: '#fbbf24' }}
         >
           {nodeData.blockNumber}
-        </Badge>
+        </div>
       )}
       
       <Handle
         type="target"
         position={Position.Top}
         id="input"
-        className="!w-4 !h-4 !bg-white !border-2 !border-gray-400 !rounded-full"
+        className="!w-[14px] !h-[14px] !bg-white !border-2 !border-[#9ca3af] !rounded-full"
         style={{ 
-          top: -8,
+          top: -7,
           left: '50%',
           transform: 'translateX(-50%)'
         }}
       />
       
-      <div className="flex items-start gap-1.5 mb-1">
-        <div className="flex-shrink-0 p-1 rounded bg-bullish/20">
-          <GitBranch size={14} weight="bold" className="text-bullish" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          {nodeData.operator && (
-            <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-              {nodeData.operator}
-            </div>
-          )}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="font-semibold text-sm text-foreground">
+          {nodeData.label}
         </div>
       </div>
       
-      <div className="flex gap-2 justify-center pt-1">
-        {outputs.map((output) => (
-          <div key={output.id} className="relative flex flex-col items-center">
+      {nodeData.operator && (
+        <div className="text-[11px] text-muted-foreground mb-2">
+          {nodeData.operator}
+        </div>
+      )}
+      
+      <div className="flex gap-4 justify-center pt-2">
+        {outputs.map((output, index) => (
+          <div key={output.id} className="relative flex flex-col items-center gap-1">
+            <div className="text-[10px] text-muted-foreground">
+              {output.label}
+            </div>
             <Handle
               type="source"
               position={Position.Bottom}
               id={output.id}
-              className="!w-3.5 !h-3.5 !rounded-full !border-2"
+              className="!w-[14px] !h-[14px] !rounded-full !border-2 !border-[oklch(0.25_0.01_260)]"
               style={{ 
                 backgroundColor: getHandleColor(output.type),
-                borderColor: getHandleColor(output.type),
                 position: 'relative',
                 bottom: 'auto',
                 left: 'auto',
                 transform: 'none',
-                marginTop: 4
+                marginTop: 0
               }}
             />
           </div>

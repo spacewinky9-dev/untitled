@@ -19,70 +19,67 @@ export const IndicatorNode = memo(({ data, selected }: NodeProps) => {
   
   return (
     <div className={cn(
-      "px-3 py-2.5 rounded-lg border-2 bg-card min-w-[140px] transition-all relative shadow-md",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4"
-    )}
-    style={{ borderLeftColor: 'oklch(0.70 0.15 210)' }}
-    >
+      "px-4 py-3 rounded-xl border-2 bg-[oklch(0.35_0.015_260)] min-w-[160px] transition-all relative shadow-lg",
+      selected ? "border-[#f59e0b] shadow-xl shadow-[#f59e0b]/30" : "border-[oklch(0.40_0.015_260)]"
+    )}>
       {nodeData.blockNumber !== undefined && (
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-2.5 -left-2.5 min-h-6 min-w-6 px-1.5 flex items-center justify-center rounded-md text-[10px] font-mono font-bold bg-accent text-black border-2 border-background"
+        <div 
+          className="absolute -top-3 left-3 h-6 px-2 flex items-center justify-center rounded-md text-[11px] font-mono font-bold text-black border-2 border-[oklch(0.25_0.01_260)]"
+          style={{ backgroundColor: '#3b82f6' }}
         >
           {nodeData.blockNumber}
-        </Badge>
+        </div>
       )}
       
       <Handle
         type="target"
         position={Position.Top}
         id="input"
-        className="!w-4 !h-4 !bg-white !border-2 !border-gray-400 !rounded-full"
+        className="!w-[14px] !h-[14px] !bg-white !border-2 !border-[#9ca3af] !rounded-full"
         style={{ 
-          top: -8,
+          top: -7,
           left: '50%',
           transform: 'translateX(-50%)'
         }}
       />
       
-      <div className="flex items-start gap-1.5 mb-1">
-        <div className="flex-shrink-0 p-1 rounded bg-accent/20">
-          <Function size={14} weight="bold" className="text-accent" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          {nodeData.indicatorType && (
-            <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-              {nodeData.indicatorType}
-            </div>
-          )}
-          {nodeData.parameters?.period && (
-            <div className="text-[10px] text-muted-foreground/80 mt-0.5">
-              Period: {nodeData.parameters.period}
-            </div>
-          )}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="font-semibold text-sm text-foreground">
+          {nodeData.label}
         </div>
       </div>
       
-      <div className="flex justify-center pt-1">
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="output"
-          className="!w-3.5 !h-3.5 !rounded-full !border-2"
-          style={{ 
-            backgroundColor: '#10b981',
-            borderColor: '#10b981',
-            position: 'relative',
-            bottom: 'auto',
-            left: 'auto',
-            transform: 'none',
-            marginTop: 4
-          }}
-        />
+      {nodeData.indicatorType && (
+        <div className="text-[11px] text-muted-foreground mb-2">
+          {nodeData.indicatorType}
+        </div>
+      )}
+      {nodeData.parameters?.period && (
+        <div className="text-[11px] text-blue-400 mb-2">
+          Period: {nodeData.parameters.period}
+        </div>
+      )}
+      
+      <div className="flex justify-center pt-2">
+        <div className="relative flex flex-col items-center gap-1">
+          <div className="text-[10px] text-muted-foreground">
+            Output
+          </div>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="output"
+            className="!w-[14px] !h-[14px] !rounded-full !border-2 !border-[oklch(0.25_0.01_260)]"
+            style={{ 
+              backgroundColor: '#f97316',
+              position: 'relative',
+              bottom: 'auto',
+              left: 'auto',
+              transform: 'none',
+              marginTop: 0
+            }}
+          />
+        </div>
       </div>
     </div>
   )

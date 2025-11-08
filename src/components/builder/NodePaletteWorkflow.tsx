@@ -188,13 +188,11 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   const renderNodeCard = (node: NodeDefinition, categoryColor: string) => {
     const Icon = iconMap[node.icon]
     return (
-      <Card
+      <div
         key={node.id}
         className={cn(
-          "p-2.5 cursor-pointer hover:bg-accent/50 transition-colors border-l-4 group relative",
-          "hover:shadow-md"
+          "px-2.5 py-2 cursor-pointer hover:bg-accent/20 transition-colors rounded group relative bg-[oklch(0.30_0.015_260)] border border-[oklch(0.38_0.015_260)]"
         )}
-        style={{ borderLeftColor: categoryColor }}
         onClick={() => onNodeAdd?.(node)}
         draggable
         onDragStart={(e) => {
@@ -202,21 +200,19 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
           e.dataTransfer.effectAllowed = 'move'
         }}
       >
-        <div className="flex items-start gap-2">
-          {Icon && (
-            <div className="p-1 rounded bg-card-foreground/5 shrink-0">
-              <Icon size={14} weight="duotone" />
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-xs">{node.label}</div>
-            <div className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
-              {node.description}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div 
+              className="w-0.5 h-6 rounded-full shrink-0"
+              style={{ backgroundColor: categoryColor }}
+            />
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-[11px] truncate">{node.label}</div>
             </div>
           </div>
-          <Plus size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          <Plus size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </div>
-      </Card>
+      </div>
     )
   }
 
@@ -245,7 +241,7 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   const sortedCategories = [...NODE_CATEGORIES].sort((a, b) => a.executionOrder - b.executionOrder)
 
   return (
-    <div className="h-full flex flex-col bg-card border-r border-border">
+    <div className="h-full w-[280px] flex flex-col bg-[oklch(0.30_0.015_260)] border-r border-border shadow-xl">
       <CategoryTabs 
         activeCategory={activeEventCategory}
         onCategoryChange={setActiveEventCategory}
@@ -254,22 +250,22 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
       
       <div className="p-3 border-b border-border space-y-2">
         <div>
-          <h3 className="font-semibold text-xs mb-0.5">Node Library</h3>
-          <p className="text-[10px] text-muted-foreground">Drag nodes to canvas or click to add</p>
+          <h3 className="font-semibold text-sm mb-1">Blocks</h3>
+          <p className="text-[11px] text-muted-foreground">Drag to canvas or click to add</p>
         </div>
         <div className="relative">
-          <MagnifyingGlass className="absolute left-2 top-2 text-muted-foreground" size={14} />
+          <MagnifyingGlass className="absolute left-2.5 top-2.5 text-muted-foreground" size={14} />
           <Input
-            placeholder="Search nodes..."
+            placeholder="Search blocks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 h-8 text-xs"
+            className="pl-8 h-9 text-xs bg-[oklch(0.28_0.015_260)] border-[oklch(0.35_0.015_260)]"
           />
         </div>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1.5">
+        <div className="p-2.5 space-y-2">
           {sortedCategories.map((categoryConfig) => {
             const isOpen = openCategories.has(categoryConfig.id)
             const categoryNodes = getFilteredNodes(categoryConfig.id)
@@ -285,30 +281,23 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                 open={isOpen}
                 onOpenChange={() => toggleCategory(categoryConfig.id)}
               >
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden bg-[oklch(0.32_0.015_260)] border-[oklch(0.38_0.015_260)]">
                   <CollapsibleTrigger className="w-full">
                     <div 
-                      className="p-2.5 flex items-center justify-between hover:bg-accent/30 transition-colors border-l-4"
-                      style={{ borderLeftColor: categoryConfig.color }}
+                      className="p-2.5 flex items-center justify-between hover:bg-accent/10 transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <Badge 
-                          variant="outline" 
-                          className="text-[10px] font-mono w-5 h-5 flex items-center justify-center p-0"
-                          style={{ 
-                            borderColor: categoryConfig.color,
-                            color: categoryConfig.color
-                          }}
-                        >
-                          {categoryConfig.executionOrder}
-                        </Badge>
+                        <div 
+                          className="w-1 h-8 rounded-full"
+                          style={{ backgroundColor: categoryConfig.color }}
+                        />
                         <div className="text-left">
-                          <div className="font-medium text-xs">{categoryConfig.label}</div>
+                          <div className="font-semibold text-xs">{categoryConfig.label}</div>
                           <div className="text-[10px] text-muted-foreground">{categoryConfig.description}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
+                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-[oklch(0.28_0.015_260)]">
                           {categoryConfig.id === 'indicator' ? indicatorNodes.length : categoryNodes.length}
                         </Badge>
                         {isOpen ? <CaretDown size={14} /> : <CaretRight size={14} />}
@@ -332,15 +321,15 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                                 open={isSubOpen}
                                 onOpenChange={() => toggleSubcategory(subcat.id)}
                               >
-                                <Card className="bg-muted/30">
+                                <Card className="bg-[oklch(0.28_0.015_260)] border-[oklch(0.35_0.015_260)]">
                                   <CollapsibleTrigger className="w-full">
-                                    <div className="p-2 flex items-center justify-between hover:bg-accent/20 transition-colors">
+                                    <div className="p-2 flex items-center justify-between hover:bg-accent/10 transition-colors">
                                       <div className="text-left">
                                         <div className="font-medium text-[11px]">{subcat.label}</div>
                                         <div className="text-[9px] text-muted-foreground">{subcat.description}</div>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">
+                                        <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4 bg-[oklch(0.25_0.015_260)]">
                                           {subcatNodes.length}
                                         </Badge>
                                         {isSubOpen ? <CaretDown size={12} /> : <CaretRight size={12} />}
