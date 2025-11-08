@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ReactFlowProvider } from '@xyflow/react'
 import { Layout } from '@/components/common/Layout'
 import { Canvas } from '@/components/builder/Canvas'
 import { BacktestView } from '@/components/backtest/BacktestView'
@@ -12,7 +13,11 @@ function App() {
   const renderView = () => {
     switch (activeTab) {
       case 'builder':
-        return <Canvas />
+        return (
+          <ReactFlowProvider>
+            <Canvas />
+          </ReactFlowProvider>
+        )
       case 'backtest':
         return <BacktestView />
       case 'library':
@@ -20,7 +25,11 @@ function App() {
       case 'settings':
         return <SettingsView />
       default:
-        return <Canvas />
+        return (
+          <ReactFlowProvider>
+            <Canvas />
+          </ReactFlowProvider>
+        )
     }
   }
 

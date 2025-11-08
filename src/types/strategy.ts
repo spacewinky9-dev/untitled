@@ -1,40 +1,36 @@
-import { Node, Edge } from '@xyflow/react'
-
 export interface Strategy {
   id: string
   name: string
   description: string
   version: string
-  createdAt: Date
-  updatedAt: Date
-  nodes: Node[]
-  edges: Edge[]
-  settings: StrategySettings
-  metadata: StrategyMetadata
+  createdAt: string
+  updatedAt: string
+  nodes: any[]
+  edges: any[]
+  settings?: StrategySettings
+  metadata?: StrategyMetadata
 }
 
 export interface StrategySettings {
-  timeframe: string
-  pairs: string[]
-  riskPerTrade: number
-  maxPositions: number
-  enableStopLoss: boolean
-  enableTakeProfit: boolean
+  initialBalance: number
+  leverage: number
+  spread: number
+  commission: number
+  slippage: number
 }
 
 export interface StrategyMetadata {
   author: string
   tags: string[]
   category: string
-  isTemplate: boolean
-  thumbnail?: string
+  timeframe: string
+  pairs: string[]
 }
 
-export interface StrategyTemplate {
-  id: string
-  name: string
-  description: string
-  category: string
-  strategy: Omit<Strategy, 'id' | 'createdAt' | 'updatedAt'>
-  thumbnail?: string
+export const defaultStrategySettings: StrategySettings = {
+  initialBalance: 10000,
+  leverage: 100,
+  spread: 2,
+  commission: 7,
+  slippage: 1
 }
