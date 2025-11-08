@@ -1,17 +1,17 @@
-import { Trade } from './strategy-executor'
 import { OHLCV } from '@/types/market-data'
 
-export interface TradeGroup {
-  groupName: string
-  trades: Trade[]
-  maxTrades: number
-  totalLots: number
-}
-
-export interface TrailingStopConfig {
-  activationPips: number
-  trailingPips: number
-  stepPips: number
+export interface TradePosition {
+  id: string
+  symbol: string
+  type: 'buy' | 'sell'
+  entryPrice: number
+  currentPrice: number
+  lots: number
+  stopLoss?: number
+  takeProfit?: number
+  openTime: number
+  groupName?: string
+  magicNumber?: number
 }
 
 export interface BreakEvenConfig {
@@ -22,6 +22,12 @@ export interface BreakEvenConfig {
 export interface PartialCloseConfig {
   profitPips: number
   closePercent: number
+}
+
+export interface TrailingStopConfig {
+  activationPips: number
+  trailingPips: number
+  stepPips: number
 }
 
 export interface ScaleInConfig {
@@ -35,316 +41,321 @@ export interface ScaleOutConfig {
   portions: number[]
 }
 
+export interface TradeGroupConfig {
+  groupName: string
+  maxTrades: number
+}
+
 export class AdvancedTradeManager {
-  private tradeGroups: Map<string, TradeGroup> = new Map()
-  private trailingStops: Map<string, number> = new Map()
+  private positions: Map<string, TradePosition> = new Map()
+  private groupPositions: Map<string, Set<string>> = new Map()
   private breakEvenApplied: Set<string> = new Set()
-  private partialCloseApplied: Map<string, number> = new Map()
+  private partialCloses: Map<string, number> = new Map()
+  private highWaterMarks: Map<string, number> = new Map()
 
-  createTradeGroup(groupName: string, maxTrades: number): TradeGroup {
-    if (!this.tradeGroups.has(groupName)) {
-      this.tradeGroups.set(groupName, {
-        groupName,
-        trades: [],
-        maxTrades,
-        totalLots: 0
-      })
+  getPipValue(symbol: string): number {
+    if (symbol.includes('JPY')) {
+      return 0.01
     }
-    return this.tradeGroups.get(groupName)!
+    return 0.0001
   }
 
-  addTradeToGroup(groupName: string, trade: Trade): boolean {
-    const group = this.tradeGroups.get(groupName)
-    if (!group) {
+  calculatePips(symbol: string, price1: number, price2: number, type: 'buy' | 'sell'): number {
+    const pipValue = this.getPipValue(symbol)
+    const priceDiff = type === 'buy' ? price2 - price1 : price1 - price2
+    return priceDiff / pipValue
+  }
+
+  addPosition(position: TradePosition): void {
+    this.positions.set(position.id, position)
+    
+    if (position.groupName) {
+      if (!this.groupPositions.has(position.groupName)) {
+        this.groupPositions.set(position.groupName, new Set())
+      }
+      this.groupPositions.get(position.groupName)!.add(position.id)
+    }
+
+    this.highWaterMarks.set(position.id, 0)
+  }
+
+  updatePosition(id: string, currentPrice: number): void {
+    const position = this.positions.get(id)
+    if (position) {
+      position.currentPrice = currentPrice
+      
+      const profitPips = this.calculatePips(
+        position.symbol,
+        position.entryPrice,
+        currentPrice,
+        position.type
+      )
+      
+      const currentMark = this.highWaterMarks.get(id) || 0
+      if (profitPips > currentMark) {
+        this.highWaterMarks.set(id, profitPips)
+      }
+    }
+  }
+
+  closePosition(id: string): void {
+    const position = this.positions.get(id)
+    if (position && position.groupName) {
+      this.groupPositions.get(position.groupName)?.delete(id)
+    }
+    this.positions.delete(id)
+    this.breakEvenApplied.delete(id)
+    this.partialCloses.delete(id)
+    this.highWaterMarks.delete(id)
+  }
+
+  applyBreakEven(id: string, config: BreakEvenConfig): boolean {
+    if (this.breakEvenApplied.has(id)) {
       return false
     }
 
-    if (group.trades.length >= group.maxTrades) {
-      return false
+    const position = this.positions.get(id)
+    if (!position) return false
+
+    const profitPips = this.calculatePips(
+      position.symbol,
+      position.entryPrice,
+      position.currentPrice,
+      position.type
+    )
+
+    if (profitPips >= config.profitPips) {
+      const pipValue = this.getPipValue(position.symbol)
+      const lockDistance = config.lockPips * pipValue
+      
+      if (position.type === 'buy') {
+        position.stopLoss = position.entryPrice + lockDistance
+      } else {
+        position.stopLoss = position.entryPrice - lockDistance
+      }
+      
+      this.breakEvenApplied.add(id)
+      return true
     }
 
-    group.trades.push(trade)
-    group.totalLots += trade.lots
-    return true
+    return false
   }
 
-  removeTradeFromGroup(groupName: string, tradeId: string): void {
-    const group = this.tradeGroups.get(groupName)
-    if (!group) return
-
-    const index = group.trades.findIndex(t => t.id === tradeId)
-    if (index !== -1) {
-      const trade = group.trades[index]
-      group.totalLots -= trade.lots
-      group.trades.splice(index, 1)
+  applyPartialClose(id: string, config: PartialCloseConfig): number {
+    const currentlyClosed = this.partialCloses.get(id) || 0
+    if (currentlyClosed >= 99) {
+      return 0
     }
+
+    const position = this.positions.get(id)
+    if (!position) return 0
+
+    const profitPips = this.calculatePips(
+      position.symbol,
+      position.entryPrice,
+      position.currentPrice,
+      position.type
+    )
+
+    if (profitPips >= config.profitPips) {
+      const closeAmount = Math.min(config.closePercent, 100 - currentlyClosed)
+      this.partialCloses.set(id, currentlyClosed + closeAmount)
+      
+      position.lots = position.lots * (1 - closeAmount / 100)
+      
+      return closeAmount
+    }
+
+    return 0
   }
 
-  getTradeGroup(groupName: string): TradeGroup | undefined {
-    return this.tradeGroups.get(groupName)
-  }
+  applyTrailingStop(id: string, config: TrailingStopConfig): boolean {
+    const position = this.positions.get(id)
+    if (!position) return false
 
-  applyTrailingStop(
-    trade: Trade,
-    currentBar: OHLCV,
-    config: TrailingStopConfig
-  ): Trade | null {
-    if (!trade.entryPrice) return null
-
-    const pipValue = 0.0001
-    const currentPrice = trade.type === 'buy' ? currentBar.close : currentBar.close
-    const profitPips = trade.type === 'buy'
-      ? (currentPrice - trade.entryPrice) / pipValue
-      : (trade.entryPrice - currentPrice) / pipValue
+    const profitPips = this.calculatePips(
+      position.symbol,
+      position.entryPrice,
+      position.currentPrice,
+      position.type
+    )
 
     if (profitPips < config.activationPips) {
-      return null
+      return false
     }
 
-    const currentStopLoss = this.trailingStops.get(trade.id) || trade.stopLoss
+    const highWaterMark = this.highWaterMarks.get(id) || 0
+    const pipValue = this.getPipValue(position.symbol)
+    const trailingDistance = config.trailingPips * pipValue
 
-    let newStopLoss: number
-    if (trade.type === 'buy') {
-      newStopLoss = currentPrice - (config.trailingPips * pipValue)
+    if (position.type === 'buy') {
+      const proposedStopLoss = position.currentPrice - trailingDistance
       
-      if (!currentStopLoss || newStopLoss > currentStopLoss) {
-        const stepsMoved = currentStopLoss 
-          ? Math.floor((newStopLoss - currentStopLoss) / (config.stepPips * pipValue))
-          : 1
-        
-        if (stepsMoved >= 1) {
-          this.trailingStops.set(trade.id, newStopLoss)
-          return { ...trade, stopLoss: newStopLoss }
+      const currentStopLoss = position.stopLoss || 0
+      if (proposedStopLoss > currentStopLoss) {
+        const improvement = (proposedStopLoss - currentStopLoss) / pipValue
+        if (improvement >= config.stepPips) {
+          position.stopLoss = proposedStopLoss
+          return true
         }
       }
     } else {
-      newStopLoss = currentPrice + (config.trailingPips * pipValue)
+      const proposedStopLoss = position.currentPrice + trailingDistance
       
-      if (!currentStopLoss || newStopLoss < currentStopLoss) {
-        const stepsMoved = currentStopLoss 
-          ? Math.floor((currentStopLoss - newStopLoss) / (config.stepPips * pipValue))
-          : 1
-        
-        if (stepsMoved >= 1) {
-          this.trailingStops.set(trade.id, newStopLoss)
-          return { ...trade, stopLoss: newStopLoss }
+      const currentStopLoss = position.stopLoss || Number.MAX_SAFE_INTEGER
+      if (proposedStopLoss < currentStopLoss) {
+        const improvement = (currentStopLoss - proposedStopLoss) / pipValue
+        if (improvement >= config.stepPips) {
+          position.stopLoss = proposedStopLoss
+          return true
         }
       }
     }
 
-    return null
+    return false
   }
 
-  applyBreakEven(
-    trade: Trade,
-    currentBar: OHLCV,
-    config: BreakEvenConfig
-  ): Trade | null {
-    if (!trade.entryPrice || this.breakEvenApplied.has(trade.id)) {
-      return null
-    }
+  canScaleIn(basePositionId: string, config: ScaleInConfig): boolean {
+    const position = this.positions.get(basePositionId)
+    if (!position || !position.groupName) return false
 
-    const pipValue = 0.0001
-    const currentPrice = currentBar.close
-    const profitPips = trade.type === 'buy'
-      ? (currentPrice - trade.entryPrice) / pipValue
-      : (trade.entryPrice - currentPrice) / pipValue
+    const groupPositions = this.groupPositions.get(position.groupName)
+    if (!groupPositions) return false
 
-    if (profitPips >= config.profitPips) {
-      const breakEvenPrice = trade.type === 'buy'
-        ? trade.entryPrice + (config.lockPips * pipValue)
-        : trade.entryPrice - (config.lockPips * pipValue)
-
-      this.breakEvenApplied.add(trade.id)
-      return { ...trade, stopLoss: breakEvenPrice }
-    }
-
-    return null
-  }
-
-  applyPartialClose(
-    trade: Trade,
-    currentBar: OHLCV,
-    config: PartialCloseConfig
-  ): { modifiedTrade: Trade | null, closedPortion: Trade | null } {
-    const closedPercent = this.partialCloseApplied.get(trade.id) || 0
-    
-    if (closedPercent >= 100) {
-      return { modifiedTrade: null, closedPortion: null }
-    }
-
-    const pipValue = 0.0001
-    const currentPrice = currentBar.close
-    const profitPips = trade.type === 'buy'
-      ? (currentPrice - trade.entryPrice) / pipValue
-      : (trade.entryPrice - currentPrice) / pipValue
-
-    if (profitPips >= config.profitPips) {
-      const closeAmount = (config.closePercent / 100) * trade.lots
-      const remainingLots = trade.lots - closeAmount
-
-      if (remainingLots < 0.01) {
-        return {
-          modifiedTrade: null,
-          closedPortion: {
-            ...trade,
-            exitPrice: currentPrice,
-            exitTime: currentBar.time
-          }
-        }
-      }
-
-      this.partialCloseApplied.set(trade.id, closedPercent + config.closePercent)
-
-      const modifiedTrade: Trade = {
-        ...trade,
-        lots: remainingLots
-      }
-
-      const closedPortion: Trade = {
-        ...trade,
-        id: `${trade.id}_partial_${closedPercent}`,
-        lots: closeAmount,
-        exitPrice: currentPrice,
-        exitTime: currentBar.time,
-        profit: this.calculateProfit(trade.type, trade.entryPrice, currentPrice, closeAmount)
-      }
-
-      return { modifiedTrade, closedPortion }
-    }
-
-    return { modifiedTrade: null, closedPortion: null }
-  }
-
-  shouldScaleIn(
-    existingTrades: Trade[],
-    currentBar: OHLCV,
-    config: ScaleInConfig
-  ): boolean {
-    if (existingTrades.length >= config.maxPositions) {
+    const count = groupPositions.size
+    if (count >= config.maxPositions) {
       return false
     }
 
-    if (existingTrades.length === 0) {
-      return false
+    const profitPips = this.calculatePips(
+      position.symbol,
+      position.entryPrice,
+      position.currentPrice,
+      position.type
+    )
+
+    return Math.abs(profitPips) >= config.addPips
+  }
+
+  calculateScaleOutLots(id: string, config: ScaleOutConfig, currentProfitPips: number): number {
+    const position = this.positions.get(id)
+    if (!position) return 0
+
+    let totalClosed = 0
+    for (let i = 0; i < config.exitLevels.length; i++) {
+      if (currentProfitPips >= config.exitLevels[i]) {
+        totalClosed += config.portions[i]
+      }
     }
 
-    const lastTrade = existingTrades[existingTrades.length - 1]
-    const pipValue = 0.0001
-    const currentPrice = currentBar.close
+    const alreadyClosed = this.partialCloses.get(id) || 0
+    const toClose = Math.max(0, totalClosed - alreadyClosed)
     
-    const pipsFromEntry = lastTrade.type === 'buy'
-      ? (currentPrice - lastTrade.entryPrice) / pipValue
-      : (lastTrade.entryPrice - currentPrice) / pipValue
-
-    return pipsFromEntry >= config.addPips
-  }
-
-  calculateScaleInLotSize(existingTrades: Trade[], config: ScaleInConfig): number {
-    if (existingTrades.length === 0) {
-      return 0.01
+    if (toClose > 0) {
+      this.partialCloses.set(id, alreadyClosed + toClose)
+      return position.lots * (toClose / 100)
     }
 
-    const lastTrade = existingTrades[existingTrades.length - 1]
-    return lastTrade.lots * config.multiplier
+    return 0
   }
 
-  shouldScaleOut(
-    trade: Trade,
-    currentBar: OHLCV,
-    config: ScaleOutConfig,
-    scaleOutLevel: number
-  ): boolean {
-    if (scaleOutLevel >= config.exitLevels.length) {
-      return false
-    }
+  checkStopLossHit(id: string, currentPrice: number): boolean {
+    const position = this.positions.get(id)
+    if (!position || !position.stopLoss) return false
 
-    const pipValue = 0.0001
-    const currentPrice = currentBar.close
-    const profitPips = trade.type === 'buy'
-      ? (currentPrice - trade.entryPrice) / pipValue
-      : (trade.entryPrice - currentPrice) / pipValue
-
-    return profitPips >= config.exitLevels[scaleOutLevel]
-  }
-
-  applyTimeStop(trade: Trade, currentBar: OHLCV, durationMinutes: number): boolean {
-    const timeInTrade = (currentBar.time - trade.entryTime) / 1000 / 60
-    return timeInTrade >= durationMinutes
-  }
-
-  createHedge(mainTrade: Trade, currentBar: OHLCV, hedgeRatio: number): Trade {
-    const hedgeType = mainTrade.type === 'buy' ? 'sell' : 'buy'
-    const hedgeLots = mainTrade.lots * hedgeRatio
-
-    return {
-      id: `${mainTrade.id}_hedge`,
-      type: hedgeType,
-      entryTime: currentBar.time,
-      entryPrice: currentBar.close,
-      lots: hedgeLots,
-      stopLoss: mainTrade.stopLoss,
-      takeProfit: mainTrade.takeProfit
+    if (position.type === 'buy') {
+      return currentPrice <= position.stopLoss
+    } else {
+      return currentPrice >= position.stopLoss
     }
   }
 
-  shouldCreateHedge(
-    trade: Trade,
-    currentBar: OHLCV,
-    triggerPips: number
-  ): boolean {
-    const pipValue = 0.0001
-    const currentPrice = currentBar.close
-    const profitPips = trade.type === 'buy'
-      ? (currentPrice - trade.entryPrice) / pipValue
-      : (trade.entryPrice - currentPrice) / pipValue
+  checkTakeProfitHit(id: string, currentPrice: number): boolean {
+    const position = this.positions.get(id)
+    if (!position || !position.takeProfit) return false
 
-    return profitPips >= triggerPips
+    if (position.type === 'buy') {
+      return currentPrice >= position.takeProfit
+    } else {
+      return currentPrice <= position.takeProfit
+    }
   }
 
-  private calculateProfit(
-    type: 'buy' | 'sell',
-    entryPrice: number,
-    exitPrice: number,
-    lots: number
-  ): number {
-    const pointValue = 10
-    const pips = type === 'buy'
-      ? (exitPrice - entryPrice) / 0.0001
-      : (entryPrice - exitPrice) / 0.0001
-    
-    return pips * lots * pointValue
+  getGroupPositions(groupName: string): TradePosition[] {
+    const ids = this.groupPositions.get(groupName)
+    if (!ids) return []
+
+    return Array.from(ids)
+      .map(id => this.positions.get(id))
+      .filter((p): p is TradePosition => p !== undefined)
   }
 
-  closeGroup(groupName: string, currentBar: OHLCV): Trade[] {
-    const group = this.tradeGroups.get(groupName)
-    if (!group) return []
-
-    const closedTrades = group.trades.map(trade => ({
-      ...trade,
-      exitPrice: currentBar.close,
-      exitTime: currentBar.time,
-      profit: this.calculateProfit(trade.type, trade.entryPrice, currentBar.close, trade.lots)
-    }))
-
-    this.tradeGroups.delete(groupName)
-    return closedTrades
+  closeGroup(groupName: string): number {
+    const positions = this.getGroupPositions(groupName)
+    positions.forEach(pos => this.closePosition(pos.id))
+    return positions.length
   }
 
-  getGroupProfit(groupName: string, currentBar: OHLCV): number {
-    const group = this.tradeGroups.get(groupName)
-    if (!group) return 0
+  checkTimeStop(id: string, currentTime: number, durationMinutes: number): boolean {
+    const position = this.positions.get(id)
+    if (!position) return false
 
-    return group.trades.reduce((total, trade) => {
-      const profit = this.calculateProfit(trade.type, trade.entryPrice, currentBar.close, trade.lots)
-      return total + profit
+    const elapsedMinutes = (currentTime - position.openTime) / (1000 * 60)
+    return elapsedMinutes >= durationMinutes
+  }
+
+  getAllPositions(): TradePosition[] {
+    return Array.from(this.positions.values())
+  }
+
+  getPosition(id: string): TradePosition | undefined {
+    return this.positions.get(id)
+  }
+
+  getGroupCount(groupName: string): number {
+    return this.groupPositions.get(groupName)?.size || 0
+  }
+
+  canOpenInGroup(groupName: string, maxTrades: number): boolean {
+    return this.getGroupCount(groupName) < maxTrades
+  }
+
+  calculateGroupProfit(groupName: string): number {
+    const positions = this.getGroupPositions(groupName)
+    return positions.reduce((total, pos) => {
+      const pips = this.calculatePips(
+        pos.symbol,
+        pos.entryPrice,
+        pos.currentPrice,
+        pos.type
+      )
+      return total + pips * pos.lots
     }, 0)
   }
 
+  getPositionProfit(id: string): { pips: number; profit: number } {
+    const position = this.positions.get(id)
+    if (!position) return { pips: 0, profit: 0 }
+
+    const pips = this.calculatePips(
+      position.symbol,
+      position.entryPrice,
+      position.currentPrice,
+      position.type
+    )
+
+    const profit = pips * position.lots * 10
+
+    return { pips, profit }
+  }
+
   reset(): void {
-    this.tradeGroups.clear()
-    this.trailingStops.clear()
+    this.positions.clear()
+    this.groupPositions.clear()
     this.breakEvenApplied.clear()
-    this.partialCloseApplied.clear()
+    this.partialCloses.clear()
+    this.highWaterMarks.clear()
   }
 }
+
+export const advancedTradeManager = new AdvancedTradeManager()
