@@ -16,65 +16,22 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle } from '@phosphor-icons/react'
 import { IndicatorNode } from './nodes/IndicatorNode'
 import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
 import { LogicNode } from './nodes/LogicNode'
 import { RiskNode } from './nodes/RiskNode'
-import { NodePalette } from './NodePalette'
+import { NodePaletteCollapsible } from './NodePaletteCollapsible'
 import { PropertiesPanel } from './PropertiesPanel'
+import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { Strategy } from '@/types/strategy'
 import { toast } from 'sonner'
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'indicator',
-    position: { x: 100, y: 100 },
-    data: {
-      label: 'Moving Average',
-      indicatorType: 'SMA',
-      parameters: { period: 20, source: 'close' }
-    }
-  },
-  {
-    id: '2',
-    type: 'indicator',
-    position: { x: 100, y: 220 },
-    data: {
-      label: 'RSI',
-      indicatorType: 'RSI',
-      parameters: { period: 14 }
-    }
-  },
-  {
-    id: '3',
-    type: 'condition',
-    position: { x: 400, y: 150 },
-    data: {
-      label: 'Cross Above',
-      operator: 'cross_above'
-    }
-  },
-  {
-    id: '4',
-    type: 'action',
-    position: { x: 650, y: 150 },
-    data: {
-      label: 'Buy Signal',
-      action: 'buy'
-    }
-  }
-]
-
-const initialEdges: Edge[] = [
-  { id: 'e1-3', source: '1', target: '3', sourceHandle: 'value-out', targetHandle: 'input-a' },
-  { id: 'e2-3', source: '2', target: '3', sourceHandle: 'value-out', targetHandle: 'input-b' },
-  { id: 'e3-4', source: '3', target: '4', sourceHandle: 'result', targetHandle: 'trigger' }
-]
+const initialNodes: Node[] = []
+const initialEdges: Edge[] = []
 
 export function Canvas() {
   const nodeTypes = useMemo(() => ({
@@ -92,6 +49,7 @@ export function Canvas() {
   const [nodeIdCounter, setNodeIdCounter] = useState(5)
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [showProperties, setShowProperties] = useState(false)
+  const [showAIBuilder, setShowAIBuilder] = useState(false)
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
 
@@ -237,9 +195,16 @@ export function Canvas() {
     }
   }, [nodes, edges, currentStrategyId, strategies, setStrategies])
 
+  const onAIStrategyGenerated = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+    setNodes(newNodes)
+    setEdges(newEdges)
+    setNodeIdCounter(newNodes.length + 1)
+    toast.success('AI-generated strategy loaded! You can now modify it manually.')
+  }, [setNodes, setEdges])
+
   return (
     <div className="w-full h-full flex">
-      <NodePalette onNodeAdd={onNodeAdd} />
+      <NodePaletteCollapsible onNodeAdd={onNodeAdd} />
       
       <div ref={reactFlowWrapper} className="flex-1 relative">
         <ReactFlow
@@ -275,6 +240,15 @@ export function Canvas() {
           />
           
           <Panel position="top-left" className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="default"
+              className="gap-2 bg-gradient-to-r from-accent to-primary hover:opacity-90"
+              onClick={() => setShowAIBuilder(true)}
+            >
+              <Sparkle size={16} weight="fill" />
+              AI Builder
+            </Button>
             <Button size="sm" className="gap-2">
               <FolderOpen size={16} />
               Open
@@ -322,8 +296,13 @@ export function Canvas() {
           onClose={() => setShowProperties(false)} 
         />
       )}
+
+      <AIStrategyBuilder
+        open={showAIBuilder}
+        onOpenChange={setShowAIBuilder}
+        onStrategyGenerated={onAIStrategyGenerated}
+      />
     </div>
   )
 }
-
 

@@ -27,13 +27,13 @@ A next-generation visual trading bot builder that empowers traders to design, te
 
 ### 1. Visual Strategy Builder (Core Feature)
 
-**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system.
+**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system. Enhanced with collapsible categorized node library inspired by FXDreema, organizing indicators into subcategories (Moving Averages, Oscillators, Volatility, etc.) for easier discovery.
 
 **Purpose:** Democratizes algorithmic trading by making strategy creation visual and intuitive rather than requiring programming knowledge, while maintaining the power and flexibility of coded solutions.
 
 **Trigger:** User opens the app or clicks "New Strategy" from the dashboard.
 
-**Progression:** Empty canvas loads → User drags nodes from palette to canvas → User connects nodes by dragging from output ports to input ports → User configures each node's parameters in properties panel → User validates strategy (checking for logic errors) → User saves strategy with name and description → Strategy appears in library.
+**Progression:** Empty canvas loads → User browses categorized node palette (can expand/collapse categories) → User drags nodes from palette to canvas or clicks to add at center → User connects nodes by dragging from output ports to input ports → User configures each node's detailed parameters in properties panel → User validates strategy (checking for logic errors) → User saves strategy with name and description → Strategy appears in library.
 
 **Success Criteria:**
 - Users can create a complete trading strategy in under 5 minutes
@@ -41,6 +41,26 @@ A next-generation visual trading bot builder that empowers traders to design, te
 - All node connections follow valid data types and logic
 - Strategies can be saved and reloaded without loss of configuration
 - Canvas supports zoom, pan, and handles 50+ nodes without performance degradation
+- Collapsible categories make it easy to find specific node types
+
+### 1a. AI Strategy Builder (New Feature)
+
+**Functionality:** AI-powered strategy generation where users describe their trading strategy in natural language, and the system automatically creates a complete node-based strategy with proper indicators, conditions, logic gates, and actions. Users can then manually modify the AI-generated strategy using the visual node editor.
+
+**Purpose:** Dramatically accelerates strategy creation for beginners and provides a starting point for experienced traders, bridging the gap between idea and implementation.
+
+**Trigger:** User clicks "AI Builder" button in the canvas toolbar.
+
+**Progression:** AI Builder dialog opens → User enters strategy description in natural language (e.g., "Create an RSI strategy that buys when oversold and sells when overbought") → User can select from example prompts → User clicks "Generate Strategy" → AI analyzes prompt and identifies required components → Progress indicator shows generation steps (analyzing prompt, identifying indicators, creating conditions, setting up actions, validating) → AI creates nodes with proper positioning and connections → Strategy loads on canvas → User can immediately modify nodes manually → User saves customized strategy.
+
+**Success Criteria:**
+- AI understands common trading strategy descriptions with 90%+ accuracy
+- Generated strategies include proper indicators, conditions, and actions
+- Node positioning follows logical left-to-right flow (indicators → conditions → actions)
+- All generated nodes have valid default parameters
+- Users can immediately edit AI-generated strategies manually
+- Generation completes in under 10 seconds
+- Clear error messages when AI cannot interpret the prompt
 
 ### 2. Technical Indicator Library
 
