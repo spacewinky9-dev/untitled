@@ -15,7 +15,11 @@ import { useKV } from '@github/spark/hooks'
 import { Strategy } from '@/types/strategy'
 import { toast } from 'sonner'
 
-export function LibraryView() {
+interface LibraryViewProps {
+  onLoadStrategy?: (strategy: Strategy) => void
+}
+
+export function LibraryView({ onLoadStrategy }: LibraryViewProps = {}) {
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -115,7 +119,13 @@ export function LibraryView() {
                     <Button 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => toast.info('Load strategy functionality coming soon')}
+                      onClick={() => {
+                        if (onLoadStrategy) {
+                          onLoadStrategy(strategy)
+                        } else {
+                          toast.info('Please use the "Open" button in the Builder tab to load strategies')
+                        }
+                      }}
                     >
                       Load
                     </Button>

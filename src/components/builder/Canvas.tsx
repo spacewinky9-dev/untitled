@@ -42,6 +42,7 @@ import { ExportDialog } from './ExportDialog'
 import { EACreationGuide } from './EACreationGuide'
 import { ContextMenuWrapper } from './ContextMenu'
 import { NewProjectDialog, ProjectConfig } from './NewProjectDialog'
+import { LoadStrategyDialog } from './LoadStrategyDialog'
 import { EditBlockLabelDialog } from './EditBlockLabelDialog'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
@@ -54,7 +55,12 @@ import { calculateBlockNumbers, validateMultipleBranches } from '@/lib/block-num
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
 
-export function Canvas() {
+interface CanvasProps {
+  pendingLoadStrategyId?: string | null
+  onStrategyLoaded?: () => void
+}
+
+export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps = {}) {
   const nodeTypes = useMemo(() => ({
     indicator: IndicatorNode,
     condition: ConditionNode,
@@ -89,10 +95,20 @@ export function Canvas() {
   const [showBlockNumbers, setShowBlockNumbers] = useState(true)
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
-  const [currentProject, setCurrentProject] = useState<ProjectConfig | null>(null)
+  const [currentProject, setCurrentProject] = useKV<ProjectConfig | null>('currentProject', null)
+  const [showLoadDialog, setShowLoadDialog] = useState(false)
   
   const history = useHistory()
   const clipboard = useClipboard()
+
+  useEffect(() => {
+    if (pendingLoadStrategyId) {
+      onLoadStrategy(pendingLoadStrategyId)
+      if (onStrategyLoaded) {
+        onStrategyLoaded()
+      }
+    }
+  }, [pendingLoadStrategyId])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -442,7 +458,7 @@ export function Canvas() {
     setCurrentStrategyId(null)
     history.clearHistory()
     toast.success(`New ${config.type} project created for ${config.language.toUpperCase()}`)
-  }, [nodes, setNodes, setEdges, history])
+  }, [nodes, setNodes, setEdges, history, setCurrentProject])
 
   const onEditBlockLabel = useCallback((label: string | number) => {
     if (!selectedNode) return
@@ -485,6 +501,44 @@ export function Canvas() {
     )
     toast.success(`Block ${isDisabled ? 'enabled' : 'disabled'}`)
   }, [selectedNode, nodes, edges, history, setNodes])
+
+  const onLoadStrategy = useCallback((strategyId: string) => {
+    const strategy = strategies?.find(s => s.id === strategyId)
+    if (!strategy) {
+      toast.error('Strategy not found')
+      return
+    }
+
+    if (nodes.length > 0) {
+      const confirmed = window.confirm('Loading a strategy will replace the current canvas. Continue?')
+      if (!confirmed) return
+    }
+
+    history.markCheckpoint(nodes, edges, 'Before load')
+    
+    const loadedNodes = strategy.nodes.map(n => ({
+      id: n.id,
+      type: n.type,
+      position: n.position,
+      data: n.data
+    }))
+    
+    const loadedEdges = strategy.edges || []
+    
+    setNodes(loadedNodes)
+    setEdges(loadedEdges)
+    setCurrentStrategyId(strategy.id)
+    
+    const maxNodeId = loadedNodes.reduce((max, node) => {
+      const match = node.id.match(/node-(\d+)/)
+      return match ? Math.max(max, parseInt(match[1])) : max
+    }, 0)
+    setNodeIdCounter(maxNodeId + 1)
+    
+    history.addHistory(loadedNodes, loadedEdges, 'Load strategy')
+    setShowLoadDialog(false)
+    toast.success(`Strategy "${strategy.name}" loaded successfully`)
+  }, [strategies, nodes, edges, history, setNodes, setEdges])
 
   const onDetachNode = useCallback(() => {
     if (!selectedNode) return
@@ -599,7 +653,7 @@ export function Canvas() {
               <Sparkle size={16} weight="fill" />
               AI Builder
             </Button>
-            <Button size="sm" className="gap-2">
+            <Button size="sm" className="gap-2" onClick={() => setShowLoadDialog(true)}>
               <FolderOpen size={16} />
               Open
             </Button>
@@ -699,12 +753,20 @@ export function Canvas() {
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
         strategy={getCurrentStrategy()}
+        projectConfig={currentProject}
       />
 
       <NewProjectDialog
         open={showNewProjectDialog}
         onOpenChange={setShowNewProjectDialog}
         onCreateProject={onNewProject}
+      />
+
+      <LoadStrategyDialog
+        open={showLoadDialog}
+        onOpenChange={setShowLoadDialog}
+        strategies={strategies || []}
+        onLoadStrategy={onLoadStrategy}
       />
 
       <EditBlockLabelDialog

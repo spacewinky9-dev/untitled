@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Download, Copy, CheckCircle } from '@phosphor-icons/react'
 import { Strategy } from '@/types/strategy'
+import { ProjectConfig } from './NewProjectDialog'
 import { exportToMQL, MQLVersion } from '@/lib/mql-export'
 import { toast } from 'sonner'
 
@@ -21,13 +22,21 @@ interface ExportDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   strategy: Strategy
+  projectConfig?: ProjectConfig | null
 }
 
-export function ExportDialog({ open, onOpenChange, strategy }: ExportDialogProps) {
+export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: ExportDialogProps) {
   const [expertName, setExpertName] = useState('ForexFlowBot')
   const [magicNumber, setMagicNumber] = useState(12345)
   const [selectedVersion, setSelectedVersion] = useState<MQLVersion>('mql4')
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (projectConfig) {
+      setExpertName(projectConfig.name)
+      setSelectedVersion(projectConfig.language as MQLVersion)
+    }
+  }, [projectConfig])
 
   const generatedCode = exportToMQL(strategy, {
     version: selectedVersion,
