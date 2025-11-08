@@ -16,7 +16,8 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers } from '@phosphor-icons/react'
 import { IndicatorNode } from './nodes/IndicatorNode'
 import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
@@ -38,10 +39,14 @@ import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
 import { EACreationGuide } from './EACreationGuide'
+import { ContextMenuWrapper } from './ContextMenu'
 import { NodeDefinition } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
+import { useHistory } from '@/hooks/use-history'
+import { useClipboard } from '@/hooks/use-clipboard'
 import { Strategy } from '@/types/strategy'
 import { toast } from 'sonner'
+import { calculateBlockNumbers, validateMultipleBranches } from '@/lib/block-numbers'
 
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
@@ -75,33 +80,164 @@ export function Canvas() {
   const [showProperties, setShowProperties] = useState(false)
   const [showAIBuilder, setShowAIBuilder] = useState(false)
   const [showExportDialog, setShowExportDialog] = useState(false)
+  const [showBlockNumbers, setShowBlockNumbers] = useState(true)
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
+  
+  const history = useHistory()
+  const clipboard = useClipboard()
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault()
         onSaveStrategy()
       }
-      if (event.key === 'Delete' || event.key === 'Backspace') {
-        const target = event.target as HTMLElement
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
-          event.preventDefault()
-          onDeleteSelected()
-        }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault()
+        handleUndo()
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+        event.preventDefault()
+        handleRedo()
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'c' && !isInputField) {
+        event.preventDefault()
+        handleCopy()
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'x' && !isInputField) {
+        event.preventDefault()
+        handleCut()
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'v' && !isInputField) {
+        event.preventDefault()
+        handlePaste()
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'd' && !isInputField) {
+        event.preventDefault()
+        handleDuplicate()
+      }
+      
+      if ((event.key === 'Delete' || event.key === 'Backspace') && !isInputField) {
+        event.preventDefault()
+        onDeleteSelected()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [nodes, edges])
+  }, [nodes, edges, clipboard])
+
+  const handleUndo = useCallback(() => {
+    const state = history.undo()
+    if (state) {
+      setNodes(state.nodes)
+      setEdges(state.edges)
+      toast.success('Undone')
+    }
+  }, [history, setNodes, setEdges])
+
+  const handleRedo = useCallback(() => {
+    const state = history.redo()
+    if (state) {
+      setNodes(state.nodes)
+      setEdges(state.edges)
+      toast.success('Redone')
+    }
+  }, [history, setNodes, setEdges])
+
+  const handleCopy = useCallback(() => {
+    clipboard.copy(nodes, edges)
+    const selectedCount = nodes.filter(n => n.selected).length
+    if (selectedCount > 0) {
+      toast.success(`Copied ${selectedCount} block(s)`)
+    }
+  }, [clipboard, nodes, edges])
+
+  const handleCut = useCallback(() => {
+    const selectedNodes = nodes.filter(n => n.selected)
+    if (selectedNodes.length === 0) return
+
+    clipboard.cut(nodes, edges)
+    history.addHistory(nodes, edges, 'Cut blocks')
+    
+    onDeleteSelected()
+    toast.success(`Cut ${selectedNodes.length} block(s)`)
+  }, [clipboard, nodes, edges, history])
+
+  const handlePaste = useCallback(() => {
+    const result = clipboard.paste()
+    if (!result) {
+      toast.error('Nothing to paste')
+      return
+    }
+
+    history.addHistory(nodes, edges, 'Paste blocks')
+    
+    setNodes((nds) => [...nds.map(n => ({ ...n, selected: false })), ...result.nodes.map(n => ({ ...n, selected: true }))])
+    setEdges((eds) => [...eds, ...result.edges])
+    
+    toast.success(`Pasted ${result.nodes.length} block(s)`)
+  }, [clipboard, nodes, edges, history, setNodes, setEdges])
+
+  const handleDuplicate = useCallback(() => {
+    const selectedNodes = nodes.filter(n => n.selected)
+    if (selectedNodes.length === 0) {
+      toast.error('No blocks selected')
+      return
+    }
+
+    const selectedNodeIds = new Set(selectedNodes.map(n => n.id))
+    const relevantEdges = edges.filter(
+      e => selectedNodeIds.has(e.source) && selectedNodeIds.has(e.target)
+    )
+
+    const idMap = new Map<string, string>()
+    const newNodes: Node[] = selectedNodes.map(node => {
+      const newId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      idMap.set(node.id, newId)
+
+      return {
+        ...node,
+        id: newId,
+        position: {
+          x: node.position.x + 50,
+          y: node.position.y + 50
+        },
+        selected: true
+      }
+    })
+
+    const newEdges: Edge[] = relevantEdges.map(edge => ({
+      ...edge,
+      id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      source: idMap.get(edge.source) || edge.source,
+      target: idMap.get(edge.target) || edge.target
+    }))
+
+    history.addHistory(nodes, edges, 'Duplicate blocks')
+    
+    setNodes((nds) => [...nds.map(n => ({ ...n, selected: false })), ...newNodes])
+    setEdges((eds) => [...eds, ...newEdges])
+    
+    toast.success(`Duplicated ${newNodes.length} block(s)`)
+  }, [nodes, edges, history, setNodes, setEdges])
 
   const onConnect = useCallback(
     (connection: Connection) => {
+      history.addHistory(nodes, edges, 'Connect blocks')
       setEdges((eds) => addEdge(connection, eds))
     },
-    [setEdges]
+    [setEdges, nodes, edges, history]
   )
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -135,10 +271,11 @@ export function Canvas() {
         }
       }
 
+      history.addHistory(nodes, edges, `Add ${nodeDefinition.label}`)
       setNodes((nds) => nds.concat(newNode))
       setNodeIdCounter((id) => id + 1)
     },
-    [screenToFlowPosition, nodeIdCounter, setNodes]
+    [screenToFlowPosition, nodeIdCounter, setNodes, nodes, edges, history]
   )
 
   const onNodeAdd = useCallback(
@@ -155,16 +292,21 @@ export function Canvas() {
         }
       }
 
+      history.addHistory(nodes, edges, `Add ${nodeDefinition.label}`)
       setNodes((nds) => nds.concat(newNode))
       setNodeIdCounter((id) => id + 1)
     },
-    [nodeIdCounter, setNodes]
+    [nodeIdCounter, setNodes, nodes, edges, history]
   )
 
   const onDeleteSelected = useCallback(() => {
+    const selectedNodes = nodes.filter(n => n.selected)
+    if (selectedNodes.length > 0) {
+      history.addHistory(nodes, edges, `Delete ${selectedNodes.length} block(s)`)
+    }
     setNodes((nds) => nds.filter(node => !node.selected))
     setEdges((eds) => eds.filter(edge => !edge.selected))
-  }, [setNodes, setEdges])
+  }, [setNodes, setEdges, nodes, edges, history])
 
   const onFitView = useCallback(() => {
     fitView({ padding: 0.2, duration: 400 })
@@ -221,11 +363,13 @@ export function Canvas() {
   }, [nodes, edges, currentStrategyId, strategies, setStrategies])
 
   const onAIStrategyGenerated = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+    history.markCheckpoint(nodes, edges, 'Before AI generation')
     setNodes(newNodes)
     setEdges(newEdges)
     setNodeIdCounter(newNodes.length + 1)
+    history.addHistory(newNodes, newEdges, 'AI-generated strategy')
     toast.success('AI-generated strategy loaded! You can now modify it manually.')
-  }, [setNodes, setEdges])
+  }, [setNodes, setEdges, nodes, edges, history])
 
   const getCurrentStrategy = useCallback((): Strategy => {
     const existingStrategy = strategies?.find(s => s.id === currentStrategyId)
@@ -256,48 +400,103 @@ export function Canvas() {
       toast.error('No nodes to export. Build a strategy first!')
       return
     }
+    
+    const validation = validateMultipleBranches(nodes, edges)
+    if (validation.warnings.length > 0) {
+      validation.warnings.forEach(w => toast.warning(w))
+    }
+    if (validation.info.length > 0) {
+      validation.info.forEach(i => toast.info(i))
+    }
+    
     setShowExportDialog(true)
-  }, [nodes])
+  }, [nodes, edges])
+
+  const toggleBlockNumbers = useCallback(() => {
+    setShowBlockNumbers(prev => !prev)
+  }, [])
+
+  const executionMap = useMemo(() => {
+    return calculateBlockNumbers(nodes, edges)
+  }, [nodes, edges])
+
+  const nodesWithBlockNumbers = useMemo(() => {
+    if (!showBlockNumbers) return nodes
+
+    return nodes.map(node => {
+      const execInfo = executionMap.get(node.id)
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          blockNumber: execInfo?.blockNumber,
+          executionOrder: execInfo?.executionOrder
+        }
+      }
+    })
+  }, [nodes, showBlockNumbers, executionMap])
 
   return (
     <div className="w-full h-full flex">
       <NodePaletteWorkflow onNodeAdd={onNodeAdd} />
       
-      <div ref={reactFlowWrapper} className="flex-1 relative">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onNodeClick={onNodeClick}
-          onPaneClick={onPaneClick}
-          nodeTypes={nodeTypes}
-          fitView
-          className="bg-background"
-        >
-          <Background 
-            variant={BackgroundVariant.Dots}
-            gap={16}
-            size={1}
-            color="oklch(0.30 0.02 250)"
-          />
-          
-          <Controls 
-            className="bg-card border border-border"
-            showInteractive={false}
-          />
-          
-          <MiniMap 
-            className="bg-card border border-border"
-            nodeColor={() => 'oklch(0.35 0.12 250)'}
-            maskColor="oklch(0.15 0.01 250 / 0.8)"
-          />
-          
-          <Panel position="top-left" className="flex gap-2">
-            <EACreationGuide />
+      <ContextMenuWrapper
+        nodes={nodes}
+        edges={edges}
+        selectedNode={selectedNode}
+        onCopy={handleCopy}
+        onCut={handleCut}
+        onPaste={handlePaste}
+        onDelete={onDeleteSelected}
+        onDuplicate={handleDuplicate}
+        onEditTitle={() => toast.info('Edit title feature coming soon')}
+        onResize={() => toast.info('Resize feature coming soon')}
+        onToggleLock={() => toast.info('Lock feature coming soon')}
+        onToggleVisibility={() => toast.info('Visibility feature coming soon')}
+        onShowInfo={() => {
+          if (selectedNode) {
+            const execInfo = executionMap.get(selectedNode.id)
+            toast.info(`Block #${execInfo?.blockNumber || '?'} - Execution Order: ${execInfo?.executionOrder || '?'}`)
+          }
+        }}
+        onCreateGroup={() => toast.info('Create group feature coming soon')}
+        onBreakConnection={() => toast.info('Break connection feature coming soon')}
+      >
+        <div ref={reactFlowWrapper} className="flex-1 relative">
+          <ReactFlow
+            nodes={nodesWithBlockNumbers}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            fitView
+            className="bg-background"
+          >
+            <Background 
+              variant={BackgroundVariant.Dots}
+              gap={16}
+              size={1}
+              color="oklch(0.30 0.02 250)"
+            />
+            
+            <Controls 
+              className="bg-card border border-border"
+              showInteractive={false}
+            />
+            
+            <MiniMap 
+              className="bg-card border border-border"
+              nodeColor={() => 'oklch(0.35 0.12 250)'}
+              maskColor="oklch(0.15 0.01 250 / 0.8)"
+            />
+            
+            <Panel position="top-left" className="flex gap-2">
+              <EACreationGuide />
             <Button 
               size="sm" 
               variant="default"
@@ -339,6 +538,38 @@ export function Canvas() {
               size="sm" 
               variant="outline" 
               className="gap-2"
+              onClick={handleUndo}
+              disabled={!history.canUndo}
+              title="Undo (Ctrl+Z)"
+            >
+              <ArrowUUpLeft size={16} />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="gap-2"
+              onClick={handleRedo}
+              disabled={!history.canRedo}
+              title="Redo (Ctrl+Y)"
+            >
+              <ArrowUUpRight size={16} />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="gap-2"
+              onClick={toggleBlockNumbers}
+              title="Toggle Block Numbers"
+            >
+              <ListNumbers size={16} />
+              {showBlockNumbers && (
+                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">ON</Badge>
+              )}
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="gap-2"
               onClick={onFitView}
             >
               <ArrowsOut size={16} />
@@ -356,6 +587,7 @@ export function Canvas() {
           </Panel>
         </ReactFlow>
       </div>
+      </ContextMenuWrapper>
 
       {showProperties && (
         <PropertiesPanel 

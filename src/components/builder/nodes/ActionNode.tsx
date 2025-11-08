@@ -1,12 +1,15 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { TrendUp, TrendDown, X } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 export interface ActionNodeData extends Record<string, unknown> {
   label: string
   action: 'buy' | 'sell' | 'close' | 'alert'
   inputs?: Array<{ id: string; label: string }>
+  blockNumber?: number
+  executionOrder?: number
 }
 
 export const ActionNode = memo(({ data, selected }: NodeProps) => {
@@ -24,7 +27,7 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-md border-2 bg-card min-w-[140px] transition-all",
+      "px-3 py-2 rounded-md border-2 bg-card min-w-[140px] transition-all relative",
       selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
       "border-l-4"
     )}
@@ -32,6 +35,19 @@ export const ActionNode = memo(({ data, selected }: NodeProps) => {
       borderLeftColor: isBuy ? 'oklch(0.65 0.18 145)' : isSell ? 'oklch(0.55 0.20 25)' : 'oklch(0.60 0.20 40)' 
     }}
     >
+      {nodeData.blockNumber !== undefined && (
+        <Badge 
+          variant="secondary" 
+          className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px] font-mono font-bold border-2 border-background"
+          style={{ 
+            backgroundColor: isBuy ? 'oklch(0.65 0.18 145)' : isSell ? 'oklch(0.55 0.20 25)' : 'oklch(0.60 0.20 40)',
+            color: 'white'
+          }}
+        >
+          {nodeData.blockNumber}
+        </Badge>
+      )}
+      
       {inputs.map((input, idx) => (
         <Handle
           key={input.id}
