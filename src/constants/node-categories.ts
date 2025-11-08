@@ -8,37 +8,56 @@ export interface NodeDefinition {
   description: string
   icon: string
   defaultParameters?: Record<string, any>
+  executionOrder?: number
 }
 
 export const NODE_CATEGORIES: Array<{
   id: NodeCategory
   label: string
   description: string
+  executionOrder: number
+  color: string
+  borderColor: string
 }> = [
   {
     id: 'indicator',
     label: 'Indicators',
-    description: 'Technical analysis indicators'
+    description: 'Technical analysis indicators',
+    executionOrder: 1,
+    color: 'oklch(0.70 0.15 210)',
+    borderColor: 'border-accent'
   },
   {
     id: 'condition',
     label: 'Conditions',
-    description: 'Comparison and condition checks'
+    description: 'Comparison and condition checks',
+    executionOrder: 2,
+    color: 'oklch(0.65 0.18 145)',
+    borderColor: 'border-bullish'
   },
   {
     id: 'logic',
     label: 'Logic',
-    description: 'Boolean logic operations'
-  },
-  {
-    id: 'action',
-    label: 'Actions',
-    description: 'Trade execution actions'
+    description: 'Boolean logic operations',
+    executionOrder: 3,
+    color: 'oklch(0.60 0.12 280)',
+    borderColor: 'border-primary'
   },
   {
     id: 'risk',
     label: 'Risk Management',
-    description: 'Position sizing and risk controls'
+    description: 'Position sizing and risk controls',
+    executionOrder: 4,
+    color: 'oklch(0.75 0.15 60)',
+    borderColor: 'border-yellow-500'
+  },
+  {
+    id: 'action',
+    label: 'Actions',
+    description: 'Trade execution actions',
+    executionOrder: 5,
+    color: 'oklch(0.55 0.20 25)',
+    borderColor: 'border-bearish'
   }
 ]
 

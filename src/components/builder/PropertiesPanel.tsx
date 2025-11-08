@@ -10,7 +10,9 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { X, Info } from '@phosphor-icons/react'
+import { getNodeDefinition, type IndicatorNodeDefinition, NODE_CATEGORIES } from '@/constants/node-categories'
 
 interface PropertiesPanelProps {
   selectedNode: Node | null
@@ -38,6 +40,9 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
     )
   }
 
+  const nodeDefinition = getNodeDefinition((selectedNode.data.indicatorType || selectedNode.type) as string)
+  const indicatorDef = nodeDefinition as IndicatorNodeDefinition | undefined
+
   const updateNodeData = (key: string, value: any) => {
     const newData = { ...nodeData, [key]: value }
     setNodeData(newData)
@@ -52,7 +57,137 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
     )
   }
 
-  const renderField = (key: string, value: any) => {
+  const renderParameterField = (param: any) => {
+    const currentValue = nodeData.parameters?.[param.key] ?? param.default
+
+    const updateParameter = (value: any) => {
+      const newParams = { ...nodeData.parameters, [param.key]: value }
+      updateNodeData('parameters', newParams)
+    }
+
+    if (param.type === 'select' && param.options) {
+      return (
+        <div key={param.key} className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor={`param-${param.key}`} className="text-xs font-medium">
+              {param.label}
+            </Label>
+            {param.description && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info size={12} className="text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">{param.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+          <Select value={currentValue} onValueChange={updateParameter}>
+            <SelectTrigger id={`param-${param.key}`} className="h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {param.options.map((opt: any) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )
+    }
+
+    if (param.type === 'number') {
+      const showSlider = param.min !== undefined && param.max !== undefined
+      return (
+        <div key={param.key} className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Label htmlFor={`param-${param.key}`} className="text-xs font-medium">
+                {param.label}
+              </Label>
+              {param.description && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info size={12} className="text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs max-w-xs">{param.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground font-mono">{currentValue}</span>
+          </div>
+          {showSlider ? (
+            <>
+              <Slider
+                id={`param-${param.key}`}
+                min={param.min}
+                max={param.max}
+                step={param.step || 1}
+                value={[currentValue]}
+                onValueChange={([v]) => updateParameter(v)}
+                className="py-1"
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+                <span>{param.min}</span>
+                <span>{param.max}</span>
+              </div>
+            </>
+          ) : (
+            <Input
+              id={`param-${param.key}`}
+              type="number"
+              value={currentValue}
+              onChange={(e) => updateParameter(parseFloat(e.target.value) || param.default)}
+              className="h-9"
+              step={param.step || 1}
+            />
+          )}
+        </div>
+      )
+    }
+
+    if (param.type === 'boolean') {
+      return (
+        <div key={param.key} className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Label htmlFor={`param-${param.key}`} className="text-xs font-medium">
+              {param.label}
+            </Label>
+            {param.description && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info size={12} className="text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">{param.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+          <Switch
+            id={`param-${param.key}`}
+            checked={currentValue}
+            onCheckedChange={updateParameter}
+          />
+        </div>
+      )
+    }
+
+    return null
+  }
+
+  const renderLegacyField = (key: string, value: any) => {
     if (key === 'label') {
       return (
         <div key={key} className="space-y-2">
@@ -69,49 +204,8 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
       )
     }
 
-    if (key === 'indicatorType' || key === 'action' || key === 'operator') {
+    if (key === 'indicatorType' || key === 'action' || key === 'operator' || key === 'parameters') {
       return null
-    }
-
-    if (key === 'source') {
-      return (
-        <div key={key} className="space-y-2">
-          <Label htmlFor={`field-${key}`} className="text-xs font-medium">
-            Price Source
-          </Label>
-          <Select value={value} onValueChange={(v) => updateNodeData(key, v)}>
-            <SelectTrigger id={`field-${key}`} className="h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="close">Close</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )
-    }
-
-    if (key === 'method') {
-      return (
-        <div key={key} className="space-y-2">
-          <Label htmlFor={`field-${key}`} className="text-xs font-medium">
-            Calculation Method
-          </Label>
-          <Select value={value} onValueChange={(v) => updateNodeData(key, v)}>
-            <SelectTrigger id={`field-${key}`} className="h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="fixed_percent">Fixed Percent</SelectItem>
-              <SelectItem value="fixed_lots">Fixed Lots</SelectItem>
-              <SelectItem value="kelly">Kelly Criterion</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )
     }
 
     if (typeof value === 'number') {
@@ -150,7 +244,7 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
       )
     }
 
-    if (typeof value === 'string') {
+    if (typeof value === 'string' && key !== 'indicatorType') {
       return (
         <div key={key} className="space-y-2">
           <Label htmlFor={`field-${key}`} className="text-xs font-medium capitalize">
@@ -169,32 +263,39 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
     return null
   }
 
-  const getNodeTypeInfo = () => {
-    const type = selectedNode.type || 'unknown'
-    const typeColors: Record<string, string> = {
-      indicator: 'bg-accent text-accent-foreground',
-      condition: 'bg-blue-500 text-white',
-      logic: 'bg-purple-500 text-white',
-      action: 'bg-bullish text-bullish-foreground',
-      risk: 'bg-yellow-500 text-black'
-    }
-    
-    return {
-      label: type.charAt(0).toUpperCase() + type.slice(1),
-      color: typeColors[type] || 'bg-muted text-muted-foreground'
-    }
+  const getCategoryConfig = () => {
+    const category = selectedNode.type
+    return NODE_CATEGORIES.find(cat => cat.id === category)
   }
 
-  const nodeTypeInfo = getNodeTypeInfo()
+  const categoryConfig = getCategoryConfig()
+  const hasParameters = indicatorDef?.parameters && indicatorDef.parameters.length > 0
 
   return (
     <Card className="w-80 h-full border-border bg-card flex flex-col">
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-base mb-1">Node Properties</h3>
-          <Badge className={nodeTypeInfo.color}>
-            {nodeTypeInfo.label}
-          </Badge>
+          <h3 className="font-semibold text-base mb-2">Node Properties</h3>
+          {categoryConfig && (
+            <div className="flex items-center gap-2">
+              <Badge 
+                variant="outline" 
+                className="text-xs font-mono w-6 h-6 flex items-center justify-center p-0"
+                style={{ 
+                  borderColor: categoryConfig.color,
+                  color: categoryConfig.color
+                }}
+              >
+                {categoryConfig.executionOrder}
+              </Badge>
+              <Badge 
+                variant="secondary"
+                className="text-xs"
+              >
+                {categoryConfig.label}
+              </Badge>
+            </div>
+          )}
         </div>
         <Button
           variant="ghost"
@@ -209,21 +310,70 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Node ID: <span className="font-mono">{selectedNode.id}</span>
+            <p className="text-xs text-muted-foreground mb-1">
+              Node ID
             </p>
+            <p className="text-xs font-mono bg-muted px-2 py-1 rounded">{selectedNode.id}</p>
           </div>
+
+          {nodeDefinition && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Description</p>
+              <p className="text-xs">{nodeDefinition.description}</p>
+            </div>
+          )}
 
           <Separator />
 
-          <div className="space-y-4">
-            {Object.entries(nodeData).map(([key, value]) => renderField(key, value))}
+          <div>
+            <Label className="text-xs font-medium">Node Label</Label>
+            <Input
+              value={nodeData.label}
+              onChange={(e) => updateNodeData('label', e.target.value)}
+              className="h-9 mt-2"
+            />
           </div>
 
-          {Object.keys(nodeData).length === 1 && (
-            <div className="text-center py-6 text-muted-foreground text-sm">
-              No configurable parameters
-            </div>
+          {hasParameters && (
+            <>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-3">Parameters</h4>
+                <div className="space-y-4">
+                  {indicatorDef.parameters.map(param => renderParameterField(param))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {!hasParameters && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                {Object.entries(nodeData)
+                  .filter(([key]) => key !== 'label')
+                  .map(([key, value]) => renderLegacyField(key, value))}
+              </div>
+            </>
+          )}
+
+          {indicatorDef?.outputs && indicatorDef.outputs.length > 0 && (
+            <>
+              <Separator />
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Outputs</h4>
+                <div className="space-y-1">
+                  {indicatorDef.outputs.map(output => (
+                    <div key={output.id} className="text-xs bg-muted px-2 py-1.5 rounded flex items-center justify-between">
+                      <span>{output.label}</span>
+                      <Badge variant="outline" className="text-[10px] font-mono">
+                        {output.id}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </ScrollArea>

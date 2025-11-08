@@ -22,7 +22,7 @@ import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
 import { LogicNode } from './nodes/LogicNode'
 import { RiskNode } from './nodes/RiskNode'
-import { NodePalette } from './NodePalette'
+import { NodePaletteWorkflow } from './NodePaletteWorkflow'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
@@ -238,7 +238,7 @@ export function Canvas() {
 
   return (
     <div className="w-full h-full flex">
-      <NodePalette onNodeAdd={onNodeAdd} />
+      <NodePaletteWorkflow onNodeAdd={onNodeAdd} />
       
       <div ref={reactFlowWrapper} className="flex-1 relative">
         <ReactFlow
