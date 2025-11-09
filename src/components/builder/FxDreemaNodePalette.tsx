@@ -158,25 +158,64 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
       )
     },
     {
-      category: 'trading_actions',
-      label: 'Trading Actions',
-      color: '#F39C12',
-      nodes: NODE_DEFINITIONS.filter(n => 
-        ['buy_limit', 'sell_limit', 'buy_stop', 'sell_stop', 'modify_pending', 
-         'delete_pending', 'stop-loss', 'take-profit', 'position-size', 'trailing-stop'].includes(n.id)
-      )
-    },
-    {
       category: 'chart_objects',
       label: 'Chart & Objects',
-      color: '#CD853F',
-      nodes: NODE_DEFINITIONS.filter(n => n.category === 'graphical')
+      color: '#FF8C69',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('draw_') || n.id.includes('delete_chart')
+      )
     },
     {
       category: 'loop_chart',
       label: 'Loop for Chart Objects',
-      color: '#E67E22',
-      nodes: NODE_DEFINITIONS.filter(n => n.id === 'delete_object')
+      color: '#FF9955',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('loop_chart_') || n.id.includes('loop_all_chart') ||
+        n.id.includes('loop_chart_lines') || n.id.includes('loop_chart_shapes')
+      )
+    },
+    {
+      category: 'output',
+      label: 'Output & Communication',
+      color: '#FFEB3B',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('send_') || n.id.includes('print_') ||
+        n.id.includes('comment_') || n.id.includes('play_sound')
+      )
+    },
+    {
+      category: 'signals',
+      label: 'Various Signals',
+      color: '#FFD700',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('signal_')
+      )
+    },
+    {
+      category: 'controls',
+      label: 'Controlling Blocks',
+      color: '#E6D5B8',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('if_else') || n.id.includes('while_') ||
+        n.id.includes('for_loop') || n.id.includes('break') ||
+        n.id.includes('continue') || n.id.includes('wait')
+      )
+    },
+    {
+      category: 'flags',
+      label: 'Flags',
+      color: '#98D98E',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('flag_')
+      )
+    },
+    {
+      category: 'counters',
+      label: 'Counters',
+      color: '#7BC8A4',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('counter_')
+      )
     },
     {
       category: 'output',
