@@ -13,8 +13,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Gear, BookOpen, Code, Robot } from '@phosphor-icons/react'
+import { Gear, BookOpen, Code, Robot, ChartLine, Question } from '@phosphor-icons/react'
 import { EADocumentation } from '@/components/builder/EADocumentation'
+import { CustomIndicatorManager } from '@/components/builder/CustomIndicatorManager'
+import { CustomIndicatorGuide } from '@/components/builder/CustomIndicatorGuide'
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 
@@ -38,6 +40,8 @@ const DEFAULT_EA_SETTINGS: EASettings = {
 
 export function SettingsView() {
   const [showEADocs, setShowEADocs] = useState(false)
+  const [showIndicatorManager, setShowIndicatorManager] = useState(false)
+  const [showIndicatorGuide, setShowIndicatorGuide] = useState(false)
   const [eaSettings, setEASettings] = useKV<EASettings>('ea-settings', DEFAULT_EA_SETTINGS)
 
   return (
@@ -75,9 +79,10 @@ export function SettingsView() {
         <Separator />
 
         <Tabs defaultValue="trading" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="trading">Trading</TabsTrigger>
             <TabsTrigger value="ea-settings">EA Settings</TabsTrigger>
+            <TabsTrigger value="indicators">Indicators</TabsTrigger>
             <TabsTrigger value="interface">Interface</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
           </TabsList>
@@ -322,6 +327,89 @@ export function SettingsView() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="indicators" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <ChartLine size={24} className="text-accent" />
+                  <div>
+                    <CardTitle>Custom Indicators</CardTitle>
+                    <CardDescription>
+                      Manage your MetaTrader custom indicators library
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium text-sm">About Custom Indicators</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Custom indicators are technical analysis tools you can write for MetaTrader. They fill output buffers 
+                    with numeric data that can be read by Expert Advisors. Each buffer maps to candles on the chart.
+                  </p>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p><strong>Important Notes:</strong></p>
+                    <ul className="list-disc list-inside space-y-1 ml-2">
+                      <li>EMPTY_VALUE indicates no data (conditions won't pass)</li>
+                      <li>For arrow indicators, try Candle ID &gt; 0 (signals on older candles)</li>
+                      <li>Some indicators draw objects directly (not in buffers)</li>
+                      <li>Buffer indices start at 0 (first buffer is 0, second is 1, etc.)</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full"
+                  onClick={() => setShowIndicatorManager(true)}
+                >
+                  <ChartLine className="mr-2" size={16} />
+                  Manage Custom Indicators
+                </Button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-xs"
+                    onClick={() => setShowIndicatorGuide(true)}
+                  >
+                    <BookOpen className="mr-2" size={14} />
+                    Indicator Guide
+                  </Button>
+                  <Button variant="outline" className="w-full text-xs">
+                    <Code className="mr-2" size={14} />
+                    MQL Reference
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Indicator Locations</CardTitle>
+                <CardDescription>
+                  Where to find your custom indicators in MetaTrader
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">MetaTrader 4</Label>
+                  <div className="bg-muted/50 p-3 rounded font-mono text-xs break-all">
+                    %Data Folder%/MQL4/Indicators/
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">MetaTrader 5</Label>
+                  <div className="bg-muted/50 p-3 rounded font-mono text-xs break-all">
+                    %Data Folder%/MQL5/Indicators/
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Open Data Folder: File → Open Data Folder in MetaTrader
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="interface" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
@@ -490,6 +578,26 @@ export function SettingsView() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <CustomIndicatorManager
+        open={showIndicatorManager}
+        onOpenChange={setShowIndicatorManager}
+      />
+
+      <Dialog open={showIndicatorGuide} onOpenChange={setShowIndicatorGuide}>
+        <DialogContent className="max-w-4xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Question size={20} />
+              Custom Indicators Guide
+            </DialogTitle>
+            <DialogDescription>
+              Everything you need to know about using custom indicators
+            </DialogDescription>
+          </DialogHeader>
+          <CustomIndicatorGuide />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
