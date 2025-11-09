@@ -65,8 +65,8 @@ export class StrategyExecutor {
   private nodeExecutionEngine: NodeExecutionEngine
 
   constructor(private strategy: Strategy, enableVisualization: boolean = false) {
-    this.nodes = new Map(strategy.nodes.map(n => [n.id, n]))
-    this.edges = strategy.edges
+    this.nodes = new Map((strategy.nodes || []).map(n => [n.id, n]))
+    this.edges = strategy.edges || []
     this.indicatorCache = new Map()
     this.nodeValues = new Map()
     this.visualizer = new ExecutionVisualizer()

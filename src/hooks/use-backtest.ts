@@ -22,6 +22,10 @@ export function useBacktest() {
     setResult(null)
 
     try {
+      if (!strategy.nodes || strategy.nodes.length === 0) {
+        throw new Error('Strategy has no nodes')
+      }
+
       const data: OHLCV[] = SAMPLE_DATA[symbol as keyof typeof SAMPLE_DATA] || SAMPLE_DATA.EURUSD
 
       const backtestConfig: BacktestConfig = {

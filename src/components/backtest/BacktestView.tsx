@@ -69,7 +69,7 @@ export function BacktestView() {
                   {strategies && strategies.length > 0 ? (
                     strategies.map(s => (
                       <SelectItem key={s.id} value={s.id}>
-                        {s.name} ({s.nodes.length} nodes)
+                        {s.name} ({s.nodes?.length || 0} nodes)
                       </SelectItem>
                     ))
                   ) : (

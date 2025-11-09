@@ -107,7 +107,7 @@ export function LibraryView({ onLoadStrategy }: LibraryViewProps = {}) {
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <GitBranch size={14} />
-                      <span>{strategy.nodes.length} nodes</span>
+                      <span>{strategy.nodes?.length || 0} nodes</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <CalendarDots size={14} />

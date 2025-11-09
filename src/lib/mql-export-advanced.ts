@@ -36,8 +36,8 @@ export function exportToMQL(strategy: Strategy, options: MQLExportOptions): stri
 }
 
 function analyzeStrategyGraph(strategy: Strategy): GraphAnalysis {
-  const nodes = strategy.nodes
-  const edges = strategy.edges
+  const nodes = strategy.nodes || []
+  const edges = strategy.edges || []
   
   const eventNodes = nodes.filter(n => (n.data as any).category === 'event')
   const indicators = nodes.filter(n => (n.data as any).category === 'indicator')

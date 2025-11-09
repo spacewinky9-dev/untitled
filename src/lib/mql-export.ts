@@ -19,8 +19,8 @@ export function exportToMQL(strategy: Strategy, options: MQLExportOptions): stri
 
 function generateMQL4(strategy: Strategy, options: MQLExportOptions): string {
   const { expertName, magicNumber } = options
-  const nodes = strategy.nodes
-  const edges = strategy.edges
+  const nodes = strategy.nodes || []
+  const edges = strategy.edges || []
 
   const indicators = nodes.filter(n => n.type === 'indicator')
   const conditions = nodes.filter(n => n.type === 'condition')
@@ -87,8 +87,8 @@ ${generateHelperFunctions()}
 
 function generateMQL5(strategy: Strategy, options: MQLExportOptions): string {
   const { expertName, magicNumber } = options
-  const nodes = strategy.nodes
-  const edges = strategy.edges
+  const nodes = strategy.nodes || []
+  const edges = strategy.edges || []
 
   const indicators = nodes.filter(n => n.type === 'indicator')
   const conditions = nodes.filter(n => n.type === 'condition')
