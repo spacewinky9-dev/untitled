@@ -17,7 +17,15 @@ import {
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus, Question } from '@phosphor-icons/react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import { IndicatorNode } from './nodes/IndicatorNode'
 import { ConditionNode } from './nodes/ConditionNode'
 import { ActionNode } from './nodes/ActionNode'
@@ -42,6 +50,7 @@ import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
 import { EACreationGuide } from './EACreationGuide'
+import { EADocumentation } from './EADocumentation'
 import { ContextMenuWrapper } from './ContextMenu'
 import { NewProjectDialog, ProjectConfig } from './NewProjectDialog'
 import { LoadStrategyDialog } from './LoadStrategyDialog'
@@ -94,6 +103,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [showEditLabelDialog, setShowEditLabelDialog] = useState(false)
+  const [showEADocs, setShowEADocs] = useState(false)
   const [showBlockNumbers, setShowBlockNumbers] = useState(true)
   const [activeEvent, setActiveEvent] = useState<EventCategory>('ontick')
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
@@ -646,6 +656,28 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               
               <Panel position="top-left" className="flex gap-2">
                 <EACreationGuide />
+                <Dialog open={showEADocs} onOpenChange={setShowEADocs}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="gap-2"
+                      title="Expert Advisor Documentation"
+                    >
+                      <Question size={16} />
+                      EA Guide
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-6xl h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle>Expert Advisor Documentation</DialogTitle>
+                      <DialogDescription>
+                        Complete guide to understanding and creating Expert Advisors
+                      </DialogDescription>
+                    </DialogHeader>
+                    <EADocumentation />
+                  </DialogContent>
+                </Dialog>
               <Button 
                 size="sm" 
                 variant="outline"
