@@ -256,18 +256,30 @@ interface NodeItemProps {
 }
 
 function NodeItem({ node, onDragStart, onClick }: NodeItemProps) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.stopPropagation()
+    onDragStart(e, node)
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClick()
+  }
+
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, node)}
-      onClick={onClick}
+      draggable={true}
+      onDragStart={handleDragStart}
+      onClick={handleClick}
+      onDragEnd={(e) => e.preventDefault()}
       className={cn(
-        'group cursor-grab active:cursor-grabbing',
+        'group cursor-grab active:cursor-grabbing select-none',
         'px-3 py-[3px] border-b border-[#555]/20',
         'hover:bg-[#4a4a4a] transition-colors'
       )}
+      style={{ WebkitUserDrag: 'element' } as React.CSSProperties}
     >
-      <div className="text-[11px] text-white font-normal leading-[1.4]">
+      <div className="text-[11px] text-white font-medium leading-[1.4] pointer-events-none">
         {node.label}
       </div>
     </div>
