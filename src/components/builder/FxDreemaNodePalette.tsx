@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Button } from '@/components/ui/button'
-import { CaretDown, CaretRight, MagnifyingGlass } from '@phosphor-icons/react'
-import { NODE_DEFINITIONS, NodeDefinition, NodeCategory } from '@/constants/node-categories'
+import { MagnifyingGlass } from '@phosphor-icons/react'
+import { NODE_DEFINITIONS, NodeDefinition } from '@/constants/node-categories'
 import { cn } from '@/lib/utils'
 
 interface FxDreemaNodePaletteProps {
@@ -16,11 +15,12 @@ interface CategoryNodes {
   label: string
   color: string
   nodes: NodeDefinition[]
+  collapsed?: boolean
 }
 
 export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['variables']))
 
   const onDragStart = (event: React.DragEvent, nodeDefinition: NodeDefinition) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeDefinition))
@@ -39,21 +39,28 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
 
   const categories: CategoryNodes[] = [
     {
+      category: 'constants',
+      label: 'Constants (Inputs)',
+      color: '#C8A46E',
+      nodes: NODE_DEFINITIONS.filter(n => n.id === 'global_constant')
+    },
+    {
       category: 'variables',
       label: 'Variables',
-      color: '#C8A46E',
+      color: '#8B7355',
       nodes: NODE_DEFINITIONS.filter(n => 
         n.id === 'set_variable' || n.id === 'get_variable' || 
-        n.id === 'global_constant' || n.id === 'global_variable'
+        n.id === 'global_variable' || n.id === 'array'
       )
     },
     {
-      category: 'condition',
+      category: 'condition_formula',
       label: 'Condition & Formula',
       color: '#D9BD6A',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'comparison' || n.id === 'cross' || 
-        n.id === 'threshold' || n.id === 'range'
+        ['comparison', 'cross', 'threshold', 'range', 'pattern'].includes(n.id) ||
+        ['math_add', 'math_subtract', 'math_multiply', 'math_divide', 'math_power', 
+         'math_sqrt', 'math_abs', 'math_min', 'math_max', 'math_modulus'].includes(n.id)
       )
     },
     {
@@ -69,84 +76,74 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
       nodes: NODE_DEFINITIONS.filter(n => n.id === 'time_filter')
     },
     {
-      category: 'trades',
+      category: 'trades_count',
       label: 'Check Trades & Orders Count',
       color: '#D9BD6A',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'trades_count' || n.id === 'trade_exists' || 
-        n.id === 'pending_exists'
+        ['trades_count', 'trade_exists', 'pending_exists'].includes(n.id)
       )
     },
     {
-      category: 'tradingconditions',
+      category: 'trading_conditions',
       label: 'Check Trading Conditions',
       color: '#D9BD6A',
-      nodes: NODE_DEFINITIONS.filter(n => n.id === 'spread_filter')
+      nodes: NODE_DEFINITIONS.filter(n => ['spread_filter', 'dynamic_value_check'].includes(n.id))
     },
     {
       category: 'buysell',
       label: 'Buy / Sell',
-      color: '#F05D5E',
-      nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'buy' || n.id === 'sell' || n.id === 'close'
-      )
+      color: '#E74C3C',
+      nodes: NODE_DEFINITIONS.filter(n => ['buy', 'sell', 'close'].includes(n.id))
     },
     {
       category: 'bucket',
       label: 'Bucket of Trades & Orders',
-      color: '#0F52BA',
-      nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'trade_group' || n.id === 'for_each_trade'
-      )
+      color: '#5DADE2',
+      nodes: NODE_DEFINITIONS.filter(n => ['trade_group', 'for_each_trade'].includes(n.id))
     },
     {
       category: 'loop',
       label: 'Loop for Trades & Orders',
-      color: '#A855F7',
+      color: '#BB8FCE',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'for_each_trade' || n.id === 'for_each_pending' || 
-        n.id === 'for_each_symbol' || n.id === 'repeat_n'
+        ['for_each_trade', 'for_each_pending', 'for_each_symbol', 'repeat_n'].includes(n.id)
       )
     },
     {
       category: 'trailing',
       label: 'Trailing Stop / Break Even',
-      color: '#D4AF37',
+      color: '#D4AC6E',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'trailing_stop' || n.id === 'break_even' || 
-        n.id === 'trailing_stop_advanced' || n.id === 'trail_group'
+        ['trailing_stop', 'break_even', 'trailing_stop_advanced', 'trail_group'].includes(n.id)
       )
     },
     {
-      category: 'tradingactions',
+      category: 'trading_actions',
       label: 'Trading Actions',
-      color: '#F97316',
+      color: '#F39C12',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'buy_limit' || n.id === 'sell_limit' || 
-        n.id === 'buy_stop' || n.id === 'sell_stop' ||
-        n.id === 'modify_pending' || n.id === 'delete_pending' ||
-        n.id === 'stop-loss' || n.id === 'take-profit'
+        ['buy_limit', 'sell_limit', 'buy_stop', 'sell_stop', 'modify_pending', 
+         'delete_pending', 'stop-loss', 'take-profit', 'position-size', 'trailing-stop'].includes(n.id)
       )
     },
     {
-      category: 'chartobjects',
+      category: 'chart_objects',
       label: 'Chart & Objects',
-      color: '#D2691E',
+      color: '#CD853F',
       nodes: NODE_DEFINITIONS.filter(n => n.category === 'graphical')
     },
     {
-      category: 'loopchart',
+      category: 'loop_chart',
       label: 'Loop for Chart Objects',
-      color: '#F97316',
+      color: '#E67E22',
       nodes: NODE_DEFINITIONS.filter(n => n.id === 'delete_object')
     },
     {
       category: 'output',
       label: 'Output & Communication',
-      color: '#8B4513',
+      color: '#8B6914',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'print' || n.id === 'comment' || n.id === 'alert' ||
-        n.category === 'messaging'
+        ['print', 'comment', 'alert'].includes(n.id) || n.category === 'messaging'
       )
     },
     {
@@ -158,25 +155,33 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
     {
       category: 'controlling',
       label: 'Controlling Blocks',
-      color: '#8B4513',
+      color: '#8B7355',
       nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'if' || n.id === 'else' || n.id === 'and' || 
-        n.id === 'or' || n.id === 'not' || n.id === 'xor'
+        ['if', 'else', 'and', 'or', 'not', 'xor', 'pass'].includes(n.id)
       )
     },
     {
       category: 'flags',
       label: 'Flags',
       color: '#A9A9A9',
-      nodes: NODE_DEFINITIONS.filter(n => 
-        n.id === 'set_variable' || n.id === 'get_variable'
-      )
+      nodes: NODE_DEFINITIONS.filter(n => ['set_variable', 'get_variable'].includes(n.id))
     },
     {
       category: 'counters',
       label: 'Counters',
       color: '#B4C7A9',
       nodes: NODE_DEFINITIONS.filter(n => n.id === 'counter')
+    },
+    {
+      category: 'more',
+      label: 'More...',
+      color: '#7F8C8D',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.category === 'money_management' || n.category === 'file_ops' || 
+        n.category === 'terminal' || n.category === 'custom' ||
+        ['account_balance', 'account_equity', 'account_margin', 'account_profit',
+         'symbol_bid', 'symbol_ask', 'symbol_spread'].includes(n.id)
+      )
     }
   ]
 
@@ -193,15 +198,15 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
     .filter(cat => cat.nodes.length > 0)
 
   return (
-    <Card className="w-[200px] h-full border-r border-border bg-[#404040] flex flex-col">
-      <div className="p-2 border-b border-border/50">
-        <div className="relative mb-2">
-          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+    <Card className="w-[200px] h-full border-r border-[#555] bg-[#404040] flex flex-col shadow-none rounded-none">
+      <div className="p-2 border-b border-[#555]">
+        <div className="relative">
+          <MagnifyingGlass className="absolute left-2 top-1/2 -translate-y-1/2 text-[#999]" size={14} weight="bold" />
           <Input
             placeholder="Search:"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-7 pl-7 text-xs bg-[#383838] border-border/50"
+            className="h-6 pl-7 text-[11px] bg-[#383838] border-[#555] text-white placeholder:text-[#999] rounded-sm"
           />
         </div>
       </div>
@@ -210,29 +215,22 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
         <div className="p-0">
           {filteredCategories.map((category) => {
             const isExpanded = expandedCategories.has(category.category)
-            const visibleNodes = isExpanded ? category.nodes : category.nodes.slice(0, 5)
-            const hasMore = category.nodes.length > 5
 
             return (
-              <div key={category.category} className="border-b border-border/30">
+              <div key={category.category} className="border-b border-[#555]/50">
                 <button
                   onClick={() => toggleCategory(category.category)}
-                  className="w-full px-2 py-1.5 flex items-center gap-1 hover:bg-white/5 transition-colors text-left"
+                  className="w-full px-2 py-[3px] flex items-start gap-1 hover:brightness-110 transition-all text-left"
                   style={{ backgroundColor: category.color }}
                 >
-                  {isExpanded ? (
-                    <CaretDown size={12} weight="bold" className="flex-shrink-0" />
-                  ) : (
-                    <CaretRight size={12} weight="bold" className="flex-shrink-0" />
-                  )}
-                  <span className="text-xs font-bold text-black leading-tight">
-                    {category.label}
+                  <span className="text-[11px] font-bold text-black leading-[1.3] mt-[1px]">
+                    {!isExpanded ? '▶' : '▼'} {category.label}
                   </span>
                 </button>
 
                 {isExpanded && (
                   <div className="bg-[#383838]">
-                    {visibleNodes.map((node) => (
+                    {category.nodes.map((node) => (
                       <NodeItem
                         key={node.id}
                         node={node}
@@ -240,25 +238,6 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
                         onClick={() => onNodeAdd?.(node)}
                       />
                     ))}
-                    {hasMore && (
-                      <button
-                        onClick={() => toggleCategory(category.category)}
-                        className="w-full px-3 py-1 text-xs text-primary hover:bg-white/5"
-                      >
-                        Show Less...
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {!isExpanded && hasMore && (
-                  <div className="bg-[#383838] px-3 py-1">
-                    <button
-                      onClick={() => toggleCategory(category.category)}
-                      className="text-xs text-primary hover:underline"
-                    >
-                      More...
-                    </button>
                   </div>
                 )}
               </div>
@@ -284,11 +263,11 @@ function NodeItem({ node, onDragStart, onClick }: NodeItemProps) {
       onClick={onClick}
       className={cn(
         'group cursor-grab active:cursor-grabbing',
-        'px-3 py-1.5 border-b border-border/20',
-        'hover:bg-white/10 transition-colors'
+        'px-3 py-[3px] border-b border-[#555]/20',
+        'hover:bg-[#4a4a4a] transition-colors'
       )}
     >
-      <div className="text-xs text-foreground font-medium leading-tight">
+      <div className="text-[11px] text-white font-normal leading-[1.4]">
         {node.label}
       </div>
     </div>
