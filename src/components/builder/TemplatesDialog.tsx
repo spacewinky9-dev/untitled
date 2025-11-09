@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { STRATEGY_TEMPLATES, StrategyTemplate } from '@/lib/strategy-templates'
-import { TrendUp, Lightning, ArrowsClockwise, ChartLineUp, Zap } from '@phosphor-icons/react'
+import { TrendUp, Lightning, ArrowsClockwise, ChartLineUp } from '@phosphor-icons/react'
+import Zap from 'lucide-react/dist/esm/icons/zap'
 
 interface TemplatesDialogProps {
   open: boolean
@@ -34,7 +35,7 @@ export function TemplatesDialog({ open, onOpenChange, onLoadTemplate }: Template
       case 'breakout':
         return <ChartLineUp size={20} />
       case 'scalping':
-        return <Zap size={20} />
+        return <Zap className="w-5 h-5" />
       default:
         return null
     }

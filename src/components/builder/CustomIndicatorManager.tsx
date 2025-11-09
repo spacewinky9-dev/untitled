@@ -13,7 +13,9 @@ import { Separator } from '@/components/ui/separator'
 import { useKV } from '@github/spark/hooks'
 import { CustomIndicator, CustomIndicatorInputParameter, CustomIndicatorOutputBuffer } from '@/types/custom-indicator'
 import { CustomIndicatorParser } from '@/lib/custom-indicator-parser'
-import { Plus, Upload, Code, Trash2, Edit, FileCode, Database, ArrowRight, Info } from '@phosphor-icons/react'
+import { Plus, Upload, Code, FileCode, Database, ArrowRight, Info } from '@phosphor-icons/react'
+import Trash from 'lucide-react/dist/esm/icons/trash'
+import Pencil from 'lucide-react/dist/esm/icons/pencil'
 import { toast } from 'sonner'
 
 interface CustomIndicatorManagerProps {
@@ -158,14 +160,14 @@ function IndicatorLibrary({ indicators, onDelete, onEdit, onAdd }: IndicatorLibr
                     variant="ghost"
                     onClick={() => onEdit(indicator)}
                   >
-                    <Edit className="w-4 h-4" />
+                    <Pencil className="w-4 h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onDelete(indicator.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -642,7 +644,7 @@ function ManualEntry({ indicators, editingIndicator, onIndicatorAdded, onCancel 
                         variant="ghost"
                         onClick={() => handleRemoveParameter(index)}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
@@ -683,7 +685,7 @@ function ManualEntry({ indicators, editingIndicator, onIndicatorAdded, onCancel 
                       onClick={() => handleRemoveBuffer(index)}
                       disabled={outputBuffers.length === 1}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash className="w-4 h-4" />
                     </Button>
                   </div>
                 </Card>
