@@ -67,7 +67,12 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
       category: 'indicators',
       label: 'Conditions for Indicators',
       color: '#F4D88A',
-      nodes: NODE_DEFINITIONS.filter(n => n.category === 'indicator')
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('indicator_') || 
+        n.id.includes('price_above_indicator') ||
+        n.id.includes('price_below_indicator') ||
+        n.id.includes('two_indicators_cross')
+      )
     },
     {
       category: 'timefilters',

@@ -1,3 +1,5 @@
+import { INDICATOR_CONDITION_DEFINITIONS } from './indicator-conditions'
+
 export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced' | 'money_management' | 'graphical' | 'messaging' | 'file_ops' | 'terminal' | 'custom'
 
 export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'ontrade' | 'onchart' | 'ondeinit' | 'all'
@@ -560,6 +562,7 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
 
 export const NODE_DEFINITIONS: NodeDefinition[] = [
   ...INDICATOR_DEFINITIONS,
+  ...INDICATOR_CONDITION_DEFINITIONS,
   {
     id: 'on_init',
     type: 'event',
