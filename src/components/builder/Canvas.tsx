@@ -363,6 +363,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         id: `node-${nodeIdCounter}`,
         type: nodeDefinition.type,
         position,
+        draggable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -384,6 +385,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         id: `node-${nodeIdCounter}`,
         type: nodeDefinition.type,
         position,
+        draggable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -608,6 +610,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       id: n.id,
       type: n.type,
       position: n.position,
+      draggable: true,
       data: n.data
     }))
     
@@ -640,6 +643,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       id: n.id,
       type: n.type,
       position: n.position,
+      draggable: true,
       data: n.data
     }))
     
@@ -682,6 +686,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       
       return {
         ...node,
+        draggable: true,
         data: {
           ...node.data,
           blockNumber: displayLabel,
@@ -756,6 +761,10 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               onNodeDoubleClick={onNodeDoubleClick}
               onPaneClick={onPaneClick}
               nodeTypes={nodeTypes}
+              nodesDraggable={true}
+              nodesConnectable={true}
+              nodesFocusable={true}
+              elementsSelectable={true}
               fitView
               className="bg-background"
             >

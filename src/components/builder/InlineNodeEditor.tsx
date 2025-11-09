@@ -83,6 +83,7 @@ export function InlineNodeEditor({
         className
       )}
       onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
     />
   )
 }
