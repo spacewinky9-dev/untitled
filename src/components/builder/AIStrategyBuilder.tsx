@@ -64,7 +64,7 @@ export function AIStrategyBuilder({ open, onOpenChange, onStrategyGenerated }: A
       updateStep(0, 'processing')
       setProgress(20)
 
-      const promptText = `You are a Forex trading strategy expert. Based on the following user description, generate a complete trading strategy structure.
+      const aiPrompt = spark.llmPrompt`You are a Forex trading strategy expert. Based on the following user description, generate a complete trading strategy structure.
 
 User Description: ${prompt}
 
@@ -73,14 +73,15 @@ Return a JSON object with this exact structure:
   "nodes": [
     {
       "id": "unique-id",
-      "type": "indicator|condition|logic|action|risk",
+      "type": "event|indicator|condition|logic|action|risk",
       "position": {"x": number, "y": number},
       "data": {
         "label": "Node Label",
-        "indicatorType": "optional indicator type",
-        "parameters": {"key": "value"},
-        "operator": "optional operator",
-        "action": "optional action type"
+        "indicatorType": "sma|ema|rsi|macd|bb|atr|stochastic|cci|adx|williams|sar|obv|vwap|wma",
+        "parameters": {},
+        "operator": "gt|lt|gte|lte|eq|neq|cross_above|cross_below",
+        "action": "buy|sell|close",
+        "riskType": "stop_loss|take_profit|position_size|trailing_stop"
       }
     }
   ],
@@ -89,27 +90,72 @@ Return a JSON object with this exact structure:
       "id": "edge-id",
       "source": "source-node-id",
       "target": "target-node-id",
-      "sourceHandle": "output-handle-id",
-      "targetHandle": "input-handle-id"
+      "sourceHandle": "output",
+      "targetHandle": "input"
     }
   ],
   "explanation": "Brief explanation of the strategy logic"
 }
 
+Available node types and their details:
+
+EVENT NODES (always start with one):
+- type: "event", data.label: "OnTick" - triggers on every price tick
+
+INDICATOR NODES with parameters:
+- type: "indicator", data.indicatorType: "sma", data.parameters: {"period": 20, "source": "close"}
+- type: "indicator", data.indicatorType: "ema", data.parameters: {"period": 20, "source": "close"}
+- type: "indicator", data.indicatorType: "rsi", data.parameters: {"period": 14, "overbought": 70, "oversold": 30}
+- type: "indicator", data.indicatorType: "macd", data.parameters: {"fastPeriod": 12, "slowPeriod": 26, "signalPeriod": 9}
+- type: "indicator", data.indicatorType: "bb", data.parameters: {"period": 20, "stdDev": 2.0}
+- type: "indicator", data.indicatorType: "atr", data.parameters: {"period": 14}
+- type: "indicator", data.indicatorType: "stochastic", data.parameters: {"kPeriod": 14, "dPeriod": 3, "slowing": 3}
+- type: "indicator", data.indicatorType: "cci", data.parameters: {"period": 14}
+
+CONDITION NODES with operators:
+- type: "condition", data.operator: "gt" (greater than), data.parameters: {"threshold": 70}
+- type: "condition", data.operator: "lt" (less than), data.parameters: {"threshold": 30}
+- type: "condition", data.operator: "cross_above", data.parameters: {}
+- type: "condition", data.operator: "cross_below", data.parameters: {}
+
+LOGIC NODES:
+- type: "logic", data.label: "AND" - requires all inputs true
+- type: "logic", data.label: "OR" - requires any input true
+- type: "logic", data.label: "NOT" - inverts input
+
+ACTION NODES:
+- type: "action", data.action: "buy", data.label: "Buy"
+- type: "action", data.action: "sell", data.label: "Sell"
+- type: "action", data.action: "close", data.label: "Close Position"
+
+RISK NODES:
+- type: "risk", data.riskType: "stop_loss", data.parameters: {"pips": 20}
+- type: "risk", data.riskType: "take_profit", data.parameters: {"pips": 40}
+- type: "risk", data.riskType: "position_size", data.parameters: {"riskPercent": 1.0}
+- type: "risk", data.riskType: "trailing_stop", data.parameters: {"pips": 15, "step": 5}
+
 Important rules:
-1. Create realistic technical indicator nodes (SMA, EMA, RSI, MACD, etc.)
-2. Include proper condition nodes to compare indicators
-3. Add logic gates (AND, OR) if multiple conditions needed
-4. Include buy and sell action nodes
-5. Add risk management nodes (stop loss, take profit)
-6. Position nodes in a logical left-to-right flow (indicators left, conditions center, actions right)
-7. Ensure all node IDs are unique
-8. Create valid edges connecting nodes properly
-9. Use standard parameter values
+1. ALWAYS start with an OnTick event node at position x:50, y:200
+2. Position nodes left-to-right: Events(x:50) → Indicators(x:250-400) → Conditions(x:550-700) → Logic(x:850) → Actions(x:1000)
+3. Vertical spacing: space nodes 150px apart vertically if multiple at same stage
+4. Use realistic parameter values for indicators
+5. Connect nodes in proper flow order
+6. Handle format: sourceHandle: "output", targetHandle: "input"
+7. Ensure all node IDs are unique (use descriptive names like "ontick_1", "rsi_1", "condition_rsi_low", "buy_action")
+8. For RSI strategy: RSI indicator → condition (< 30 oversold or > 70 overbought) → action
+9. For MA crossover: Two MA indicators → cross_above/cross_below condition → action
+10. Include risk management nodes for realistic strategies
 
-Example flow: Indicator → Condition → Logic Gate → Action`
+Example valid strategy (RSI oversold/overbought):
+- OnTick event (x:50, y:200)
+- RSI indicator (x:300, y:200)
+- Condition RSI < 30 (x:600, y:150)
+- Buy action (x:900, y:150)
+- Condition RSI > 70 (x:600, y:250)
+- Sell action (x:900, y:250)
+With edges connecting: event→rsi, rsi→condition_low, condition_low→buy, rsi→condition_high, condition_high→sell`
 
-      const result = await window.spark.llm(promptText, 'gpt-4o', true)
+      const result = await window.spark.llm(aiPrompt, 'gpt-4o', true)
       updateStep(0, 'complete')
       setProgress(40)
 
@@ -175,10 +221,12 @@ Example flow: Indicator → Condition → Logic Gate → Action`
   }
 
   const examplePrompts = [
-    "Create a simple moving average crossover strategy with 20 and 50 periods",
-    "Build an RSI strategy that buys when oversold below 30 and sells when overbought above 70",
-    "Make a MACD strategy with trend confirmation using 200 EMA",
-    "Create a Bollinger Bands mean reversion strategy with RSI filter"
+    "Create a simple RSI strategy that buys when RSI(14) is below 30 (oversold) and sells when RSI is above 70 (overbought). Include 20 pip stop loss and 40 pip take profit.",
+    "Build a moving average crossover strategy where we buy when 20 EMA crosses above 50 EMA, and sell when 20 EMA crosses below 50 EMA. Add position sizing with 1% risk.",
+    "Make a MACD momentum strategy that buys when MACD line crosses above signal line and sells when it crosses below. Use default MACD parameters (12,26,9).",
+    "Create a Bollinger Bands mean reversion strategy that buys when price touches lower band and sells when price touches upper band. Use 20 period BB with 2 standard deviations.",
+    "Build a trend-following strategy using 200 EMA as filter. Buy when price is above 200 EMA AND RSI is above 50. Sell when price is below 200 EMA AND RSI is below 50.",
+    "Create a breakout strategy using ATR. Buy when price breaks above recent high with ATR-based stop loss at 2x ATR. Include trailing stop of 1.5x ATR."
   ]
 
   return (
@@ -205,10 +253,10 @@ Example flow: Indicator → Condition → Logic Gate → Action`
             </Label>
             <Textarea
               id="strategy-prompt"
-              placeholder="Example: Create a trend-following strategy using EMA crossover with RSI confirmation. Buy when 20 EMA crosses above 50 EMA and RSI is above 50. Set stop loss at 50 pips and take profit at 100 pips..."
+              placeholder="Example: Create a trend-following strategy using 20 and 50 period EMA crossover. Buy when 20 EMA crosses above 50 EMA AND price is above 200 EMA. Sell when 20 EMA crosses below 50 EMA AND price is below 200 EMA. Use 30 pip stop loss and 60 pip take profit with 1% position sizing..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              className="min-h-[120px] resize-none"
+              className="min-h-[140px] resize-none"
               disabled={isGenerating}
             />
             <p className="text-xs text-muted-foreground">

@@ -164,8 +164,9 @@ function generateIndicatorInputs(indicators: Node[]): string {
   indicators.forEach(node => {
     const data = node.data as any
     const params = data.parameters || {}
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
     
-    switch (node.id.split('_')[0]) {
+    switch (indicatorType) {
       case 'sma':
       case 'ema':
       case 'wma':
@@ -188,6 +189,28 @@ function generateIndicatorInputs(indicators: Node[]): string {
       case 'atr':
         inputs.push(`input int ATR_Period_${node.id} = ${params.period || 14};`)
         break
+      case 'stochastic':
+        inputs.push(`input int Stoch_K_Period_${node.id} = ${params.kPeriod || 14};`)
+        inputs.push(`input int Stoch_D_Period_${node.id} = ${params.dPeriod || 3};`)
+        inputs.push(`input int Stoch_Slowing_${node.id} = ${params.slowing || 3};`)
+        break
+      case 'cci':
+        inputs.push(`input int CCI_Period_${node.id} = ${params.period || 14};`)
+        break
+      case 'adx':
+        inputs.push(`input int ADX_Period_${node.id} = ${params.period || 14};`)
+        break
+      case 'williams':
+        inputs.push(`input int Williams_Period_${node.id} = ${params.period || 14};`)
+        break
+      case 'sar':
+        inputs.push(`input double SAR_Step_${node.id} = ${params.step || 0.02};`)
+        inputs.push(`input double SAR_Maximum_${node.id} = ${params.maximum || 0.2};`)
+        break
+      case 'obv':
+        break
+      case 'vwap':
+        break
     }
   })
   
@@ -197,26 +220,47 @@ function generateIndicatorInputs(indicators: Node[]): string {
 function generateRiskInputs(riskNodes: Node[]): string {
   const inputs: string[] = []
   
+  let hasStopLoss = false
+  let hasTakeProfit = false
+  
   riskNodes.forEach(node => {
     const data = node.data as any
     const params = data.parameters || {}
+    const riskType = data.riskType || node.id.split('_')[0]
     
-    switch (node.id.split('_')[0]) {
+    switch (riskType) {
       case 'stop':
-        inputs.push(`input int StopLoss_Pips_${node.id} = ${params.pips || 20};`)
+      case 'stop_loss':
+        if (!hasStopLoss) {
+          inputs.push(`input int StopLoss_Pips = ${params.pips || 20};`)
+          hasStopLoss = true
+        }
         break
       case 'take':
-        inputs.push(`input int TakeProfit_Pips_${node.id} = ${params.pips || 40};`)
+      case 'take_profit':
+        if (!hasTakeProfit) {
+          inputs.push(`input int TakeProfit_Pips = ${params.pips || 40};`)
+          hasTakeProfit = true
+        }
         break
       case 'trailing':
-        inputs.push(`input int TrailingStop_Pips_${node.id} = ${params.pips || 15};`)
-        inputs.push(`input int TrailingStep_Pips_${node.id} = ${params.step || 5};`)
+      case 'trailing_stop':
+        inputs.push(`input int TrailingStop_Pips = ${params.pips || 15};`)
+        inputs.push(`input int TrailingStep_Pips = ${params.step || 5};`)
         break
       case 'position':
-        inputs.push(`input double RiskPercent_${node.id} = ${params.riskPercent || 1.0};`)
+      case 'position_size':
+        inputs.push(`input double RiskPercent = ${params.riskPercent || 1.0};`)
         break
     }
   })
+  
+  if (!hasStopLoss) {
+    inputs.push(`input int StopLoss_Pips = 20;`)
+  }
+  if (!hasTakeProfit) {
+    inputs.push(`input int TakeProfit_Pips = 40;`)
+  }
   
   return inputs.join('\n')
 }
@@ -225,12 +269,14 @@ function generateGlobalVariables(indicators: Node[]): string {
   const vars: string[] = []
   
   indicators.forEach(node => {
-    const nodeType = node.id.split('_')[0]
-    switch (nodeType) {
+    const data = node.data as any
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
+    
+    switch (indicatorType) {
       case 'sma':
       case 'ema':
       case 'wma':
-        vars.push(`double ${nodeType}_${node.id}[];`)
+        vars.push(`double ${indicatorType}_${node.id}[];`)
         break
       case 'rsi':
         vars.push(`double rsi_${node.id}[];`)
@@ -243,6 +289,27 @@ function generateGlobalVariables(indicators: Node[]): string {
         break
       case 'atr':
         vars.push(`double atr_${node.id}[];`)
+        break
+      case 'stochastic':
+        vars.push(`double stoch_main_${node.id}[], stoch_signal_${node.id}[];`)
+        break
+      case 'cci':
+        vars.push(`double cci_${node.id}[];`)
+        break
+      case 'adx':
+        vars.push(`double adx_${node.id}[];`)
+        break
+      case 'williams':
+        vars.push(`double williams_${node.id}[];`)
+        break
+      case 'sar':
+        vars.push(`double sar_${node.id}[];`)
+        break
+      case 'obv':
+        vars.push(`double obv_${node.id}[];`)
+        break
+      case 'vwap':
+        vars.push(`double vwap_${node.id}[];`)
         break
     }
   })
@@ -290,9 +357,9 @@ function generateIndicatorCalculations(indicators: Node[]): string {
   indicators.forEach(node => {
     const data = node.data as any
     const params = data.parameters || {}
-    const nodeType = node.id.split('_')[0]
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
     
-    switch (nodeType) {
+    switch (indicatorType) {
       case 'sma':
         calcs.push(`   double sma_${node.id} = iMA(NULL, 0, MA_Period_${node.id}, 0, MODE_SMA, PRICE_CLOSE, 0);`)
         break
@@ -316,6 +383,29 @@ function generateIndicatorCalculations(indicators: Node[]): string {
         break
       case 'atr':
         calcs.push(`   double atr_${node.id} = iATR(NULL, 0, ATR_Period_${node.id}, 0);`)
+        break
+      case 'stochastic':
+        calcs.push(`   double stoch_main_${node.id} = iStochastic(NULL, 0, Stoch_K_Period_${node.id}, Stoch_D_Period_${node.id}, Stoch_Slowing_${node.id}, MODE_SMA, 0, MODE_MAIN, 0);`)
+        calcs.push(`   double stoch_signal_${node.id} = iStochastic(NULL, 0, Stoch_K_Period_${node.id}, Stoch_D_Period_${node.id}, Stoch_Slowing_${node.id}, MODE_SMA, 0, MODE_SIGNAL, 0);`)
+        break
+      case 'cci':
+        calcs.push(`   double cci_${node.id} = iCCI(NULL, 0, CCI_Period_${node.id}, PRICE_TYPICAL, 0);`)
+        break
+      case 'adx':
+        calcs.push(`   double adx_${node.id} = iADX(NULL, 0, ADX_Period_${node.id}, PRICE_CLOSE, MODE_MAIN, 0);`)
+        break
+      case 'williams':
+        calcs.push(`   double williams_${node.id} = iWPR(NULL, 0, Williams_Period_${node.id}, 0);`)
+        break
+      case 'sar':
+        calcs.push(`   double sar_${node.id} = iSAR(NULL, 0, SAR_Step_${node.id}, SAR_Maximum_${node.id}, 0);`)
+        break
+      case 'obv':
+        calcs.push(`   double obv_${node.id} = iOBV(NULL, 0, PRICE_CLOSE, 0);`)
+        break
+      case 'vwap':
+        calcs.push(`   // VWAP calculation - custom implementation needed`)
+        calcs.push(`   double vwap_${node.id} = Close[0]; // Placeholder`)
         break
     }
   })
@@ -364,20 +454,104 @@ function generateConditionChecks(conditions: Node[], edges: Edge[], nodes: Node[
   checks.push('   bool sellCondition = false;')
   checks.push('')
   
-  conditions.forEach(node => {
-    const nodeType = node.id.split('_')[0]
-    const data = node.data as any
-    const params = data.parameters || {}
+  const buyActions = nodes.filter(n => n.type === 'action' && (n.data as any).action === 'buy')
+  const sellActions = nodes.filter(n => n.type === 'action' && (n.data as any).action === 'sell')
+  
+  if (buyActions.length > 0) {
+    checks.push('   // Buy Conditions')
+    buyActions.forEach(action => {
+      const conditionChain = buildConditionChain(action, edges, nodes)
+      if (conditionChain) {
+        checks.push(`   buyCondition = ${conditionChain};`)
+      }
+    })
+    checks.push('')
+  }
+  
+  if (sellActions.length > 0) {
+    checks.push('   // Sell Conditions')
+    sellActions.forEach(action => {
+      const conditionChain = buildConditionChain(action, edges, nodes)
+      if (conditionChain) {
+        checks.push(`   sellCondition = ${conditionChain};`)
+      }
+    })
+  }
+  
+  return checks.join('\n')
+}
+
+function buildConditionChain(targetNode: Node, edges: Edge[], nodes: Node[]): string {
+  const incomingEdges = edges.filter(e => e.target === targetNode.id)
+  
+  if (incomingEdges.length === 0) {
+    return 'true'
+  }
+  
+  const conditions: string[] = []
+  
+  incomingEdges.forEach(edge => {
+    const sourceNode = nodes.find(n => n.id === edge.source)
+    if (!sourceNode) return
     
-    const incomingEdges = edges.filter(e => e.target === node.id)
+    const data = sourceNode.data as any
     
-    if (incomingEdges.length >= 2) {
-      const sourceNodes = incomingEdges.map(e => nodes.find(n => n.id === e.source))
-      checks.push(`   // Condition: ${data.label || node.id}`)
+    if (sourceNode.type === 'condition') {
+      const operator = data.operator || 'gt'
+      const threshold = data.parameters?.threshold || 50
+      
+      const indicatorEdges = edges.filter(e => e.target === sourceNode.id)
+      if (indicatorEdges.length > 0) {
+        const indicatorNode = nodes.find(n => n.id === indicatorEdges[0].source)
+        if (indicatorNode) {
+          const indicatorData = indicatorNode.data as any
+          const indicatorType = indicatorData.indicatorType || indicatorNode.id.split('_')[0]
+          const indicatorVar = `${indicatorType}_${indicatorNode.id}`
+          
+          let condition = ''
+          switch (operator) {
+            case 'gt':
+              condition = `(${indicatorVar} > ${threshold})`
+              break
+            case 'lt':
+              condition = `(${indicatorVar} < ${threshold})`
+              break
+            case 'gte':
+              condition = `(${indicatorVar} >= ${threshold})`
+              break
+            case 'lte':
+              condition = `(${indicatorVar} <= ${threshold})`
+              break
+            case 'eq':
+              condition = `(${indicatorVar} == ${threshold})`
+              break
+            case 'cross_above':
+              condition = `(${indicatorVar} > ${threshold} && iMA(NULL, 0, MA_Period_${indicatorNode.id}, 0, MODE_SMA, PRICE_CLOSE, 1) <= ${threshold})`
+              break
+            case 'cross_below':
+              condition = `(${indicatorVar} < ${threshold} && iMA(NULL, 0, MA_Period_${indicatorNode.id}, 0, MODE_SMA, PRICE_CLOSE, 1) >= ${threshold})`
+              break
+            default:
+              condition = `(${indicatorVar} > ${threshold})`
+          }
+          
+          conditions.push(condition)
+        }
+      }
+    } else if (sourceNode.type === 'logic') {
+      const logicType = data.label || 'AND'
+      const subCondition = buildConditionChain(sourceNode, edges, nodes)
+      if (subCondition) {
+        conditions.push(subCondition)
+      }
     }
   })
   
-  return checks.join('\n')
+  if (conditions.length === 0) {
+    return 'true'
+  }
+  
+  return conditions.length === 1 ? conditions[0] : `(${conditions.join(' && ')})`
 }
 
 function generateConditionChecksMQL5(conditions: Node[], edges: Edge[], nodes: Node[]): string {
