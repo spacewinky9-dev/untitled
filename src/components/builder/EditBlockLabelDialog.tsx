@@ -55,6 +55,13 @@ export function EditBlockLabelDialog({
     onOpenChange(false)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSave()
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px] bg-card border-border">
@@ -86,6 +93,7 @@ export function EditBlockLabelDialog({
                 min={1}
                 value={numberValue}
                 onChange={(e) => setNumberValue(parseInt(e.target.value) || 1)}
+                onKeyDown={handleKeyDown}
                 className="bg-background font-mono"
               />
               <p className="text-xs text-muted-foreground">
@@ -101,6 +109,7 @@ export function EditBlockLabelDialog({
                 id="block-label"
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="e.g., ENTRY, EXIT, FILTER"
                 maxLength={12}
                 className="bg-background font-mono uppercase"

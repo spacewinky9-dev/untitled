@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Dialog,
@@ -19,30 +20,14 @@ import { CustomIndicatorManager } from '@/components/builder/CustomIndicatorMana
 import { CustomIndicatorGuide } from '@/components/builder/CustomIndicatorGuide'
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-
-interface EASettings {
-  magicNumberBase: number
-  slippage: number
-  maxSpread: number
-  enableLogging: boolean
-  logLevel: 'minimal' | 'normal' | 'verbose'
-  commentPrefix: string
-}
-
-const DEFAULT_EA_SETTINGS: EASettings = {
-  magicNumberBase: 12345,
-  slippage: 3,
-  maxSpread: 3.0,
-  enableLogging: true,
-  logLevel: 'normal',
-  commentPrefix: 'ForexFlow'
-}
+import { EASettings, CanvasSettings, DEFAULT_EA_SETTINGS, DEFAULT_CANVAS_SETTINGS } from '@/types/settings'
 
 export function SettingsView() {
   const [showEADocs, setShowEADocs] = useState(false)
   const [showIndicatorManager, setShowIndicatorManager] = useState(false)
   const [showIndicatorGuide, setShowIndicatorGuide] = useState(false)
   const [eaSettings, setEASettings] = useKV<EASettings>('ea-settings', DEFAULT_EA_SETTINGS)
+  const [canvasSettings, setCanvasSettings] = useKV<CanvasSettings>('canvas-settings', DEFAULT_CANVAS_SETTINGS)
 
   return (
     <div className="h-full overflow-auto p-6">
@@ -426,7 +411,10 @@ export function SettingsView() {
                       Display grid on strategy canvas
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={canvasSettings.showGrid}
+                    onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, showGrid: checked })}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -435,7 +423,10 @@ export function SettingsView() {
                       Display execution order numbers on nodes
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={canvasSettings.showBlockNumbers}
+                    onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, showBlockNumbers: checked })}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -444,7 +435,10 @@ export function SettingsView() {
                       Display canvas minimap for navigation
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={canvasSettings.showMinimap}
+                    onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, showMinimap: checked })}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -453,7 +447,10 @@ export function SettingsView() {
                       Automatically organize nodes when adding
                     </p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    checked={canvasSettings.autoArrange}
+                    onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, autoArrange: checked })}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -462,7 +459,61 @@ export function SettingsView() {
                       Align nodes to grid when moving
                     </p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    checked={canvasSettings.snapToGrid}
+                    onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, snapToGrid: checked })}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Connection Animation</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Animate data flow through connections
+                      </p>
+                    </div>
+                    <Switch 
+                      checked={canvasSettings.enableConnectionAnimation}
+                      onCheckedChange={(checked) => setCanvasSettings({ ...canvasSettings, enableConnectionAnimation: checked })}
+                    />
+                  </div>
+                  
+                  {canvasSettings.enableConnectionAnimation && (
+                    <div className="space-y-3 pl-4 border-l-2 border-border">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="animation-speed">Animation Speed</Label>
+                          <span className="text-sm font-mono text-muted-foreground">
+                            {canvasSettings.connectionAnimationSpeed}x
+                          </span>
+                        </div>
+                        <Slider
+                          id="animation-speed"
+                          min={0.1}
+                          max={3}
+                          step={0.1}
+                          value={[canvasSettings.connectionAnimationSpeed]}
+                          onValueChange={([value]) => setCanvasSettings({ ...canvasSettings, connectionAnimationSpeed: value })}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Slow (0.1x)</span>
+                          <span>Normal (1x)</span>
+                          <span>Fast (3x)</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {canvasSettings.connectionAnimationSpeed < 0.5 && 'Very slow - Best for detailed visualization'}
+                          {canvasSettings.connectionAnimationSpeed >= 0.5 && canvasSettings.connectionAnimationSpeed < 1 && 'Slow - Good for learning data flow'}
+                          {canvasSettings.connectionAnimationSpeed === 1 && 'Normal speed - Default animation rate'}
+                          {canvasSettings.connectionAnimationSpeed > 1 && canvasSettings.connectionAnimationSpeed <= 2 && 'Fast - Quick visual feedback'}
+                          {canvasSettings.connectionAnimationSpeed > 2 && 'Very fast - Minimal distraction'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -27,13 +27,13 @@ A next-generation visual trading bot builder that empowers traders to design, te
 
 ### 1. Visual Strategy Builder (Core Feature)
 
-**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system. Enhanced with workflow-ordered categorized node library, organizing nodes by their logical execution order (1. Events → 2. Indicators → 3. Conditions → 4. Logic → 5. Risk Management → 6. Actions). Categories are collapsible with color-coded workflow badges, showing 5 nodes initially with "More" button expansion. Node names are displayed as bold colored text without boxes, making discovery intuitive and progressive.
+**Functionality:** Drag-and-drop node-based canvas where users construct trading strategies by connecting various node types (indicators, conditions, actions, logic gates) to form a complete algorithmic trading system. Enhanced with workflow-ordered categorized node library, organizing nodes by their logical execution order (1. Events → 2. Indicators → 3. Conditions → 4. Logic → 5. Risk Management → 6. Actions). Categories are collapsible with color-coded workflow badges, showing 5 nodes initially with "More" button expansion. Node names are displayed as bold colored text without boxes, making discovery intuitive and progressive. All nodes support custom name editing via double-click, F2 keyboard shortcut, or context menu for personalized strategy organization.
 
 **Purpose:** Democratizes algorithmic trading by making strategy creation visual and intuitive rather than requiring programming knowledge, while maintaining the power and flexibility of coded solutions. The workflow-based organization guides users through proper strategy construction.
 
 **Trigger:** User opens the app or clicks "New Strategy" from the dashboard.
 
-**Progression:** Empty canvas loads → User browses workflow-ordered node palette (color-coded by execution order) → User expands desired category → User sees initial 5 nodes with "More" button → User drags nodes from palette to canvas or clicks to add at center → User connects nodes by dragging from output ports to input ports → User configures each node's detailed parameters in properties panel → User validates strategy (checking for logic errors) → User exports to MQL4/MQL5 → User saves strategy with name and description → Strategy appears in library.
+**Progression:** Empty canvas loads → User browses workflow-ordered node palette (color-coded by execution order) → User expands desired category → User sees initial 5 nodes with "More" button → User drags nodes from palette to canvas or clicks to add at center → User connects nodes by dragging from output ports to input ports → User configures each node's detailed parameters in properties panel → User can rename nodes by double-clicking, pressing F2, or using context menu → User validates strategy (checking for logic errors) → User exports to MQL4/MQL5 → User saves strategy with name and description → Strategy appears in library.
 
 **Success Criteria:**
 - Users can create a complete trading strategy in under 5 minutes
@@ -44,6 +44,8 @@ A next-generation visual trading bot builder that empowers traders to design, te
 - Workflow-ordered categories with color coding guide proper strategy flow
 - More button functionality prevents overwhelming users while maintaining full access
 - Bold colored text display for node names without boxes for clean interface
+- All nodes support inline editing (double-click), keyboard shortcut (F2), and context menu renaming
+- Node names persist across sessions and can be customized per instance
 - MQL4/MQL5 export generates working, production-ready Expert Advisor code
 
 ### 1a. AI Strategy Builder (New Feature)

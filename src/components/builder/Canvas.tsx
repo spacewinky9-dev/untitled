@@ -58,11 +58,12 @@ import { EditBlockLabelDialog } from './EditBlockLabelDialog'
 import { TemplatesDialog } from './TemplatesDialog'
 import { ValidationPanel } from './ValidationPanel'
 import { StrategyTemplate } from '@/lib/strategy-templates'
-import { NodeDefinition, EventCategory } from '@/constants/node-categories'
+import { NodeDefinition, EventCategory, getCategoryColors } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
 import { useClipboard } from '@/hooks/use-clipboard'
 import { Strategy } from '@/types/strategy'
+import { DEFAULT_CANVAS_SETTINGS } from '@/types/settings'
 import { toast } from 'sonner'
 import { calculateBlockNumbers, validateMultipleBranches } from '@/lib/block-numbers'
 import { ConnectionValidator } from '@/lib/engine/connection-validator'
@@ -116,9 +117,23 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
   const [currentProject, setCurrentProject] = useKV<ProjectConfig | null>('currentProject', null)
   const [showLoadDialog, setShowLoadDialog] = useState(false)
+  const [hasSeenRenameTip, setHasSeenRenameTip] = useKV<boolean>('hasSeenRenameTip', false)
+  const [canvasSettings] = useKV('canvas-settings', DEFAULT_CANVAS_SETTINGS)
   
   const history = useHistory()
   const clipboard = useClipboard()
+
+  useEffect(() => {
+    if (!hasSeenRenameTip && nodes.length === 0) {
+      const timer = setTimeout(() => {
+        toast.info('💡 Tip: Double-click or press F2 to rename any node!', {
+          duration: 5000
+        })
+        setHasSeenRenameTip(true)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [hasSeenRenameTip, setHasSeenRenameTip, nodes.length])
 
   useEffect(() => {
     if (pendingLoadStrategyId) {
@@ -169,6 +184,11 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         handleDuplicate()
       }
       
+      if (event.key === 'F2' && !isInputField && selectedNode) {
+        event.preventDefault()
+        setShowEditLabelDialog(true)
+      }
+      
       if ((event.key === 'Delete' || event.key === 'Backspace') && !isInputField) {
         event.preventDefault()
         onDeleteSelected()
@@ -177,7 +197,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [nodes, edges, clipboard])
+  }, [nodes, edges, clipboard, selectedNode])
 
   const handleUndo = useCallback(() => {
     const state = history.undo()
@@ -298,8 +318,21 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         return
       }
 
+      const categoryColors = getCategoryColors(sourceNode.type as any)
+      
+      const newEdge: Edge = {
+        ...connection,
+        id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'default',
+        animated: false,
+        style: {
+          stroke: categoryColors.accentColor,
+          strokeWidth: 2.5
+        }
+      }
+
       history.addHistory(nodes, edges, 'Connect blocks')
-      setEdges((eds) => addEdge(connection, eds))
+      setEdges((eds) => [...eds, newEdge])
       toast.success('Blocks connected')
     },
     [setEdges, nodes, edges, history]
@@ -330,6 +363,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         id: `node-${nodeIdCounter}`,
         type: nodeDefinition.type,
         position,
+        draggable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -351,6 +385,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         id: `node-${nodeIdCounter}`,
         type: nodeDefinition.type,
         position,
+        draggable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -575,6 +610,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       id: n.id,
       type: n.type,
       position: n.position,
+      draggable: true,
       data: n.data
     }))
     
@@ -607,6 +643,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       id: n.id,
       type: n.type,
       position: n.position,
+      draggable: true,
       data: n.data
     }))
     
@@ -649,6 +686,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       
       return {
         ...node,
+        draggable: true,
         data: {
           ...node.data,
           blockNumber: displayLabel,
@@ -657,6 +695,26 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       }
     })
   }, [nodes, showBlockNumbers, executionMap])
+
+  const styledEdges = useMemo(() => {
+    return edges.map(edge => {
+      const sourceNode = nodes.find(n => n.id === edge.source)
+      if (!sourceNode) return edge
+
+      const categoryColors = getCategoryColors(sourceNode.type as any)
+      
+      return {
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: edge.style?.stroke || categoryColors.accentColor,
+          strokeWidth: edge.selected ? 3 : 2.5,
+          animationDuration: canvasSettings.enableConnectionAnimation ? `${1 / canvasSettings.connectionAnimationSpeed}s` : undefined
+        },
+        animated: canvasSettings.enableConnectionAnimation && (edge.selected || false)
+      }
+    })
+  }, [edges, nodes, canvasSettings.enableConnectionAnimation, canvasSettings.connectionAnimationSpeed])
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -688,10 +746,12 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
           onCreateGroup={() => toast.info('Create group feature coming soon')}
           onBreakConnection={onDetachNode}
         >
-          <div ref={reactFlowWrapper} className="flex-1 relative">
+          <div ref={reactFlowWrapper} className="flex-1 relative" style={{
+            '--animation-duration': `${1 / canvasSettings.connectionAnimationSpeed}s`
+          } as React.CSSProperties}>
             <ReactFlow
               nodes={nodesWithBlockNumbers}
-              edges={edges}
+              edges={styledEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
@@ -701,6 +761,10 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               onNodeDoubleClick={onNodeDoubleClick}
               onPaneClick={onPaneClick}
               nodeTypes={nodeTypes}
+              nodesDraggable={true}
+              nodesConnectable={true}
+              nodesFocusable={true}
+              elementsSelectable={true}
               fitView
               className="bg-background"
             >
