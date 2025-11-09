@@ -888,6 +888,53 @@ int CountOrders(int orderType)
       }
    }
    return count;
+}
+
+//+------------------------------------------------------------------+
+//| Pattern Detection Helpers                                        |
+//+------------------------------------------------------------------+
+bool IsBullishEngulfing()
+{
+   bool prevBearish = Close[1] < Open[1];
+   bool currBullish = Close[0] > Open[0];
+   bool engulfing = Open[0] < Close[1] && Close[0] > Open[1];
+   
+   return prevBearish && currBullish && engulfing;
+}
+
+bool IsBearishEngulfing()
+{
+   bool prevBullish = Close[1] > Open[1];
+   bool currBearish = Close[0] < Open[0];
+   bool engulfing = Open[0] > Close[1] && Close[0] < Open[1];
+   
+   return prevBullish && currBearish && engulfing;
+}
+
+bool IsDoji()
+{
+   double body = MathAbs(Close[0] - Open[0]);
+   double range = High[0] - Low[0];
+   
+   return range > 0 && body / range < 0.1;
+}
+
+bool IsHammer()
+{
+   double body = MathAbs(Close[0] - Open[0]);
+   double lowerWick = MathMin(Open[0], Close[0]) - Low[0];
+   double upperWick = High[0] - MathMax(Open[0], Close[0]);
+   
+   return lowerWick > body * 2 && upperWick < body;
+}
+
+bool IsShootingStar()
+{
+   double body = MathAbs(Close[0] - Open[0]);
+   double upperWick = High[0] - MathMax(Open[0], Close[0]);
+   double lowerWick = MathMin(Open[0], Close[0]) - Low[0];
+   
+   return upperWick > body * 2 && lowerWick < body;
 }`
 }
 
@@ -924,5 +971,115 @@ int CountPositions(ENUM_POSITION_TYPE posType = -1)
       }
    }
    return count;
+}
+
+//+------------------------------------------------------------------+
+//| Pattern Detection Helpers                                        |
+//+------------------------------------------------------------------+
+bool IsBullishEngulfing()
+{
+   MqlRates rates[];
+   ArraySetAsSeries(rates, true);
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, 2, rates);
+   if(copied < 2) return false;
+   
+   bool prevBearish = rates[1].close < rates[1].open;
+   bool currBullish = rates[0].close > rates[0].open;
+   bool engulfing = rates[0].open < rates[1].close && rates[0].close > rates[1].open;
+   
+   return prevBearish && currBullish && engulfing;
+}
+
+bool IsBearishEngulfing()
+{
+   MqlRates rates[];
+   ArraySetAsSeries(rates, true);
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, 2, rates);
+   if(copied < 2) return false;
+   
+   bool prevBullish = rates[1].close > rates[1].open;
+   bool currBearish = rates[0].close < rates[0].open;
+   bool engulfing = rates[0].open > rates[1].close && rates[0].close < rates[1].open;
+   
+   return prevBullish && currBearish && engulfing;
+}
+
+bool IsDoji()
+{
+   MqlRates rates[];
+   ArraySetAsSeries(rates, true);
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, 1, rates);
+   if(copied < 1) return false;
+   
+   double body = MathAbs(rates[0].close - rates[0].open);
+   double range = rates[0].high - rates[0].low;
+   
+   return range > 0 && body / range < 0.1;
+}
+
+bool IsHammer()
+{
+   MqlRates rates[];
+   ArraySetAsSeries(rates, true);
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, 1, rates);
+   if(copied < 1) return false;
+   
+   double body = MathAbs(rates[0].close - rates[0].open);
+   double lowerWick = MathMin(rates[0].open, rates[0].close) - rates[0].low;
+   double upperWick = rates[0].high - MathMax(rates[0].open, rates[0].close);
+   
+   return lowerWick > body * 2 && upperWick < body;
+}
+
+bool IsShootingStar()
+{
+   MqlRates rates[];
+   ArraySetAsSeries(rates, true);
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, 1, rates);
+   if(copied < 1) return false;
+   
+   double body = MathAbs(rates[0].close - rates[0].open);
+   double upperWick = rates[0].high - MathMax(rates[0].open, rates[0].close);
+   double lowerWick = MathMin(rates[0].open, rates[0].close) - rates[0].low;
+   
+   return upperWick > body * 2 && lowerWick < body;
 }`
+}
+
+// Export function for generating pattern detection code comments
+function generatePatternDetectionComments(nodes: Node[]): string {
+  const patternNodes = nodes.filter(n => n.type === 'pattern')
+  if (patternNodes.length === 0) return ''
+  
+  const comments: string[] = []
+  comments.push('// Pattern Detection:')
+  
+  patternNodes.forEach(node => {
+    const data = node.data as any
+    const patternType = data.patternType || data.parameters?.pattern
+    if (patternType) {
+      comments.push(`// - ${patternType}: Use Is${patternType.charAt(0).toUpperCase() + patternType.slice(1)}() function`)
+    }
+  })
+  
+  return comments.join('\n')
+}
+
+// Export function for generating MTF indicator comments
+function generateMTFComments(nodes: Node[]): string {
+  const mtfNodes = nodes.filter(n => n.type === 'mtf')
+  if (mtfNodes.length === 0) return ''
+  
+  const comments: string[] = []
+  comments.push('// Multi-Timeframe Analysis:')
+  
+  mtfNodes.forEach(node => {
+    const data = node.data as any
+    const params = data.parameters || {}
+    const timeframe = params.timeframe || 'H1'
+    const indicator = params.indicator || 'sma'
+    comments.push(`// - ${indicator} on ${timeframe}: Use i${indicator.toUpperCase()}(_Symbol, ${timeframe}, ...) or create separate indicator handle`)
+  })
+  
+  return comments.join('\n')
 }
