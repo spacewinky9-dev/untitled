@@ -17,7 +17,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus, Question } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus, Question, BookOpen, CheckCircle } from '@phosphor-icons/react'
 import {
   Dialog,
   DialogContent,
@@ -55,6 +55,9 @@ import { ContextMenuWrapper } from './ContextMenu'
 import { NewProjectDialog, ProjectConfig } from './NewProjectDialog'
 import { LoadStrategyDialog } from './LoadStrategyDialog'
 import { EditBlockLabelDialog } from './EditBlockLabelDialog'
+import { TemplatesDialog } from './TemplatesDialog'
+import { ValidationPanel } from './ValidationPanel'
+import { StrategyTemplate } from '@/lib/strategy-templates'
 import { NodeDefinition, EventCategory } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
@@ -62,6 +65,7 @@ import { useClipboard } from '@/hooks/use-clipboard'
 import { Strategy } from '@/types/strategy'
 import { toast } from 'sonner'
 import { calculateBlockNumbers, validateMultipleBranches } from '@/lib/block-numbers'
+import { ConnectionValidator } from '@/lib/engine/connection-validator'
 
 const initialNodes: Node[] = []
 const initialEdges: Edge[] = []
@@ -105,6 +109,8 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [showEditLabelDialog, setShowEditLabelDialog] = useState(false)
   const [showEADocs, setShowEADocs] = useState(false)
   const [showBlockNumbers, setShowBlockNumbers] = useState(true)
+  const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
+  const [showValidationPanel, setShowValidationPanel] = useState(false)
   const [activeEvent, setActiveEvent] = useState<EventCategory>('ontick')
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
@@ -270,8 +276,31 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
 
   const onConnect = useCallback(
     (connection: Connection) => {
+      if (!connection.source || !connection.target) return
+
+      const sourceNode = nodes.find(n => n.id === connection.source)
+      const targetNode = nodes.find(n => n.id === connection.target)
+
+      if (!sourceNode || !targetNode) {
+        toast.error('Invalid connection: Node not found')
+        return
+      }
+
+      const validation = ConnectionValidator.validateConnection(
+        sourceNode,
+        targetNode,
+        connection.sourceHandle,
+        connection.targetHandle
+      )
+
+      if (!validation.valid) {
+        toast.error(`Connection blocked: ${validation.reason}`)
+        return
+      }
+
       history.addHistory(nodes, edges, 'Connect blocks')
       setEdges((eds) => addEdge(connection, eds))
+      toast.success('Blocks connected')
     },
     [setEdges, nodes, edges, history]
   )
@@ -442,6 +471,14 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
     }
   }, [nodes, edges, currentStrategyId, strategies])
 
+  const getValidationResult = useCallback(() => {
+    return ConnectionValidator.validateStrategyFlow(nodes, edges)
+  }, [nodes, edges])
+
+  const onValidateStrategy = useCallback(() => {
+    setShowValidationPanel(true)
+  }, [])
+
   const onExport = useCallback(() => {
     if (nodes.length === 0) {
       toast.error('No nodes to export. Build a strategy first!')
@@ -557,6 +594,37 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
     setShowLoadDialog(false)
     toast.success(`Strategy "${strategy.name}" loaded successfully`)
   }, [strategies, nodes, edges, history, setNodes, setEdges])
+
+  const onLoadTemplate = useCallback((template: StrategyTemplate) => {
+    if (nodes.length > 0) {
+      const confirmed = window.confirm('Loading a template will replace the current canvas. Continue?')
+      if (!confirmed) return
+    }
+
+    history.markCheckpoint(nodes, edges, 'Before template load')
+    
+    const loadedNodes = template.strategy.nodes.map(n => ({
+      id: n.id,
+      type: n.type,
+      position: n.position,
+      data: n.data
+    }))
+    
+    const loadedEdges = template.strategy.edges || []
+    
+    setNodes(loadedNodes)
+    setEdges(loadedEdges)
+    setCurrentStrategyId(null)
+    
+    const maxNodeId = loadedNodes.reduce((max, node) => {
+      const match = node.id.match(/node-(\d+)/)
+      return match ? Math.max(max, parseInt(match[1])) : max
+    }, 0)
+    setNodeIdCounter(maxNodeId + 1)
+    
+    history.addHistory(loadedNodes, loadedEdges, 'Load template')
+    toast.success(`Template "${template.name}" loaded successfully`)
+  }, [nodes, edges, history, setNodes, setEdges])
 
   const onDetachNode = useCallback(() => {
     if (!selectedNode) return
@@ -689,6 +757,15 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               </Button>
               <Button 
                 size="sm" 
+                variant="outline"
+                className="gap-2"
+                onClick={() => setShowTemplatesDialog(true)}
+              >
+                <BookOpen size={16} />
+                Templates
+              </Button>
+              <Button 
+                size="sm" 
                 variant="default"
                 className="gap-2 bg-gradient-to-r from-accent to-primary hover:opacity-90"
                 onClick={() => setShowAIBuilder(true)}
@@ -703,6 +780,16 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               <Button size="sm" variant="outline" className="gap-2" onClick={onSaveStrategy}>
                 <FloppyDisk size={16} />
                 Save
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={onValidateStrategy}
+                title="Validate Strategy"
+              >
+                <CheckCircle size={16} />
+                Validate
               </Button>
               <Button 
                 size="sm" 
@@ -818,6 +905,18 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         onOpenChange={setShowEditLabelDialog}
         currentLabel={selectedNode?.data.customLabel || selectedNode?.data.blockNumber}
         onSave={onEditBlockLabel}
+      />
+
+      <TemplatesDialog
+        open={showTemplatesDialog}
+        onOpenChange={setShowTemplatesDialog}
+        onLoadTemplate={onLoadTemplate}
+      />
+
+      <ValidationPanel
+        open={showValidationPanel}
+        onOpenChange={setShowValidationPanel}
+        validation={getValidationResult()}
       />
     </div>
   )
