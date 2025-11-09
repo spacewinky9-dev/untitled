@@ -36,6 +36,8 @@ import { FileOpsNode } from './nodes/FileOpsNode'
 import { TerminalNode } from './nodes/TerminalNode'
 import { CustomBlockNode } from './nodes/CustomBlockNode'
 import { NodePaletteWorkflow } from './NodePaletteWorkflow'
+import { CompactNodePalette } from './CompactNodePalette'
+import { EventTabs } from './EventTabs'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
 import { ExportDialog } from './ExportDialog'
@@ -44,7 +46,7 @@ import { ContextMenuWrapper } from './ContextMenu'
 import { NewProjectDialog, ProjectConfig } from './NewProjectDialog'
 import { LoadStrategyDialog } from './LoadStrategyDialog'
 import { EditBlockLabelDialog } from './EditBlockLabelDialog'
-import { NodeDefinition } from '@/constants/node-categories'
+import { NodeDefinition, EventCategory } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
 import { useClipboard } from '@/hooks/use-clipboard'
@@ -93,6 +95,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [showEditLabelDialog, setShowEditLabelDialog] = useState(false)
   const [showBlockNumbers, setShowBlockNumbers] = useState(true)
+  const [activeEvent, setActiveEvent] = useState<EventCategory>('ontick')
   const [strategies, setStrategies] = useKV<Strategy[]>('strategies', [])
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
   const [currentProject, setCurrentProject] = useKV<ProjectConfig | null>('currentProject', null)
@@ -321,6 +324,11 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
     },
     [nodeIdCounter, setNodes, nodes, edges, history]
   )
+  
+  const onDragStart = useCallback((event: React.DragEvent, nodeDefinition: NodeDefinition) => {
+    event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeDefinition))
+    event.dataTransfer.effectAllowed = 'move'
+  }, [])
 
   const onDeleteSelected = useCallback(() => {
     const selectedNodes = nodes.filter(n => n.selected)
@@ -573,175 +581,179 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   }, [nodes, showBlockNumbers, executionMap])
 
   return (
-    <div className="w-full h-full flex">
-      <NodePaletteWorkflow onNodeAdd={onNodeAdd} />
+    <div className="w-full h-full flex flex-col">
+      <EventTabs activeEvent={activeEvent} onEventChange={setActiveEvent} />
       
-      <ContextMenuWrapper
-        nodes={nodes}
-        edges={edges}
-        selectedNode={selectedNode}
-        onCopy={handleCopy}
-        onCut={handleCut}
-        onPaste={handlePaste}
-        onDelete={onDeleteSelected}
-        onDuplicate={handleDuplicate}
-        onEditTitle={() => setShowEditLabelDialog(true)}
-        onResize={() => toast.info('Resize feature coming soon')}
-        onToggleLock={() => toast.info('Lock feature coming soon')}
-        onToggleVisibility={() => toast.info('Visibility feature coming soon')}
-        onToggleEnabled={onToggleNodeEnabled}
-        onShowInfo={() => {
-          if (selectedNode) {
-            const execInfo = executionMap.get(selectedNode.id)
-            toast.info(`Block #${execInfo?.blockNumber || '?'} - Execution Order: ${execInfo?.executionOrder || '?'}`)
-          }
-        }}
-        onCreateGroup={() => toast.info('Create group feature coming soon')}
-        onBreakConnection={onDetachNode}
-      >
-        <div ref={reactFlowWrapper} className="flex-1 relative">
-          <ReactFlow
-            nodes={nodesWithBlockNumbers}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onNodeClick={onNodeClick}
-            onNodeDoubleClick={onNodeDoubleClick}
-            onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
-            fitView
-            className="bg-background"
-          >
-            <Background 
-              variant={BackgroundVariant.Dots}
-              gap={20}
-              size={1}
-              color="oklch(0.35 0.015 260)"
-            />
-            
-            <Controls 
-              className="bg-card border border-border"
-              showInteractive={false}
-            />
-            
-            <MiniMap 
-              className="bg-card border border-border"
-              nodeColor={() => 'oklch(0.55 0.18 50)'}
-              maskColor="oklch(0.25 0.01 260 / 0.85)"
-            />
-            
-            <Panel position="top-left" className="flex gap-2">
-              <EACreationGuide />
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="gap-2"
-              onClick={() => setShowNewProjectDialog(true)}
+      <div className="flex-1 flex overflow-hidden">
+        <CompactNodePalette activeEvent={activeEvent} onDragStart={onDragStart} />
+        
+        <ContextMenuWrapper
+          nodes={nodes}
+          edges={edges}
+          selectedNode={selectedNode}
+          onCopy={handleCopy}
+          onCut={handleCut}
+          onPaste={handlePaste}
+          onDelete={onDeleteSelected}
+          onDuplicate={handleDuplicate}
+          onEditTitle={() => setShowEditLabelDialog(true)}
+          onResize={() => toast.info('Resize feature coming soon')}
+          onToggleLock={() => toast.info('Lock feature coming soon')}
+          onToggleVisibility={() => toast.info('Visibility feature coming soon')}
+          onToggleEnabled={onToggleNodeEnabled}
+          onShowInfo={() => {
+            if (selectedNode) {
+              const execInfo = executionMap.get(selectedNode.id)
+              toast.info(`Block #${execInfo?.blockNumber || '?'} - Execution Order: ${execInfo?.executionOrder || '?'}`)
+            }
+          }}
+          onCreateGroup={() => toast.info('Create group feature coming soon')}
+          onBreakConnection={onDetachNode}
+        >
+          <div ref={reactFlowWrapper} className="flex-1 relative">
+            <ReactFlow
+              nodes={nodesWithBlockNumbers}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onNodeClick={onNodeClick}
+              onNodeDoubleClick={onNodeDoubleClick}
+              onPaneClick={onPaneClick}
+              nodeTypes={nodeTypes}
+              fitView
+              className="bg-background"
             >
-              <FilePlus size={16} />
-              New
-            </Button>
-            <Button 
-              size="sm" 
-              variant="default"
-              className="gap-2 bg-gradient-to-r from-accent to-primary hover:opacity-90"
-              onClick={() => setShowAIBuilder(true)}
-            >
-              <Sparkle size={16} weight="fill" />
-              AI Builder
-            </Button>
-            <Button size="sm" className="gap-2" onClick={() => setShowLoadDialog(true)}>
-              <FolderOpen size={16} />
-              Open
-            </Button>
-            <Button size="sm" variant="outline" className="gap-2" onClick={onSaveStrategy}>
-              <FloppyDisk size={16} />
-              Save
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
-              onClick={onExport}
-            >
-              <Export size={16} />
-              Export MQL
-            </Button>
-            <Button 
-              size="sm" 
-              variant="default" 
-              className="gap-2 bg-bullish text-bullish-foreground hover:bg-bullish/90"
-            >
-              <Play size={16} weight="fill" />
-              Run Backtest
-            </Button>
-          </Panel>
+              <Background 
+                variant={BackgroundVariant.Dots}
+                gap={20}
+                size={1}
+                color="oklch(0.35 0.015 260)"
+              />
+              
+              <Controls 
+                className="bg-card border border-border"
+                showInteractive={false}
+              />
+              
+              <MiniMap 
+                className="bg-card border border-border"
+                nodeColor={() => 'oklch(0.55 0.18 50)'}
+                maskColor="oklch(0.25 0.01 260 / 0.85)"
+              />
+              
+              <Panel position="top-left" className="flex gap-2">
+                <EACreationGuide />
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="gap-2"
+                onClick={() => setShowNewProjectDialog(true)}
+              >
+                <FilePlus size={16} />
+                New
+              </Button>
+              <Button 
+                size="sm" 
+                variant="default"
+                className="gap-2 bg-gradient-to-r from-accent to-primary hover:opacity-90"
+                onClick={() => setShowAIBuilder(true)}
+              >
+                <Sparkle size={16} weight="fill" />
+                AI Builder
+              </Button>
+              <Button size="sm" className="gap-2" onClick={() => setShowLoadDialog(true)}>
+                <FolderOpen size={16} />
+                Open
+              </Button>
+              <Button size="sm" variant="outline" className="gap-2" onClick={onSaveStrategy}>
+                <FloppyDisk size={16} />
+                Save
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={onExport}
+              >
+                <Export size={16} />
+                Export MQL
+              </Button>
+              <Button 
+                size="sm" 
+                variant="default" 
+                className="gap-2 bg-bullish text-bullish-foreground hover:bg-bullish/90"
+              >
+                <Play size={16} weight="fill" />
+                Run Backtest
+              </Button>
+            </Panel>
 
-          <Panel position="top-right" className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
-              onClick={handleUndo}
-              disabled={!history.canUndo}
-              title="Undo (Ctrl+Z)"
-            >
-              <ArrowUUpLeft size={16} />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
-              onClick={handleRedo}
-              disabled={!history.canRedo}
-              title="Redo (Ctrl+Y)"
-            >
-              <ArrowUUpRight size={16} />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
-              onClick={toggleBlockNumbers}
-              title="Toggle Block Numbers"
-            >
-              <ListNumbers size={16} />
-              {showBlockNumbers && (
-                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">ON</Badge>
-              )}
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
-              onClick={onFitView}
-            >
-              <ArrowsOut size={16} />
-              Fit View
-            </Button>
-            <Button 
-              size="sm" 
-              variant="destructive" 
-              className="gap-2"
-              onClick={onDeleteSelected}
-            >
-              <Trash size={16} />
-              Delete
-            </Button>
-          </Panel>
-        </ReactFlow>
+            <Panel position="top-right" className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={handleUndo}
+                disabled={!history.canUndo}
+                title="Undo (Ctrl+Z)"
+              >
+                <ArrowUUpLeft size={16} />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={handleRedo}
+                disabled={!history.canRedo}
+                title="Redo (Ctrl+Y)"
+              >
+                <ArrowUUpRight size={16} />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={toggleBlockNumbers}
+                title="Toggle Block Numbers"
+              >
+                <ListNumbers size={16} />
+                {showBlockNumbers && (
+                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">ON</Badge>
+                )}
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={onFitView}
+              >
+                <ArrowsOut size={16} />
+                Fit View
+              </Button>
+              <Button 
+                size="sm" 
+                variant="destructive" 
+                className="gap-2"
+                onClick={onDeleteSelected}
+              >
+                <Trash size={16} />
+                Delete
+              </Button>
+            </Panel>
+          </ReactFlow>
+        </div>
+        </ContextMenuWrapper>
+
+        {showProperties && (
+          <PropertiesPanel 
+            selectedNode={selectedNode} 
+            onClose={() => setShowProperties(false)} 
+          />
+        )}
       </div>
-      </ContextMenuWrapper>
-
-      {showProperties && (
-        <PropertiesPanel 
-          selectedNode={selectedNode} 
-          onClose={() => setShowProperties(false)} 
-        />
-      )}
 
       <AIStrategyBuilder
         open={showAIBuilder}
