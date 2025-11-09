@@ -575,37 +575,179 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'mtf_indicator',
     type: 'mtf',
     category: 'mtf',
-    label: 'MTF',
-    description: 'Multi-timeframe indicator value',
+    label: 'MTF Indicator',
+    description: 'Calculate indicator on a higher/lower timeframe',
     icon: 'ChartLine',
+    parameters: [
+      { 
+        key: 'timeframe', 
+        label: 'Timeframe', 
+        type: 'select', 
+        default: 'H1',
+        options: [
+          { label: '1 Minute (M1)', value: 'M1' },
+          { label: '5 Minutes (M5)', value: 'M5' },
+          { label: '15 Minutes (M15)', value: 'M15' },
+          { label: '30 Minutes (M30)', value: 'M30' },
+          { label: '1 Hour (H1)', value: 'H1' },
+          { label: '4 Hours (H4)', value: 'H4' },
+          { label: '1 Day (D1)', value: 'D1' },
+          { label: '1 Week (W1)', value: 'W1' },
+          { label: '1 Month (MN)', value: 'MN' }
+        ]
+      },
+      { 
+        key: 'indicator', 
+        label: 'Indicator', 
+        type: 'select', 
+        default: 'sma',
+        options: [
+          { label: 'SMA', value: 'sma' },
+          { label: 'EMA', value: 'ema' },
+          { label: 'RSI', value: 'rsi' },
+          { label: 'MACD', value: 'macd' },
+          { label: 'Stochastic', value: 'stochastic' },
+          { label: 'ATR', value: 'atr' },
+          { label: 'ADX', value: 'adx' },
+          { label: 'Bollinger Bands', value: 'bollinger' }
+        ]
+      },
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 1, max: 500 },
+      { 
+        key: 'source', 
+        label: 'Source', 
+        type: 'select', 
+        default: 'close',
+        options: [
+          { label: 'Close', value: 'close' },
+          { label: 'Open', value: 'open' },
+          { label: 'High', value: 'high' },
+          { label: 'Low', value: 'low' }
+        ]
+      }
+    ],
     defaultParameters: {
       timeframe: 'H1',
       indicator: 'sma',
-      period: 20
-    }
+      period: 20,
+      source: 'close'
+    },
+    inputs: [
+      { id: 'trigger', label: 'Trigger', type: 'input', dataType: 'signal' }
+    ],
+    outputs: [
+      { id: 'value', label: 'Value', type: 'output', dataType: 'number' }
+    ]
   },
   {
     id: 'mtf_condition',
     type: 'mtf',
     category: 'mtf',
-    label: 'Condition',
-    description: 'Multi-timeframe condition check',
+    label: 'MTF Condition',
+    description: 'Check condition on another timeframe',
     icon: 'Equalizer',
+    parameters: [
+      { 
+        key: 'timeframe', 
+        label: 'Timeframe', 
+        type: 'select', 
+        default: 'H1',
+        options: [
+          { label: '1 Minute (M1)', value: 'M1' },
+          { label: '5 Minutes (M5)', value: 'M5' },
+          { label: '15 Minutes (M15)', value: 'M15' },
+          { label: '30 Minutes (M30)', value: 'M30' },
+          { label: '1 Hour (H1)', value: 'H1' },
+          { label: '4 Hours (H4)', value: 'H4' },
+          { label: '1 Day (D1)', value: 'D1' },
+          { label: '1 Week (W1)', value: 'W1' },
+          { label: '1 Month (MN)', value: 'MN' }
+        ]
+      },
+      { 
+        key: 'condition', 
+        label: 'Condition', 
+        type: 'select', 
+        default: 'trend_up',
+        options: [
+          { label: 'Trend Up', value: 'trend_up' },
+          { label: 'Trend Down', value: 'trend_down' },
+          { label: 'Sideways', value: 'sideways' }
+        ]
+      },
+      { 
+        key: 'method', 
+        label: 'Method', 
+        type: 'select', 
+        default: 'ma',
+        options: [
+          { label: 'Moving Average', value: 'ma' },
+          { label: 'Price', value: 'price' },
+          { label: 'Slope', value: 'slope' }
+        ]
+      },
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 5, max: 200 }
+    ],
     defaultParameters: {
       timeframe: 'H1',
-      condition: 'trend_up'
-    }
+      condition: 'trend_up',
+      method: 'ma',
+      period: 20
+    },
+    inputs: [
+      { id: 'trigger', label: 'Trigger', type: 'input', dataType: 'signal' }
+    ],
+    outputs: [
+      { id: 'result', label: 'Result', type: 'output', dataType: 'boolean' }
+    ]
   },
   {
     id: 'higher_timeframe_trend',
     type: 'mtf',
     category: 'mtf',
-    label: 'Trend',
-    description: 'Higher timeframe trend direction',
+    label: 'HTF Trend',
+    description: 'Detect higher timeframe trend direction',
     icon: 'TrendUp',
+    parameters: [
+      { 
+        key: 'timeframe', 
+        label: 'Timeframe', 
+        type: 'select', 
+        default: 'H4',
+        options: [
+          { label: '15 Minutes (M15)', value: 'M15' },
+          { label: '30 Minutes (M30)', value: 'M30' },
+          { label: '1 Hour (H1)', value: 'H1' },
+          { label: '4 Hours (H4)', value: 'H4' },
+          { label: '1 Day (D1)', value: 'D1' },
+          { label: '1 Week (W1)', value: 'W1' },
+          { label: '1 Month (MN)', value: 'MN' }
+        ]
+      },
+      { 
+        key: 'method', 
+        label: 'Method', 
+        type: 'select', 
+        default: 'ma',
+        options: [
+          { label: 'Moving Average', value: 'ma' },
+          { label: 'Price Action', value: 'price' },
+          { label: 'Slope Analysis', value: 'slope' }
+        ]
+      },
+      { key: 'period', label: 'Period', type: 'number', default: 50, min: 10, max: 200 }
+    ],
     defaultParameters: {
-      timeframe: 'H4'
-    }
+      timeframe: 'H4',
+      method: 'ma',
+      period: 50
+    },
+    inputs: [
+      { id: 'trigger', label: 'Trigger', type: 'input', dataType: 'signal' }
+    ],
+    outputs: [
+      { id: 'trend', label: 'Trend', type: 'output', dataType: 'number', description: '1=up, -1=down, 0=sideways' }
+    ]
   },
   {
     id: 'candlestick_pattern',

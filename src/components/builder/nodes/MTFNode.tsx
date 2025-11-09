@@ -1,25 +1,36 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { cn } from '@/lib/utils'
+import { getTimeframeInfo } from '@/constants/timeframes'
 
 export interface MTFNodeData extends Record<string, unknown> {
   label: string
   mtfType: 'mtf_indicator' | 'mtf_condition' | 'higher_timeframe_trend'
   parameters?: Record<string, any>
   blockNumber?: number | string
+  timeframe?: string
+  indicator?: string
 }
 
 export const MTFNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as MTFNodeData
   const isDisabled = nodeData.disabled || false
   
-  const inputs = [{ id: 'input', label: 'Input' }]
-  const outputs = [{ id: 'output', label: 'Value' }]
+  // Get timeframe info for display
+  const timeframeInfo = nodeData.timeframe ? getTimeframeInfo(nodeData.timeframe as any) : null
+  
+  const inputs = [{ id: 'trigger', label: 'Trigger' }]
+  const outputs = [
+    { id: nodeData.mtfType === 'mtf_condition' ? 'result' : 
+           nodeData.mtfType === 'higher_timeframe_trend' ? 'trend' : 'value', 
+      label: nodeData.mtfType === 'mtf_condition' ? 'Result' : 
+             nodeData.mtfType === 'higher_timeframe_trend' ? 'Trend' : 'Value' }
+  ]
   
   return (
     <div className={cn(
-      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
-      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      "px-3 py-2 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[140px] transition-all relative",
+      selected ? "ring-2 ring-[#06b6d4] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
       isDisabled && "opacity-50"
     )}>
       {nodeData.blockNumber !== undefined && (
@@ -44,10 +55,20 @@ export const MTFNode = memo(({ data, selected }: NodeProps) => {
         />
       ))}
       
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center gap-0.5">
         <div className="font-semibold text-xs text-foreground text-center leading-tight">
           {nodeData.label}
         </div>
+        {timeframeInfo && (
+          <div className="text-[10px] text-cyan-400 font-mono">
+            {timeframeInfo.value}
+          </div>
+        )}
+        {nodeData.indicator && (
+          <div className="text-[10px] text-muted-foreground">
+            {nodeData.indicator.toUpperCase()}
+          </div>
+        )}
       </div>
       
       {outputs.map((output, idx) => (
