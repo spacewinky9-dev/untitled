@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Command } from 'lucide-react'
-import { KEYBOARD_SHORTCUTS } from '@/hooks/useKeyboardShortcuts'
 
 export interface CommandAction {
   id: string

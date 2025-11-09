@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { X, Info, ArrowCounterClockwise, ArrowClockwise, FloppyDisk } from '@phosphor-icons/react'
+import { X, Info, ArrowCounterClockwise, ArrowClockwise } from '@phosphor-icons/react'
 import { getNodeDefinition, type IndicatorNodeDefinition, NODE_CATEGORIES } from '@/constants/node-categories'
 
 interface NodeParameter {

@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from 'react'
-import { Node } from '@xyflow/react'
 
 export interface KeyboardShortcutsConfig {
   onSave?: () => void
