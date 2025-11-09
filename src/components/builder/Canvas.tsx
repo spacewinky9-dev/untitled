@@ -686,7 +686,6 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       
       return {
         ...node,
-        draggable: true,
         data: {
           ...node.data,
           blockNumber: displayLabel,

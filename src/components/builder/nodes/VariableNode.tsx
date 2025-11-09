@@ -26,12 +26,6 @@ export const VariableNode = memo(({ data, selected, id }: NodeProps) => {
     e.stopPropagation()
     setIsEditingLabel(true)
   }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (isEditingLabel) {
-      e.stopPropagation()
-    }
-  }
   
   return (
     <div 
@@ -68,7 +62,7 @@ export const VariableNode = memo(({ data, selected, id }: NodeProps) => {
         />
       ))}
       
-      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick} onMouseDown={handleMouseDown}>
+      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick}>
         <InlineNodeEditor
           nodeId={id}
           currentLabel={nodeData.label}
