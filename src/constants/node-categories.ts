@@ -855,6 +855,24 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     }
   },
   {
+    id: 'if',
+    type: 'logic',
+    category: 'logic',
+    label: 'IF',
+    description: 'Conditional branching - execute if condition is true',
+    icon: 'GitBranch',
+    defaultParameters: {}
+  },
+  {
+    id: 'else',
+    type: 'logic',
+    category: 'logic',
+    label: 'ELSE',
+    description: 'Alternative branch - execute if condition is false',
+    icon: 'ArrowBendUpLeft',
+    defaultParameters: {}
+  },
+  {
     id: 'and',
     type: 'logic',
     category: 'logic',
