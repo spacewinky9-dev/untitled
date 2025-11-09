@@ -30,7 +30,7 @@
 
 .react-flow__edge.animated .react-flow__edge-path {
   stroke-dasharray: 5;
-  animation: dashdraw 0.5s linear infinite;
+  animation: dashdraw var(--animation-duration, 0.5s) linear infinite;
 }
 
 @keyframes dashdraw {

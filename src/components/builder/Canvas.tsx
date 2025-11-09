@@ -63,6 +63,7 @@ import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
 import { useClipboard } from '@/hooks/use-clipboard'
 import { Strategy } from '@/types/strategy'
+import { DEFAULT_CANVAS_SETTINGS } from '@/types/settings'
 import { toast } from 'sonner'
 import { calculateBlockNumbers, validateMultipleBranches } from '@/lib/block-numbers'
 import { ConnectionValidator } from '@/lib/engine/connection-validator'
@@ -117,6 +118,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [currentProject, setCurrentProject] = useKV<ProjectConfig | null>('currentProject', null)
   const [showLoadDialog, setShowLoadDialog] = useState(false)
   const [hasSeenRenameTip, setHasSeenRenameTip] = useKV<boolean>('hasSeenRenameTip', false)
+  const [canvasSettings] = useKV('canvas-settings', DEFAULT_CANVAS_SETTINGS)
   
   const history = useHistory()
   const clipboard = useClipboard()
@@ -701,12 +703,13 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         style: {
           ...edge.style,
           stroke: edge.style?.stroke || categoryColors.accentColor,
-          strokeWidth: edge.selected ? 3 : 2.5
+          strokeWidth: edge.selected ? 3 : 2.5,
+          animationDuration: canvasSettings.enableConnectionAnimation ? `${1 / canvasSettings.connectionAnimationSpeed}s` : undefined
         },
-        animated: edge.selected
+        animated: canvasSettings.enableConnectionAnimation && (edge.selected || false)
       }
     })
-  }, [edges, nodes])
+  }, [edges, nodes, canvasSettings.enableConnectionAnimation, canvasSettings.connectionAnimationSpeed])
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -738,7 +741,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
           onCreateGroup={() => toast.info('Create group feature coming soon')}
           onBreakConnection={onDetachNode}
         >
-          <div ref={reactFlowWrapper} className="flex-1 relative">
+          <div ref={reactFlowWrapper} className="flex-1 relative" style={{
+            '--animation-duration': `${1 / canvasSettings.connectionAnimationSpeed}s`
+          } as React.CSSProperties}>
             <ReactFlow
               nodes={nodesWithBlockNumbers}
               edges={styledEdges}
