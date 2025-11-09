@@ -1,3 +1,20 @@
+import { INDICATOR_CONDITION_DEFINITIONS } from './indicator-conditions'
+import { TIME_FILTER_DEFINITIONS } from './time-filter-nodes'
+import { TRADE_ORDER_COUNT_DEFINITIONS } from './trade-order-count-nodes'
+import { TRADING_CONDITION_DEFINITIONS } from './trading-conditions-nodes'
+import { BUY_SELL_DEFINITIONS } from './buy-sell-nodes'
+import { BUCKET_DEFINITIONS } from './bucket-nodes'
+import { LOOP_DEFINITIONS } from './loop-nodes'
+import { TRAILING_STOP_DEFINITIONS } from './trailing-stop-nodes'
+import { TRADING_ACTIONS_DEFINITIONS } from './trading-actions-nodes'
+import { CHART_OBJECTS_DEFINITIONS } from './chart-objects-nodes'
+import { LOOP_CHART_OBJECTS_DEFINITIONS } from './loop-chart-objects-nodes'
+import { OUTPUT_COMMUNICATION_DEFINITIONS } from './output-communication-nodes'
+import { VARIOUS_SIGNALS_DEFINITIONS } from './various-signals-nodes'
+import { CONTROLLING_BLOCKS_DEFINITIONS } from './controlling-blocks-nodes'
+import { FLAGS_DEFINITIONS } from './flags-nodes'
+import { COUNTERS_DEFINITIONS } from './counters-nodes'
+
 export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced' | 'money_management' | 'graphical' | 'messaging' | 'file_ops' | 'terminal' | 'custom'
 
 export type EventCategory = 'ontick' | 'oninit' | 'ontimer' | 'ontrade' | 'onchart' | 'ondeinit' | 'all'
@@ -560,6 +577,22 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
 
 export const NODE_DEFINITIONS: NodeDefinition[] = [
   ...INDICATOR_DEFINITIONS,
+  ...INDICATOR_CONDITION_DEFINITIONS,
+  ...TIME_FILTER_DEFINITIONS,
+  ...TRADE_ORDER_COUNT_DEFINITIONS,
+  ...TRADING_CONDITION_DEFINITIONS,
+  ...BUY_SELL_DEFINITIONS,
+  ...BUCKET_DEFINITIONS,
+  ...LOOP_DEFINITIONS,
+  ...TRAILING_STOP_DEFINITIONS,
+  ...TRADING_ACTIONS_DEFINITIONS,
+  ...CHART_OBJECTS_DEFINITIONS,
+  ...LOOP_CHART_OBJECTS_DEFINITIONS,
+  ...OUTPUT_COMMUNICATION_DEFINITIONS,
+  ...VARIOUS_SIGNALS_DEFINITIONS,
+  ...CONTROLLING_BLOCKS_DEFINITIONS,
+  ...FLAGS_DEFINITIONS,
+  ...COUNTERS_DEFINITIONS,
   {
     id: 'on_init',
     type: 'event',
