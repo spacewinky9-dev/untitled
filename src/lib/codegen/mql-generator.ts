@@ -29,8 +29,8 @@ export class MQLCodeGenerator {
     strategy: Strategy,
     options: Partial<MQLGeneratorOptions> = {}
   ) {
-    this.nodes = strategy.nodes
-    this.edges = strategy.edges
+    this.nodes = strategy.nodes || []
+    this.edges = strategy.edges || []
     this.options = {
       language: options.language || 'mql5',
       strategyName: options.strategyName || strategy.name || 'GeneratedEA',
