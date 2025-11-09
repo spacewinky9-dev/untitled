@@ -37,6 +37,7 @@ export function AIStrategyBuilder({ open, onOpenChange, onStrategyGenerated }: A
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [retryCount, setRetryCount] = useState(0)
   const [steps, setSteps] = useState<GenerationStep[]>([
     { label: 'Analyzing prompt', status: 'pending' },
     { label: 'Identifying indicators', status: 'pending' },
@@ -51,17 +52,63 @@ export function AIStrategyBuilder({ open, onOpenChange, onStrategyGenerated }: A
     ))
   }
 
-  const generateStrategy = async () => {
-    if (!prompt.trim()) {
-      toast.error('Please enter a strategy description')
-      return
+  const validateStrategyStructure = (data: any): { valid: boolean; errors: string[] } => {
+    const errors: string[] = []
+    
+    if (!data || typeof data !== 'object') {
+      errors.push('Invalid response format')
+      return { valid: false, errors }
     }
+    
+    if (!data.nodes || !Array.isArray(data.nodes)) {
+      errors.push('Missing or invalid nodes array')
+      return { valid: false, errors }
+    }
+    
+    if (data.nodes.length === 0) {
+      errors.push('No nodes generated')
+      return { valid: false, errors }
+    }
+    
+    // Check for required node types
+    const hasEvent = data.nodes.some((n: any) => n.type === 'event')
+    const hasIndicator = data.nodes.some((n: any) => n.type === 'indicator')
+    const hasAction = data.nodes.some((n: any) => n.type === 'action')
+    
+    if (!hasEvent) {
+      errors.push('Missing event node (OnTick)')
+    }
+    if (!hasIndicator) {
+      errors.push('Missing indicator nodes')
+    }
+    if (!hasAction) {
+      errors.push('Missing action nodes (buy/sell)')
+    }
+    
+    // Validate node structure
+    for (const node of data.nodes) {
+      if (!node.id || !node.type || !node.position) {
+        errors.push(`Invalid node structure: ${JSON.stringify(node)}`)
+      }
+    }
+    
+    // Validate edges if present
+    if (data.edges && Array.isArray(data.edges)) {
+      for (const edge of data.edges) {
+        if (!edge.source || !edge.target) {
+          errors.push(`Invalid edge structure: ${JSON.stringify(edge)}`)
+        }
+      }
+    }
+    
+    return { valid: errors.length === 0, errors }
+  }
 
-    setIsGenerating(true)
-    setProgress(0)
-
+  const generateStrategyWithRetry = async (attempt: number = 0): Promise<any> => {
+    const maxRetries = 2
+    
     try {
-      updateStep(0, 'processing')
+      updateStep(0, 'processing', attempt > 0 ? `Retry ${attempt}/${maxRetries}` : undefined)
       setProgress(20)
 
       const aiPrompt = spark.llmPrompt`You are a Forex trading strategy expert. Based on the following user description, generate a complete trading strategy structure.
@@ -159,10 +206,17 @@ With edges connecting: event→rsi, rsi→condition_low, condition_low→buy, rs
       updateStep(0, 'complete')
       setProgress(40)
 
-      const strategyData = JSON.parse(result)
+      let strategyData
+      try {
+        strategyData = JSON.parse(result)
+      } catch (parseError) {
+        throw new Error(`Failed to parse AI response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`)
+      }
       
-      if (!strategyData.nodes || !Array.isArray(strategyData.nodes)) {
-        throw new Error('Invalid strategy structure')
+      // Validate the structure
+      const validation = validateStrategyStructure(strategyData)
+      if (!validation.valid) {
+        throw new Error(`Invalid strategy structure: ${validation.errors.join(', ')}`)
       }
 
       updateStep(1, 'complete', `${strategyData.nodes.filter((n: any) => n.type === 'indicator').length} indicators`)
@@ -174,20 +228,38 @@ With edges connecting: event→rsi, rsi→condition_low, condition_low→buy, rs
       updateStep(3, 'complete', `${strategyData.nodes.filter((n: any) => n.type === 'action').length} actions`)
       setProgress(90)
 
-      updateStep(4, 'processing')
-      
-      const isValid = strategyData.nodes.length > 0 && 
-                      strategyData.nodes.some((n: any) => n.type === 'action')
-      
-      if (!isValid) {
-        updateStep(4, 'error', 'Strategy incomplete')
-        toast.error('Generated strategy is incomplete. Try refining your prompt.')
-        return
-      }
-
       updateStep(4, 'complete', 'Strategy validated')
       setProgress(100)
 
+      return strategyData
+      
+    } catch (error) {
+      console.error(`AI generation attempt ${attempt + 1} failed:`, error)
+      
+      if (attempt < maxRetries) {
+        // Retry with exponential backoff
+        const delay = Math.pow(2, attempt) * 1000
+        await new Promise(resolve => setTimeout(resolve, delay))
+        return generateStrategyWithRetry(attempt + 1)
+      }
+      
+      throw error
+    }
+  }
+
+  const generateStrategy = async () => {
+    if (!prompt.trim()) {
+      toast.error('Please enter a strategy description')
+      return
+    }
+
+    setIsGenerating(true)
+    setProgress(0)
+    setRetryCount(0)
+
+    try {
+      const strategyData = await generateStrategyWithRetry()
+      
       toast.success(`Strategy generated: ${strategyData.explanation || 'Ready to use'}`)
       
       setTimeout(() => {
@@ -198,10 +270,11 @@ With edges connecting: event→rsi, rsi→condition_low, condition_low→buy, rs
 
     } catch (error) {
       console.error('AI generation error:', error)
-      toast.error('Failed to generate strategy. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      toast.error(`Failed to generate strategy: ${errorMessage}`)
       const errorIndex = steps.findIndex(s => s.status === 'processing')
       if (errorIndex >= 0) {
-        updateStep(errorIndex, 'error', 'Generation failed')
+        updateStep(errorIndex, 'error', errorMessage)
       }
     } finally {
       setIsGenerating(false)

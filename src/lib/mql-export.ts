@@ -126,6 +126,8 @@ int OnInit()
    trade.SetExpertMagicNumber(MagicNumber);
    trade.SetDeviationInPoints(Slippage);
    
+   ${generateIndicatorHandleInitialization(indicators)}
+   
    Print("${expertName} initialized successfully");
    return(INIT_SUCCEEDED);
 }
@@ -321,13 +323,15 @@ function generateGlobalVariablesMQL5(indicators: Node[]): string {
   const vars: string[] = []
   
   indicators.forEach(node => {
-    const nodeType = node.id.split('_')[0]
-    switch (nodeType) {
+    const data = node.data as any
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
+    
+    switch (indicatorType) {
       case 'sma':
       case 'ema':
       case 'wma':
         vars.push(`int handle_${node.id};`)
-        vars.push(`double ${nodeType}_${node.id}[];`)
+        vars.push(`double ${indicatorType}_${node.id}[];`)
         break
       case 'rsi':
         vars.push(`int handle_rsi_${node.id};`)
@@ -345,10 +349,108 @@ function generateGlobalVariablesMQL5(indicators: Node[]): string {
         vars.push(`int handle_atr_${node.id};`)
         vars.push(`double atr_${node.id}[];`)
         break
+      case 'stochastic':
+        vars.push(`int handle_stoch_${node.id};`)
+        vars.push(`double stoch_main_${node.id}[], stoch_signal_${node.id}[];`)
+        break
+      case 'cci':
+        vars.push(`int handle_cci_${node.id};`)
+        vars.push(`double cci_${node.id}[];`)
+        break
+      case 'adx':
+        vars.push(`int handle_adx_${node.id};`)
+        vars.push(`double adx_${node.id}[];`)
+        break
+      case 'williams':
+        vars.push(`int handle_williams_${node.id};`)
+        vars.push(`double williams_${node.id}[];`)
+        break
+      case 'sar':
+        vars.push(`int handle_sar_${node.id};`)
+        vars.push(`double sar_${node.id}[];`)
+        break
+      case 'obv':
+        vars.push(`int handle_obv_${node.id};`)
+        vars.push(`double obv_${node.id}[];`)
+        break
+      case 'vwap':
+        vars.push(`// VWAP requires custom implementation`)
+        vars.push(`double vwap_${node.id}[];`)
+        break
     }
   })
   
   return vars.join('\n')
+}
+
+function generateIndicatorHandleInitialization(indicators: Node[]): string {
+  const inits: string[] = []
+  
+  inits.push('   // Initialize indicator handles')
+  
+  indicators.forEach(node => {
+    const data = node.data as any
+    const params = data.parameters || {}
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
+    
+    switch (indicatorType) {
+      case 'sma':
+        inits.push(`   handle_${node.id} = iMA(_Symbol, PERIOD_CURRENT, MA_Period_${node.id}, 0, MODE_SMA, PRICE_CLOSE);`)
+        inits.push(`   if(handle_${node.id} == INVALID_HANDLE) { Print("Failed to create SMA handle"); return(INIT_FAILED); }`)
+        break
+      case 'ema':
+        inits.push(`   handle_${node.id} = iMA(_Symbol, PERIOD_CURRENT, MA_Period_${node.id}, 0, MODE_EMA, PRICE_CLOSE);`)
+        inits.push(`   if(handle_${node.id} == INVALID_HANDLE) { Print("Failed to create EMA handle"); return(INIT_FAILED); }`)
+        break
+      case 'wma':
+        inits.push(`   handle_${node.id} = iMA(_Symbol, PERIOD_CURRENT, MA_Period_${node.id}, 0, MODE_LWMA, PRICE_CLOSE);`)
+        inits.push(`   if(handle_${node.id} == INVALID_HANDLE) { Print("Failed to create WMA handle"); return(INIT_FAILED); }`)
+        break
+      case 'rsi':
+        inits.push(`   handle_rsi_${node.id} = iRSI(_Symbol, PERIOD_CURRENT, RSI_Period_${node.id}, PRICE_CLOSE);`)
+        inits.push(`   if(handle_rsi_${node.id} == INVALID_HANDLE) { Print("Failed to create RSI handle"); return(INIT_FAILED); }`)
+        break
+      case 'macd':
+        inits.push(`   handle_macd_${node.id} = iMACD(_Symbol, PERIOD_CURRENT, MACD_Fast_${node.id}, MACD_Slow_${node.id}, MACD_Signal_${node.id}, PRICE_CLOSE);`)
+        inits.push(`   if(handle_macd_${node.id} == INVALID_HANDLE) { Print("Failed to create MACD handle"); return(INIT_FAILED); }`)
+        break
+      case 'bb':
+        inits.push(`   handle_bb_${node.id} = iBands(_Symbol, PERIOD_CURRENT, BB_Period_${node.id}, 0, BB_Deviation_${node.id}, PRICE_CLOSE);`)
+        inits.push(`   if(handle_bb_${node.id} == INVALID_HANDLE) { Print("Failed to create Bollinger Bands handle"); return(INIT_FAILED); }`)
+        break
+      case 'atr':
+        inits.push(`   handle_atr_${node.id} = iATR(_Symbol, PERIOD_CURRENT, ATR_Period_${node.id});`)
+        inits.push(`   if(handle_atr_${node.id} == INVALID_HANDLE) { Print("Failed to create ATR handle"); return(INIT_FAILED); }`)
+        break
+      case 'stochastic':
+        inits.push(`   handle_stoch_${node.id} = iStochastic(_Symbol, PERIOD_CURRENT, Stoch_K_Period_${node.id}, Stoch_D_Period_${node.id}, Stoch_Slowing_${node.id}, MODE_SMA, STO_LOWHIGH);`)
+        inits.push(`   if(handle_stoch_${node.id} == INVALID_HANDLE) { Print("Failed to create Stochastic handle"); return(INIT_FAILED); }`)
+        break
+      case 'cci':
+        inits.push(`   handle_cci_${node.id} = iCCI(_Symbol, PERIOD_CURRENT, CCI_Period_${node.id}, PRICE_TYPICAL);`)
+        inits.push(`   if(handle_cci_${node.id} == INVALID_HANDLE) { Print("Failed to create CCI handle"); return(INIT_FAILED); }`)
+        break
+      case 'adx':
+        inits.push(`   handle_adx_${node.id} = iADX(_Symbol, PERIOD_CURRENT, ADX_Period_${node.id});`)
+        inits.push(`   if(handle_adx_${node.id} == INVALID_HANDLE) { Print("Failed to create ADX handle"); return(INIT_FAILED); }`)
+        break
+      case 'williams':
+        inits.push(`   handle_williams_${node.id} = iWPR(_Symbol, PERIOD_CURRENT, Williams_Period_${node.id});`)
+        inits.push(`   if(handle_williams_${node.id} == INVALID_HANDLE) { Print("Failed to create Williams %R handle"); return(INIT_FAILED); }`)
+        break
+      case 'sar':
+        inits.push(`   handle_sar_${node.id} = iSAR(_Symbol, PERIOD_CURRENT, SAR_Step_${node.id}, SAR_Maximum_${node.id});`)
+        inits.push(`   if(handle_sar_${node.id} == INVALID_HANDLE) { Print("Failed to create Parabolic SAR handle"); return(INIT_FAILED); }`)
+        break
+      case 'obv':
+        inits.push(`   handle_obv_${node.id} = iOBV(_Symbol, PERIOD_CURRENT, VOLUME_TICK);`)
+        inits.push(`   if(handle_obv_${node.id} == INVALID_HANDLE) { Print("Failed to create OBV handle"); return(INIT_FAILED); }`)
+        break
+    }
+  })
+  
+  inits.push('')
+  return inits.join('\n')
 }
 
 function generateIndicatorCalculations(indicators: Node[]): string {
@@ -416,33 +518,74 @@ function generateIndicatorCalculations(indicators: Node[]): string {
 function generateIndicatorCalculationsMQL5(indicators: Node[]): string {
   const calcs: string[] = []
   
+  calcs.push('   // Copy indicator values from buffers')
+  
   indicators.forEach(node => {
-    const nodeType = node.id.split('_')[0]
+    const data = node.data as any
+    const indicatorType = data.indicatorType || node.id.split('_')[0]
     
-    switch (nodeType) {
+    switch (indicatorType) {
       case 'sma':
       case 'ema':
       case 'wma':
-        calcs.push(`   CopyBuffer(handle_${node.id}, 0, 0, 1, ${nodeType}_${node.id});`)
+        calcs.push(`   ArraySetAsSeries(${indicatorType}_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_${node.id}, 0, 0, 1, ${indicatorType}_${node.id});`)
         break
       case 'rsi':
+        calcs.push(`   ArraySetAsSeries(rsi_${node.id}, true);`)
         calcs.push(`   CopyBuffer(handle_rsi_${node.id}, 0, 0, 1, rsi_${node.id});`)
         break
       case 'macd':
+        calcs.push(`   ArraySetAsSeries(macd_main_${node.id}, true);`)
+        calcs.push(`   ArraySetAsSeries(macd_signal_${node.id}, true);`)
         calcs.push(`   CopyBuffer(handle_macd_${node.id}, 0, 0, 1, macd_main_${node.id});`)
         calcs.push(`   CopyBuffer(handle_macd_${node.id}, 1, 0, 1, macd_signal_${node.id});`)
         break
       case 'bb':
+        calcs.push(`   ArraySetAsSeries(bb_upper_${node.id}, true);`)
+        calcs.push(`   ArraySetAsSeries(bb_middle_${node.id}, true);`)
+        calcs.push(`   ArraySetAsSeries(bb_lower_${node.id}, true);`)
         calcs.push(`   CopyBuffer(handle_bb_${node.id}, 0, 0, 1, bb_upper_${node.id});`)
         calcs.push(`   CopyBuffer(handle_bb_${node.id}, 1, 0, 1, bb_middle_${node.id});`)
         calcs.push(`   CopyBuffer(handle_bb_${node.id}, 2, 0, 1, bb_lower_${node.id});`)
         break
       case 'atr':
+        calcs.push(`   ArraySetAsSeries(atr_${node.id}, true);`)
         calcs.push(`   CopyBuffer(handle_atr_${node.id}, 0, 0, 1, atr_${node.id});`)
+        break
+      case 'stochastic':
+        calcs.push(`   ArraySetAsSeries(stoch_main_${node.id}, true);`)
+        calcs.push(`   ArraySetAsSeries(stoch_signal_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_stoch_${node.id}, 0, 0, 1, stoch_main_${node.id});`)
+        calcs.push(`   CopyBuffer(handle_stoch_${node.id}, 1, 0, 1, stoch_signal_${node.id});`)
+        break
+      case 'cci':
+        calcs.push(`   ArraySetAsSeries(cci_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_cci_${node.id}, 0, 0, 1, cci_${node.id});`)
+        break
+      case 'adx':
+        calcs.push(`   ArraySetAsSeries(adx_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_adx_${node.id}, 0, 0, 1, adx_${node.id});`)
+        break
+      case 'williams':
+        calcs.push(`   ArraySetAsSeries(williams_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_williams_${node.id}, 0, 0, 1, williams_${node.id});`)
+        break
+      case 'sar':
+        calcs.push(`   ArraySetAsSeries(sar_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_sar_${node.id}, 0, 0, 1, sar_${node.id});`)
+        break
+      case 'obv':
+        calcs.push(`   ArraySetAsSeries(obv_${node.id}, true);`)
+        calcs.push(`   CopyBuffer(handle_obv_${node.id}, 0, 0, 1, obv_${node.id});`)
+        break
+      case 'vwap':
+        calcs.push(`   // VWAP calculation - custom implementation needed`)
         break
     }
   })
   
+  calcs.push('')
   return calcs.join('\n')
 }
 
@@ -539,10 +682,11 @@ function buildConditionChain(targetNode: Node, edges: Edge[], nodes: Node[]): st
         }
       }
     } else if (sourceNode.type === 'logic') {
-      const logicType = data.label || 'AND'
-      const subCondition = buildConditionChain(sourceNode, edges, nodes)
-      if (subCondition) {
-        conditions.push(subCondition)
+      // Generate logic gate MQL code
+      const logicType = (data.logicType || data.label || 'AND').toUpperCase()
+      const logicResult = generateLogicGate(sourceNode, edges, nodes)
+      if (logicResult) {
+        conditions.push(logicResult)
       }
     }
   })
@@ -552,6 +696,110 @@ function buildConditionChain(targetNode: Node, edges: Edge[], nodes: Node[]): st
   }
   
   return conditions.length === 1 ? conditions[0] : `(${conditions.join(' && ')})`
+}
+
+function generateLogicGate(logicNode: Node, edges: Edge[], nodes: Node[]): string {
+  const data = logicNode.data as any
+  const logicType = (data.logicType || data.label || 'AND').toUpperCase()
+  
+  // Get all input conditions for this logic gate
+  const incomingEdges = edges.filter(e => e.target === logicNode.id)
+  const inputConditions: string[] = []
+  
+  incomingEdges.forEach(edge => {
+    const sourceNode = nodes.find(n => n.id === edge.source)
+    if (!sourceNode) return
+    
+    if (sourceNode.type === 'condition') {
+      const condition = buildSingleCondition(sourceNode, edges, nodes)
+      if (condition) {
+        inputConditions.push(condition)
+      }
+    } else if (sourceNode.type === 'logic') {
+      // Recursively handle nested logic gates
+      const nestedLogic = generateLogicGate(sourceNode, edges, nodes)
+      if (nestedLogic) {
+        inputConditions.push(nestedLogic)
+      }
+    }
+  })
+  
+  if (inputConditions.length === 0) {
+    return 'true'
+  }
+  
+  // Apply logic gate operator
+  switch (logicType) {
+    case 'AND':
+      return inputConditions.length === 1 
+        ? inputConditions[0] 
+        : `(${inputConditions.join(' && ')})`
+    
+    case 'OR':
+      return inputConditions.length === 1 
+        ? inputConditions[0] 
+        : `(${inputConditions.join(' || ')})`
+    
+    case 'NOT':
+      return `(!(${inputConditions[0] || 'true'}))`
+    
+    case 'XOR':
+      if (inputConditions.length === 2) {
+        return `((${inputConditions[0]}) != (${inputConditions[1]}))`
+      }
+      // For more than 2 inputs, XOR means exactly one is true
+      return `((${inputConditions.join(' ? 1 : 0) + (')}) == 1)`
+    
+    case 'NAND':
+      return `(!(${inputConditions.join(' && ')}))`
+    
+    case 'NOR':
+      return `(!(${inputConditions.join(' || ')}))`
+    
+    default:
+      return inputConditions.join(' && ')
+  }
+}
+
+function buildSingleCondition(conditionNode: Node, edges: Edge[], nodes: Node[]): string {
+  const data = conditionNode.data as any
+  const operator = data.operator || 'gt'
+  const threshold = data.parameters?.threshold || 50
+  
+  const indicatorEdges = edges.filter(e => e.target === conditionNode.id)
+  if (indicatorEdges.length === 0) {
+    return ''
+  }
+  
+  const indicatorNode = nodes.find(n => n.id === indicatorEdges[0].source)
+  if (!indicatorNode) {
+    return ''
+  }
+  
+  const indicatorData = indicatorNode.data as any
+  const indicatorType = indicatorData.indicatorType || indicatorNode.id.split('_')[0]
+  const indicatorVar = `${indicatorType}_${indicatorNode.id}`
+  
+  switch (operator) {
+    case 'gt':
+      return `(${indicatorVar} > ${threshold})`
+    case 'lt':
+      return `(${indicatorVar} < ${threshold})`
+    case 'gte':
+      return `(${indicatorVar} >= ${threshold})`
+    case 'lte':
+      return `(${indicatorVar} <= ${threshold})`
+    case 'eq':
+      return `(${indicatorVar} == ${threshold})`
+    case 'neq':
+      return `(${indicatorVar} != ${threshold})`
+    case 'cross_above':
+      return `(${indicatorVar} > ${threshold} && iMA(NULL, 0, MA_Period_${indicatorNode.id}, 0, MODE_SMA, PRICE_CLOSE, 1) <= ${threshold})`
+    case 'cross_below':
+      return `(${indicatorVar} < ${threshold} && iMA(NULL, 0, MA_Period_${indicatorNode.id}, 0, MODE_SMA, PRICE_CLOSE, 1) >= ${threshold})`
+    default:
+      return `(${indicatorVar} > ${threshold})`
+  }
 }
 
 function generateConditionChecksMQL5(conditions: Node[], edges: Edge[], nodes: Node[]): string {
