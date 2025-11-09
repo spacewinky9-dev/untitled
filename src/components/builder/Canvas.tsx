@@ -364,6 +364,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         type: nodeDefinition.type,
         position,
         draggable: true,
+        selectable: true,
+        connectable: true,
+        focusable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -373,6 +376,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       history.addHistory(nodes, edges, `Add ${nodeDefinition.label}`)
       setNodes((nds) => nds.concat(newNode))
       setNodeIdCounter((id) => id + 1)
+      toast.success(`Added ${nodeDefinition.label}`)
     },
     [screenToFlowPosition, nodeIdCounter, setNodes, nodes, edges, history]
   )
@@ -386,6 +390,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         type: nodeDefinition.type,
         position,
         draggable: true,
+        selectable: true,
+        connectable: true,
+        focusable: true,
         data: {
           label: nodeDefinition.label,
           ...nodeDefinition.defaultParameters
@@ -611,6 +618,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       type: n.type,
       position: n.position,
       draggable: true,
+      selectable: true,
+      connectable: true,
+      focusable: true,
       data: n.data
     }))
     
@@ -644,6 +654,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       type: n.type,
       position: n.position,
       draggable: true,
+      selectable: true,
+      connectable: true,
+      focusable: true,
       data: n.data
     }))
     
@@ -686,6 +699,10 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       
       return {
         ...node,
+        draggable: node.draggable !== false,
+        selectable: node.selectable !== false,
+        connectable: node.connectable !== false,
+        focusable: node.focusable !== false,
         data: {
           ...node.data,
           blockNumber: displayLabel,
@@ -764,6 +781,9 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
               nodesConnectable={true}
               nodesFocusable={true}
               elementsSelectable={true}
+              selectNodesOnDrag={false}
+              panOnDrag={[1, 2]}
+              selectionOnDrag={false}
               fitView
               className="bg-background"
             >

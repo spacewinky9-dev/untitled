@@ -142,18 +142,21 @@ export function CompactNodePalette({ activeEvent, onDragStart }: CompactNodePale
                     {displayNodes.map(node => (
                       <div
                         key={node.id}
-                        draggable
+                        draggable={true}
                         onDragStart={(e) => onDragStart(e, node)}
+                        onDragEnd={(e) => e.preventDefault()}
                         className={`
-                          px-2 py-1.5 text-[11px] rounded cursor-move
+                          px-2 py-1.5 text-[11px] rounded cursor-grab active:cursor-grabbing
                           border border-l-2
                           ${categoryColors[categoryId]}
                           hover:bg-opacity-30 transition-all
                           flex items-center gap-1.5
+                          select-none
                         `}
+                        title={node.description}
                       >
-                        <span className="text-base">{node.icon}</span>
-                        <span className="flex-1 truncate">{node.label}</span>
+                        <span className="text-base pointer-events-none">{node.icon}</span>
+                        <span className="flex-1 truncate pointer-events-none">{node.label}</span>
                       </div>
                     ))}
                     
