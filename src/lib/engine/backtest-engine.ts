@@ -2009,11 +2009,25 @@ export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
 export function getNodeDefinition(id: string): NodeDefinition | undefined {
   return (NODE_DEFINITIONS || []).find(node => node.id === id)
 }
-]export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {  return (NODE_DEFINITIONS || []).filter(node => node.category === category)}export function getNodeDefinition(id: string): NodeDefinition | undefined {  return (NODE_DEFINITIONS || []).find(node => node.id === id)}
+
 export function getNodesByEventContext(eventContext: EventCategory): NodeDefinition[] {
   if (eventContext === 'all') {
     return NODE_DEFINITIONS || []
-  return (NODE_DEFINITIONS || []).filter(node =>     !node.eventContext ||     node.eventContext.includes(eventContext) ||     node.eventContext.includes('all')  )}export function countNodesByEventContext(eventContext: EventCategory): number {  return getNodesByEventContext(eventContext).length}export function getCategoryColors(category: NodeCategory) {  const categoryInfo = NODE_CATEGORIES.find(cat => cat.id === category)  return categoryInfo ? {
+  }
+  return (NODE_DEFINITIONS || []).filter(node => 
+    !node.eventContext || 
+    node.eventContext.includes(eventContext) || 
+    node.eventContext.includes('all')
+  )
+}
+
+export function countNodesByEventContext(eventContext: EventCategory): number {
+  return getNodesByEventContext(eventContext).length
+}
+
+export function getCategoryColors(category: NodeCategory) {
+  const categoryInfo = NODE_CATEGORIES.find(cat => cat.id === category)
+  return categoryInfo ? {
     color: categoryInfo.color,
     bgColor: categoryInfo.bgColor,
     textColor: categoryInfo.textColor,
@@ -2025,6 +2039,8 @@ export function getNodesByEventContext(eventContext: EventCategory): NodeDefinit
     textColor: 'oklch(0.95 0.14 50)',
     borderColor: 'oklch(0.55 0.22 50)',
     accentColor: '#f59e0b'
+  }
+}
 
 export function getCategoryInfo(category: NodeCategory) {
   return NODE_CATEGORIES.find(cat => cat.id === category)

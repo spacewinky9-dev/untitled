@@ -17,7 +17,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus, Question, BookOpen, CheckCircle } from '@phosphor-icons/react'
+import { Play, FloppyDisk, FolderOpen, Trash, ArrowsOut, Sparkle, Export, ArrowUUpLeft, ArrowUUpRight, ListNumbers, FilePlus, Question, BookOpen, CheckCircle, TestTube } from '@phosphor-icons/react'
 import {
   Dialog,
   DialogContent,
@@ -687,6 +687,119 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
     toast.success('Block detached from all connections')
   }, [selectedNode, edges, history, setEdges])
 
+  const onAddTestNodes = useCallback(() => {
+    history.addHistory(nodes, edges, 'Add test nodes')
+    
+    const eventNode: Node = {
+      id: `node-test-event-${Date.now()}`,
+      type: 'event',
+      position: { x: 100, y: 200 },
+      data: {
+        label: 'OnTick',
+        eventType: 'ontick',
+        outputs: [{ id: 'signal', label: 'Signal', type: 'output', dataType: 'signal' }]
+      }
+    }
+
+    const rsiNode: Node = {
+      id: `node-test-rsi-${Date.now()}`,
+      type: 'indicator',
+      position: { x: 300, y: 150 },
+      data: {
+        label: 'RSI',
+        indicatorType: 'RSI',
+        parameters: { period: 14, source: 'close' },
+        inputs: [],
+        outputs: [{ id: 'value', label: 'Value', type: 'output', dataType: 'number' }]
+      }
+    }
+
+    const maNode: Node = {
+      id: `node-test-ma-${Date.now()}`,
+      type: 'indicator',
+      position: { x: 300, y: 280 },
+      data: {
+        label: 'Moving Average',
+        indicatorType: 'SMA',
+        parameters: { period: 20, source: 'close' },
+        inputs: [],
+        outputs: [{ id: 'value', label: 'Value', type: 'output', dataType: 'number' }]
+      }
+    }
+
+    const conditionNode: Node = {
+      id: `node-test-condition-${Date.now()}`,
+      type: 'condition',
+      position: { x: 550, y: 200 },
+      data: {
+        label: 'RSI < 30',
+        operator: 'lt',
+        inputs: [
+          { id: 'input1', label: 'A', type: 'input', dataType: 'number' },
+          { id: 'input2', label: 'B', type: 'input', dataType: 'number' }
+        ],
+        outputs: [{ id: 'result', label: 'Result', type: 'output', dataType: 'boolean' }],
+        parameters: { value: 30 }
+      }
+    }
+
+    const actionNode: Node = {
+      id: `node-test-action-${Date.now()}`,
+      type: 'action',
+      position: { x: 800, y: 200 },
+      data: {
+        label: 'Buy',
+        action: 'buy',
+        inputs: [{ id: 'signal', label: 'Signal', type: 'input', dataType: 'boolean' }],
+        outputs: [],
+        parameters: { lots: 0.1, stopLoss: 50, takeProfit: 100 }
+      }
+    }
+
+    const testEdges: Edge[] = [
+      {
+        id: `edge-test-1-${Date.now()}`,
+        source: eventNode.id,
+        target: rsiNode.id,
+        sourceHandle: 'signal',
+        targetHandle: null
+      },
+      {
+        id: `edge-test-2-${Date.now()}`,
+        source: rsiNode.id,
+        target: conditionNode.id,
+        sourceHandle: 'value',
+        targetHandle: 'input1'
+      },
+      {
+        id: `edge-test-3-${Date.now()}`,
+        source: conditionNode.id,
+        target: actionNode.id,
+        sourceHandle: 'result',
+        targetHandle: 'signal'
+      }
+    ]
+
+    setNodes((nds) => [...nds, eventNode, rsiNode, maNode, conditionNode, actionNode])
+    setEdges((eds) => [...eds, ...testEdges])
+    
+    toast.success('Test nodes added: Event → RSI → Condition → Buy Action')
+  }, [nodes, edges, history, setNodes, setEdges])
+
+  const onClearCanvas = useCallback(() => {
+    if (nodes.length === 0 && edges.length === 0) {
+      toast.info('Canvas is already empty')
+      return
+    }
+
+    history.addHistory(nodes, edges, 'Clear canvas')
+    setNodes([])
+    setEdges([])
+    setSelectedNode(null)
+    setShowProperties(false)
+    toast.success('Canvas cleared')
+  }, [nodes, edges, history, setNodes, setEdges])
+
   const executionMap = useMemo(() => {
     return calculateBlockNumbers(nodes, edges)
   }, [nodes, edges])
@@ -879,6 +992,16 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
                 size="sm" 
                 variant="outline" 
                 className="gap-2"
+                onClick={() => setShowTestPanel(true)}
+                title="Test Indicator Connections"
+              >
+                <TestTube size={16} />
+                Test
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
                 onClick={onExport}
               >
                 <Export size={16} />
@@ -1002,6 +1125,28 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         onOpenChange={setShowValidationPanel}
         validation={getValidationResult()}
       />
+
+      <Dialog open={showTestPanel} onOpenChange={setShowTestPanel}>
+        <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <TestTube size={24} weight="duotone" className="text-primary" />
+              Indicator Connection Test Panel
+            </DialogTitle>
+            <DialogDescription>
+              Test indicator nodes and verify all connections work properly
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <IndicatorTestPanel
+              nodes={nodes}
+              edges={edges}
+              onAddTestNodes={onAddTestNodes}
+              onClearCanvas={onClearCanvas}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
