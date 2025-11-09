@@ -31,135 +31,186 @@ export const NODE_CATEGORIES: Array<{
   description: string
   executionOrder: number
   color: string
+  bgColor: string
+  textColor: string
   borderColor: string
+  accentColor: string
 }> = [
   {
     id: 'event',
     label: 'Events',
     description: 'Strategy lifecycle events (OnInit, OnTick, OnTimer, etc.)',
     executionOrder: 0,
-    color: 'oklch(0.80 0.10 320)',
-    borderColor: 'border-purple-500'
+    color: 'oklch(0.75 0.15 290)',
+    bgColor: 'oklch(0.35 0.08 290)',
+    textColor: 'oklch(0.95 0.12 290)',
+    borderColor: 'oklch(0.60 0.18 290)',
+    accentColor: '#9333ea'
   },
   {
     id: 'indicator',
     label: 'Indicators',
     description: 'Technical analysis indicators',
     executionOrder: 1,
-    color: 'oklch(0.70 0.15 210)',
-    borderColor: 'border-accent'
+    color: 'oklch(0.65 0.20 240)',
+    bgColor: 'oklch(0.35 0.10 240)',
+    textColor: 'oklch(0.95 0.15 240)',
+    borderColor: 'oklch(0.55 0.25 240)',
+    accentColor: '#3b82f6'
   },
   {
     id: 'mtf',
     label: 'Multi-Timeframe',
     description: 'Multi-timeframe analysis nodes',
     executionOrder: 2,
-    color: 'oklch(0.65 0.12 180)',
-    borderColor: 'border-cyan-500'
+    color: 'oklch(0.70 0.18 200)',
+    bgColor: 'oklch(0.35 0.09 200)',
+    textColor: 'oklch(0.95 0.14 200)',
+    borderColor: 'oklch(0.58 0.22 200)',
+    accentColor: '#0ea5e9'
   },
   {
     id: 'pattern',
     label: 'Patterns',
     description: 'Chart patterns and formations',
     executionOrder: 3,
-    color: 'oklch(0.70 0.18 90)',
-    borderColor: 'border-green-500'
+    color: 'oklch(0.68 0.20 160)',
+    bgColor: 'oklch(0.35 0.10 160)',
+    textColor: 'oklch(0.95 0.16 160)',
+    borderColor: 'oklch(0.56 0.24 160)',
+    accentColor: '#10b981'
   },
   {
     id: 'condition',
     label: 'Conditions',
     description: 'Comparison and condition checks',
     executionOrder: 4,
-    color: 'oklch(0.65 0.18 145)',
-    borderColor: 'border-bullish'
+    color: 'oklch(0.72 0.18 140)',
+    bgColor: 'oklch(0.35 0.09 140)',
+    textColor: 'oklch(0.95 0.14 140)',
+    borderColor: 'oklch(0.60 0.22 140)',
+    accentColor: '#22c55e'
   },
   {
     id: 'logic',
     label: 'Logic',
     description: 'Boolean logic operations',
     executionOrder: 5,
-    color: 'oklch(0.60 0.12 280)',
-    borderColor: 'border-primary'
+    color: 'oklch(0.68 0.16 260)',
+    bgColor: 'oklch(0.35 0.08 260)',
+    textColor: 'oklch(0.95 0.12 260)',
+    borderColor: 'oklch(0.56 0.20 260)',
+    accentColor: '#8b5cf6'
   },
   {
     id: 'variable',
     label: 'Variables',
     description: 'Variables and data storage',
     executionOrder: 6,
-    color: 'oklch(0.68 0.10 40)',
-    borderColor: 'border-orange-500'
+    color: 'oklch(0.70 0.16 50)',
+    bgColor: 'oklch(0.35 0.08 50)',
+    textColor: 'oklch(0.95 0.12 50)',
+    borderColor: 'oklch(0.58 0.20 50)',
+    accentColor: '#f97316'
   },
   {
     id: 'risk',
     label: 'Risk Management',
     description: 'Position sizing and risk controls',
     executionOrder: 7,
-    color: 'oklch(0.75 0.15 60)',
-    borderColor: 'border-yellow-500'
+    color: 'oklch(0.75 0.18 80)',
+    bgColor: 'oklch(0.35 0.09 80)',
+    textColor: 'oklch(0.95 0.14 80)',
+    borderColor: 'oklch(0.62 0.22 80)',
+    accentColor: '#eab308'
   },
   {
     id: 'money_management',
     label: 'Money Management',
     description: 'Position sizing, Martingale, Fibonacci, Risk % and more',
     executionOrder: 8,
-    color: 'oklch(0.70 0.18 120)',
-    borderColor: 'border-emerald-500'
+    color: 'oklch(0.68 0.20 130)',
+    bgColor: 'oklch(0.35 0.10 130)',
+    textColor: 'oklch(0.95 0.16 130)',
+    borderColor: 'oklch(0.56 0.24 130)',
+    accentColor: '#84cc16'
   },
   {
     id: 'advanced',
     label: 'Advanced Trade',
     description: 'Advanced trade management (trailing, break-even, partial close)',
     executionOrder: 9,
-    color: 'oklch(0.60 0.15 300)',
-    borderColor: 'border-pink-500'
+    color: 'oklch(0.68 0.18 310)',
+    bgColor: 'oklch(0.35 0.09 310)',
+    textColor: 'oklch(0.95 0.14 310)',
+    borderColor: 'oklch(0.56 0.22 310)',
+    accentColor: '#ec4899'
   },
   {
     id: 'graphical',
     label: 'Graphical Objects',
     description: 'Draw arrows, lines, text, Fibonacci on chart',
     executionOrder: 10,
-    color: 'oklch(0.65 0.15 250)',
-    borderColor: 'border-indigo-500'
+    color: 'oklch(0.68 0.18 270)',
+    bgColor: 'oklch(0.35 0.09 270)',
+    textColor: 'oklch(0.95 0.14 270)',
+    borderColor: 'oklch(0.56 0.22 270)',
+    accentColor: '#6366f1'
   },
   {
     id: 'messaging',
     label: 'Messaging',
     description: 'Send notifications to email, website, smartphone',
     executionOrder: 11,
-    color: 'oklch(0.68 0.14 200)',
-    borderColor: 'border-sky-500'
+    color: 'oklch(0.70 0.18 220)',
+    bgColor: 'oklch(0.35 0.09 220)',
+    textColor: 'oklch(0.95 0.14 220)',
+    borderColor: 'oklch(0.58 0.22 220)',
+    accentColor: '#06b6d4'
   },
   {
     id: 'file_ops',
     label: 'File Operations',
     description: 'Read and write data to files',
     executionOrder: 12,
-    color: 'oklch(0.62 0.16 30)',
-    borderColor: 'border-amber-500'
+    color: 'oklch(0.72 0.20 40)',
+    bgColor: 'oklch(0.35 0.10 40)',
+    textColor: 'oklch(0.95 0.16 40)',
+    borderColor: 'oklch(0.60 0.24 40)',
+    accentColor: '#f59e0b'
   },
   {
     id: 'terminal',
     label: 'Terminal Variables',
     description: 'Access terminal and account information',
     executionOrder: 13,
-    color: 'oklch(0.66 0.12 270)',
-    borderColor: 'border-violet-500'
+    color: 'oklch(0.70 0.16 280)',
+    bgColor: 'oklch(0.35 0.08 280)',
+    textColor: 'oklch(0.95 0.12 280)',
+    borderColor: 'oklch(0.58 0.20 280)',
+    accentColor: '#a855f7'
   },
   {
     id: 'custom',
     label: 'Custom Blocks',
     description: 'Create and use custom reusable blocks',
     executionOrder: 14,
-    color: 'oklch(0.64 0.14 340)',
-    borderColor: 'border-rose-500'
+    color: 'oklch(0.70 0.18 350)',
+    bgColor: 'oklch(0.35 0.09 350)',
+    textColor: 'oklch(0.95 0.14 350)',
+    borderColor: 'oklch(0.58 0.22 350)',
+    accentColor: '#f43f5e'
   },
   {
     id: 'action',
     label: 'Actions',
     description: 'Trade execution actions',
     executionOrder: 15,
-    color: 'oklch(0.55 0.20 25)',
-    borderColor: 'border-bearish'
+    color: 'oklch(0.65 0.22 25)',
+    bgColor: 'oklch(0.35 0.11 25)',
+    textColor: 'oklch(0.95 0.18 25)',
+    borderColor: 'oklch(0.55 0.26 25)',
+    accentColor: '#ef4444'
   }
 ]
 
@@ -1972,4 +2023,21 @@ export function getNodesByEventContext(eventContext: EventCategory): NodeDefinit
 
 export function countNodesByEventContext(eventContext: EventCategory): number {
   return getNodesByEventContext(eventContext).length
+}
+
+export function getCategoryColors(category: NodeCategory) {
+  const categoryInfo = NODE_CATEGORIES.find(cat => cat.id === category)
+  return categoryInfo ? {
+    color: categoryInfo.color,
+    bgColor: categoryInfo.bgColor,
+    textColor: categoryInfo.textColor,
+    borderColor: categoryInfo.borderColor,
+    accentColor: categoryInfo.accentColor
+  } : {
+    color: 'oklch(0.55 0.18 50)',
+    bgColor: 'oklch(0.35 0.09 50)',
+    textColor: 'oklch(0.95 0.14 50)',
+    borderColor: 'oklch(0.55 0.22 50)',
+    accentColor: '#f59e0b'
+  }
 }
