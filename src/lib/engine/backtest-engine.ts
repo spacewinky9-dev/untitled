@@ -211,14 +211,31 @@ export const NODE_CATEGORIES: Array<{
     textColor: 'oklch(0.95 0.18 25)',
     borderColor: 'oklch(0.55 0.26 25)',
     accentColor: '#ef4444'
-
-]   const downside = negativeReturns.reduce((sum, r) => sum + Math.pow(r, 2), 0) / negativeReturns.length
+  }
+]
 
 export type IndicatorSubcategory = 'moving_averages' | 'oscillators' | 'volatility' | 'volume' | 'trend' | 'support_resistance'
-nsideDev) * Math.sqrt(252) : 0
+
 export interface IndicatorNodeDefinition extends NodeDefinition {
   subcategory?: IndicatorSubcategory
-  outputs: Array<{ id: string; label: string }>  parameters: Array<{    key: string    label: string    type: 'number' | 'select' | 'boolean'    default: any    min?: number    max?: number    step?: number    options?: Array<{ label: string; value: any }>    description?: string  }>}export const INDICATOR_SUBCATEGORIES: Array<{  id: IndicatorSubcategory  label: string  description: string
+  outputs: Array<{ id: string; label: string }>
+  parameters: Array<{
+    key: string
+    label: string
+    type: 'number' | 'select' | 'boolean'
+    default: any
+    min?: number
+    max?: number
+    step?: number
+    options?: Array<{ label: string; value: any }>
+    description?: string
+  }>
+}
+
+export const INDICATOR_SUBCATEGORIES: Array<{
+  id: IndicatorSubcategory
+  label: string
+  description: string
 }> = [
   { id: 'moving_averages', label: 'Moving Averages', description: 'Trend-following indicators' },
   { id: 'oscillators', label: 'Oscillators', description: 'Momentum and overbought/oversold indicators' },
@@ -254,9 +271,50 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
           { label: 'HLC/3', value: 'hlc3' },
           { label: 'OHLC/4', value: 'ohlc4' }
         ]
-    ],    defaultParameters: { period: 20, source: 'close' }  },  {    id: 'ema',    type: 'indicator',    category: 'indicator',    subcategory: 'moving_averages',    label: 'EMA',    description: 'Exponential Moving Average - weighted average favoring recent data',    icon: 'ChartLine',    outputs: [{ id: 'value', label: 'EMA Value' }],    parameters: [      { key: 'period', label: 'Period', type: 'number', default: 20, min: 1, max: 500, step: 1 },      {         key: 'source',         label: 'Source',         type: 'select',         default: 'close',        options: [          { label: 'Close', value: 'close' },          { label: 'Open', value: 'open' },          { label: 'High', value: 'high' },          { label: 'Low', value: 'low' },          { label: 'HL/2', value: 'hl2' },          { label: 'HLC/3', value: 'hlc3' },          { label: 'OHLC/4', value: 'ohlc4' }
+      }
+    ],
+    defaultParameters: { period: 20, source: 'close' }
+  },
+  {
+    id: 'ema',
+    type: 'indicator',
+    category: 'indicator',
+    subcategory: 'moving_averages',
+    label: 'EMA',
+    description: 'Exponential Moving Average - weighted average favoring recent data',
+    icon: 'ChartLine',
+    outputs: [{ id: 'value', label: 'EMA Value' }],
+    parameters: [
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 1, max: 500, step: 1 },
+      { 
+        key: 'source',
+        label: 'Source',
+        type: 'select',
+        default: 'close',
+        options: [
+          { label: 'Close', value: 'close' },
+          { label: 'Open', value: 'open' },
+          { label: 'High', value: 'high' },
+          { label: 'Low', value: 'low' },
+          { label: 'HL/2', value: 'hl2' },
+          { label: 'HLC/3', value: 'hlc3' },
+          { label: 'OHLC/4', value: 'ohlc4' }
         ]
-    ],    defaultParameters: { period: 20, source: 'close' }  },  {    id: 'wma',    type: 'indicator',    category: 'indicator',    subcategory: 'moving_averages',    label: 'WMA',    description: 'Weighted Moving Average - linearly weighted average',    icon: 'ChartLine',    outputs: [{ id: 'value', label: 'WMA Value' }],    parameters: [      { key: 'period', label: 'Period', type: 'number', default: 20, min: 1, max: 500, step: 1 },
+      }
+    ],
+    defaultParameters: { period: 20, source: 'close' }
+  },
+  {
+    id: 'wma',
+    type: 'indicator',
+    category: 'indicator',
+    subcategory: 'moving_averages',
+    label: 'WMA',
+    description: 'Weighted Moving Average - linearly weighted average',
+    icon: 'ChartLine',
+    outputs: [{ id: 'value', label: 'WMA Value' }],
+    parameters: [
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 1, max: 500, step: 1 },
       { 
         key: 'source', 
         label: 'Source', 
@@ -268,7 +326,11 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
           { label: 'High', value: 'high' },
           { label: 'Low', value: 'low' }
         ]
-    ],    defaultParameters: { period: 20, source: 'close' }  },  {
+      }
+    ],
+    defaultParameters: { period: 20, source: 'close' }
+  },
+  {
     id: 'rsi',
     type: 'indicator',
     category: 'indicator',
@@ -324,12 +386,71 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
           { label: 'High', value: 'high' },
           { label: 'Low', value: 'low' }
         ]
-    ],    defaultParameters: { fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, source: 'close' }  },  {    id: 'stochastic',    type: 'indicator',    category: 'indicator',    subcategory: 'oscillators',    label: 'Stoch',    description: 'Stochastic Oscillator - momentum indicator (0-100)',    icon: 'Waveform',    outputs: [      { id: 'k', label: '%K Line' },      { id: 'd', label: '%D Line' }    ],    parameters: [      { key: 'kPeriod', label: '%K Period', type: 'number', default: 14, min: 1, max: 100, step: 1 },      { key: 'dPeriod', label: '%D Period', type: 'number', default: 3, min: 1, max: 50, step: 1 },      { key: 'smooth', label: 'Smooth', type: 'number', default: 3, min: 1, max: 50, step: 1 }    ],    defaultParameters: { kPeriod: 14, dPeriod: 3, smooth: 3 }  },  {    id: 'cci',    type: 'indicator',    category: 'indicator',    subcategory: 'oscillators',    label: 'CCI',    description: 'Commodity Channel Index - cyclical trends indicator',    icon: 'Waveform',    outputs: [{ id: 'value', label: 'CCI Value' }],    parameters: [      { key: 'period', label: 'Period', type: 'number', default: 20, min: 2, max: 200, step: 1 }    ],    defaultParameters: { period: 20 }  },  {    id: 'bb',    type: 'indicator',    category: 'indicator',    subcategory: 'volatility',    label: 'BB',    description: 'Bollinger Bands - volatility bands around moving average',    icon: 'Activity',    outputs: [      { id: 'upper', label: 'Upper Band' },      { id: 'middle', label: 'Middle Band' },      { id: 'lower', label: 'Lower Band' }    ],    parameters: [      { key: 'period', label: 'Period', type: 'number', default: 20, min: 2, max: 200, step: 1 },      { key: 'stdDev', label: 'Std Deviation', type: 'number', default: 2, min: 0.5, max: 5, step: 0.1 },      {         key: 'source',         label: 'Source',         type: 'select',         default: 'close',        options: [
+      }
+    ],
+    defaultParameters: { fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, source: 'close' }
+  },
+  {
+    id: 'stochastic',
+    type: 'indicator',
+    category: 'indicator',
+    subcategory: 'oscillators',
+    label: 'Stoch',
+    description: 'Stochastic Oscillator - momentum indicator (0-100)',
+    icon: 'Waveform',
+    outputs: [
+      { id: 'k', label: '%K Line' },
+      { id: 'd', label: '%D Line' }
+    ],
+    parameters: [
+      { key: 'kPeriod', label: '%K Period', type: 'number', default: 14, min: 1, max: 100, step: 1 },
+      { key: 'dPeriod', label: '%D Period', type: 'number', default: 3, min: 1, max: 50, step: 1 },
+      { key: 'smooth', label: 'Smooth', type: 'number', default: 3, min: 1, max: 50, step: 1 }
+    ],
+    defaultParameters: { kPeriod: 14, dPeriod: 3, smooth: 3 }
+  },
+  {
+    id: 'cci',
+    type: 'indicator',
+    category: 'indicator',
+    subcategory: 'oscillators',
+    label: 'CCI',
+    description: 'Commodity Channel Index - cyclical trends indicator',
+    icon: 'Waveform',
+    outputs: [{ id: 'value', label: 'CCI Value' }],
+    parameters: [
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 2, max: 200, step: 1 }
+    ],
+    defaultParameters: { period: 20 }
+  },
+  {
+    id: 'bb',
+    type: 'indicator',
+    category: 'indicator',
+    subcategory: 'volatility',
+    label: 'BB',
+    description: 'Bollinger Bands - volatility bands around moving average',
+    icon: 'Activity',
+    outputs: [
+      { id: 'upper', label: 'Upper Band' },
+      { id: 'middle', label: 'Middle Band' },
+      { id: 'lower', label: 'Lower Band' }
+    ],
+    parameters: [
+      { key: 'period', label: 'Period', type: 'number', default: 20, min: 2, max: 200, step: 1 },
+      { key: 'stdDev', label: 'Std Deviation', type: 'number', default: 2, min: 0.5, max: 5, step: 0.1 },
+      { 
+        key: 'source',
+        label: 'Source',
+        type: 'select',
+        default: 'close',
+        options: [
           { label: 'Close', value: 'close' },
           { label: 'Open', value: 'open' },
           { label: 'High', value: 'high' },
           { label: 'Low', value: 'low' }
         ]
+      }
     ],
     defaultParameters: { period: 20, stdDev: 2, source: 'close' }
   },
@@ -512,11 +633,43 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
       timeframe: 'H1',
       indicator: 'sma',
       period: 20
-  },  {    id: 'mtf_condition',    type: 'mtf',    category: 'mtf',    label: 'Cond',    description: 'Multi-timeframe condition check',    icon: 'Equalizer',    defaultParameters: {      timeframe: 'H1',      condition: 'trend_up'    }  },  {    id: 'higher_timeframe_trend',    type: 'mtf',    category: 'mtf',    label: 'Trend',    description: 'Higher timeframe trend direction',    icon: 'TrendUp',    defaultParameters: {      timeframe: 'H4'
-  },  {    id: 'candlestick_pattern',    type: 'pattern',    category: 'pattern',    label: 'Candle',    description: 'Detect candlestick patterns (engulfing, doji, hammer, etc.)',    icon: 'Barcode',
+    }
+  },
+  {
+    id: 'mtf_condition',
+    type: 'mtf',
+    category: 'mtf',
+    label: 'Cond',
+    description: 'Multi-timeframe condition check',
+    icon: 'Equalizer',
+    defaultParameters: {
+      timeframe: 'H1',
+      condition: 'trend_up'
+    }
+  },
+  {
+    id: 'higher_timeframe_trend',
+    type: 'mtf',
+    category: 'mtf',
+    label: 'Trend',
+    description: 'Higher timeframe trend direction',
+    icon: 'TrendUp',
+    defaultParameters: {
+      timeframe: 'H4'
+    }
+  },
+  {
+    id: 'candlestick_pattern',
+    type: 'pattern',
+    category: 'pattern',
+    label: 'Candle',
+    description: 'Detect candlestick patterns (engulfing, doji, hammer, etc.)',
+    icon: 'Barcode',
     defaultParameters: {
       pattern: 'bullish_engulfing'
-  },  {
+    }
+  },
+  {
     id: 'chart_pattern',
     type: 'pattern',
     category: 'pattern',
@@ -1846,6 +1999,16 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
       blockName: ''
     },
     eventContext: ['all']
+  }
+]
+
+export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
+  return (NODE_DEFINITIONS || []).filter(node => node.category === category)
+}
+
+export function getNodeDefinition(id: string): NodeDefinition | undefined {
+  return (NODE_DEFINITIONS || []).find(node => node.id === id)
+}
 ]export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {  return (NODE_DEFINITIONS || []).filter(node => node.category === category)}export function getNodeDefinition(id: string): NodeDefinition | undefined {  return (NODE_DEFINITIONS || []).find(node => node.id === id)}
 export function getNodesByEventContext(eventContext: EventCategory): NodeDefinition[] {
   if (eventContext === 'all') {
