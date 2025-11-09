@@ -148,7 +148,27 @@ Logic → Logic (for complex conditions)
 - Real-time state updates for each node
 - Proper error propagation and handling
 
-#### 3. Fix Node Naming (FXDreema Style)
+#### 3. Improve Node Palette UI ✅
+**Status:** COMPLETED  
+**Files:** `src/components/builder/NodePaletteWorkflow.tsx`
+
+**Implemented:**
+- Removed subcategories for cleaner interface
+- Display 5 nodes initially per category (down from 6)
+- "More" button shows/hides additional nodes
+- Node names shown as bold colored text (no boxes)
+- Medium font weight for better readability
+- Clean, streamlined interface matching FXDreema style
+- All settings, pins, and connections working correctly
+
+**Benefits:**
+- Faster node discovery
+- Less visual clutter
+- Better color coding visibility
+- More screen space for canvas
+- Simplified navigation
+
+#### 4. Fix Node Naming (FXDreema Style)
 **Status:** TODO  
 **Files:** `src/constants/node-categories.ts`, all node definition files
 
@@ -280,9 +300,10 @@ Logic → Logic (for complex conditions)
 ### Week 1: Core Completions
 1. ✅ Fix connection validation (DONE)
 2. ✅ Add strategy templates (DONE)
-3. 🔲 Simplify node names
-4. 🔲 Complete all node implementations
-5. 🔲 Full execution engine integration
+3. ✅ Improve node palette UI (DONE)
+4. 🔲 Simplify remaining node names
+5. 🔲 Complete all node implementations
+6. 🔲 Full execution engine integration
 
 ### Week 2: Strategy Execution
 1. 🔲 Strategy validation system
@@ -436,9 +457,14 @@ const newTemplate: StrategyTemplate = {
 - 5 working strategy templates demonstrating correct connections
 - Templates dialog with category filtering
 - Integration into Canvas with toolbar button
+- Improved node palette UI:
+  - Removed subcategories for cleaner interface
+  - Show 5 nodes initially with "More" button
+  - Bold colored text for node names (no boxes)
+  - Medium font weight for better readability
 
 **🎯 Next Priority:**
-- Simplify node names (SMA, RSI, etc.)
+- Simplify remaining node names (SMA, RSI format)
 - Complete all node implementations
 - Full execution engine integration
 - Strategy validation panel
@@ -449,4 +475,4 @@ const newTemplate: StrategyTemplate = {
 - Full backtest integration
 - Strategy optimizer UI
 
-All implementations follow proper node connection flow: Event → Indicator → Condition → Logic → Action, ensuring strategies work correctly and follow industry best practices.
+All implementations follow proper node connection flow: Event → Indicator → Condition → Logic → Action, ensuring strategies work correctly and follow industry best practices. The interface now matches FXDreema's clean, professional style with improved navigation and readability.

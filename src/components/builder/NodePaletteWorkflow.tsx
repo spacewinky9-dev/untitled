@@ -34,13 +34,10 @@ import {
 } from '@phosphor-icons/react'
 import { 
   NODE_CATEGORIES, 
-  INDICATOR_SUBCATEGORIES,
   INDICATOR_DEFINITIONS,
   NODE_DEFINITIONS,
   type NodeCategory, 
   type NodeDefinition,
-  type IndicatorNodeDefinition,
-  type IndicatorSubcategory,
   type EventCategory
 } from '@/constants/node-categories'
 import { CategoryTabs } from './CategoryTabs'
@@ -70,13 +67,12 @@ interface NodePaletteWorkflowProps {
   onNodeAdd?: (nodeDefinition: NodeDefinition) => void
 }
 
-const INITIAL_SHOW_COUNT = 6
+const INITIAL_SHOW_COUNT = 5
 
 export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeEventCategory, setActiveEventCategory] = useState<EventCategory>('all')
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set(['event', 'indicator']))
-  const [openSubcategories, setOpenSubcategories] = useState<Set<string>>(new Set(['moving_averages']))
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
   const toggleCategory = (categoryId: string) => {
@@ -86,18 +82,6 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
         next.delete(categoryId)
       } else {
         next.add(categoryId)
-      }
-      return next
-    })
-  }
-
-  const toggleSubcategory = (subcategoryId: string) => {
-    setOpenSubcategories(prev => {
-      const next = new Set(prev)
-      if (next.has(subcategoryId)) {
-        next.delete(subcategoryId)
-      } else {
-        next.add(subcategoryId)
       }
       return next
     })
@@ -116,7 +100,9 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
   }
 
   const getFilteredNodes = (category: NodeCategory) => {
-    let nodes = NODE_DEFINITIONS.filter(node => node.category === category)
+    let nodes = category === 'indicator' 
+      ? INDICATOR_DEFINITIONS 
+      : NODE_DEFINITIONS.filter(node => node.category === category)
     
     if (activeEventCategory !== 'all') {
       nodes = nodes.filter(node => 
@@ -128,22 +114,6 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
     return nodes.filter(node => 
       node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       node.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }
-
-  const getFilteredIndicators = (subcategory: IndicatorSubcategory) => {
-    let indicators = INDICATOR_DEFINITIONS.filter(ind => ind.subcategory === subcategory)
-    
-    if (activeEventCategory !== 'all') {
-      indicators = indicators.filter(ind => 
-        !ind.eventContext || ind.eventContext.includes(activeEventCategory)
-      )
-    }
-    
-    if (!searchQuery) return indicators
-    return indicators.filter(ind => 
-      ind.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ind.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }
 
@@ -191,7 +161,7 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
       <div
         key={node.id}
         className={cn(
-          "px-2.5 py-2 cursor-pointer hover:bg-accent/20 transition-colors rounded group relative bg-[oklch(0.30_0.015_260)] border border-[oklch(0.38_0.015_260)]"
+          "px-2 py-1.5 cursor-pointer hover:bg-accent/10 transition-colors rounded-sm group relative"
         )}
         onClick={() => onNodeAdd?.(node)}
         draggable
@@ -200,17 +170,14 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
           e.dataTransfer.effectAllowed = 'move'
         }}
       >
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div 
-              className="w-0.5 h-6 rounded-full shrink-0"
-              style={{ backgroundColor: categoryColor }}
-            />
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-[11px] truncate">{node.label}</div>
-            </div>
-          </div>
-          <Plus size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+        <div className="flex items-center gap-2">
+          <span 
+            className="font-bold text-sm"
+            style={{ color: categoryColor }}
+          >
+            {node.label}
+          </span>
+          <Plus size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-auto" />
         </div>
       </div>
     )
@@ -269,9 +236,8 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
           {sortedCategories.map((categoryConfig) => {
             const isOpen = openCategories.has(categoryConfig.id)
             const categoryNodes = getFilteredNodes(categoryConfig.id)
-            const indicatorNodes = categoryConfig.id === 'indicator' ? INDICATOR_DEFINITIONS : []
 
-            if (activeEventCategory !== 'all' && categoryNodes.length === 0 && categoryConfig.id !== 'indicator') {
+            if (activeEventCategory !== 'all' && categoryNodes.length === 0) {
               return null
             }
 
@@ -298,7 +264,7 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-[oklch(0.28_0.015_260)]">
-                          {categoryConfig.id === 'indicator' ? indicatorNodes.length : categoryNodes.length}
+                          {categoryNodes.length}
                         </Badge>
                         {isOpen ? <CaretDown size={14} /> : <CaretRight size={14} />}
                       </div>
@@ -306,49 +272,8 @@ export function NodePaletteWorkflow({ onNodeAdd }: NodePaletteWorkflowProps) {
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
-                    <div className="p-2 pt-0 space-y-1.5">
-                      {categoryConfig.id === 'indicator' ? (
-                        <>
-                          {INDICATOR_SUBCATEGORIES.map((subcat) => {
-                            const subcatNodes = getFilteredIndicators(subcat.id)
-                            const isSubOpen = openSubcategories.has(subcat.id)
-
-                            if (subcatNodes.length === 0 && searchQuery) return null
-
-                            return (
-                              <Collapsible
-                                key={subcat.id}
-                                open={isSubOpen}
-                                onOpenChange={() => toggleSubcategory(subcat.id)}
-                              >
-                                <Card className="bg-[oklch(0.28_0.015_260)] border-[oklch(0.35_0.015_260)]">
-                                  <CollapsibleTrigger className="w-full">
-                                    <div className="p-2 flex items-center justify-between hover:bg-accent/10 transition-colors">
-                                      <div className="text-left">
-                                        <div className="font-medium text-[11px]">{subcat.label}</div>
-                                        <div className="text-[9px] text-muted-foreground">{subcat.description}</div>
-                                      </div>
-                                      <div className="flex items-center gap-2">
-                                        <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4 bg-[oklch(0.25_0.015_260)]">
-                                          {subcatNodes.length}
-                                        </Badge>
-                                        {isSubOpen ? <CaretDown size={12} /> : <CaretRight size={12} />}
-                                      </div>
-                                    </div>
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent>
-                                    <div className="p-1.5 pt-0">
-                                      {renderNodeList(subcatNodes, `${categoryConfig.id}-${subcat.id}`, categoryConfig.color)}
-                                    </div>
-                                  </CollapsibleContent>
-                                </Card>
-                              </Collapsible>
-                            )
-                          })}
-                        </>
-                      ) : (
-                        renderNodeList(categoryNodes, categoryConfig.id, categoryConfig.color)
-                      )}
+                    <div className="p-2 pt-0 space-y-0.5">
+                      {renderNodeList(categoryNodes, categoryConfig.id, categoryConfig.color)}
                     </div>
                   </CollapsibleContent>
                 </Card>
