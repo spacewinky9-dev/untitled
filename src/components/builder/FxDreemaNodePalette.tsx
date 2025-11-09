@@ -99,27 +99,44 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
     {
       category: 'trading_conditions',
       label: 'Check Trading Conditions',
-      color: '#D9BD6A',
-      nodes: NODE_DEFINITIONS.filter(n => ['spread_filter', 'dynamic_value_check'].includes(n.id))
+      color: '#B3D9FF',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('balance_') || n.id.includes('equity_') ||
+        n.id.includes('margin_') || n.id.includes('free_margin_') ||
+        n.id.includes('profit_') || n.id.includes('floating_profit_')
+      )
     },
     {
       category: 'buysell',
       label: 'Buy / Sell',
-      color: '#E74C3C',
-      nodes: NODE_DEFINITIONS.filter(n => ['buy', 'sell', 'close'].includes(n.id))
+      color: '#00FF00',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('buy_market') || n.id.includes('sell_market') ||
+        n.id.includes('buy_limit') || n.id.includes('sell_limit') ||
+        n.id.includes('buy_stop') || n.id.includes('sell_stop')
+      )
     },
     {
       category: 'bucket',
       label: 'Bucket of Trades & Orders',
-      color: '#5DADE2',
-      nodes: NODE_DEFINITIONS.filter(n => ['trade_group', 'for_each_trade'].includes(n.id))
+      color: '#6B8EFF',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('all_trades') || n.id.includes('all_buy_trades') ||
+        n.id.includes('all_sell_trades') || n.id.includes('oldest_') ||
+        n.id.includes('newest_') || n.id.includes('most_profitable') ||
+        n.id.includes('least_profitable') || n.id.includes('all_pending') ||
+        n.id.includes('all_buy_orders') || n.id.includes('all_sell_orders') ||
+        n.id.includes('trades_by_magic')
+      )
     },
     {
       category: 'loop',
       label: 'Loop for Trades & Orders',
-      color: '#BB8FCE',
+      color: '#FF00FF',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['for_each_trade', 'for_each_pending', 'for_each_symbol', 'repeat_n'].includes(n.id)
+        n.id.includes('loop_') && (
+          n.id.includes('trades') || n.id.includes('orders')
+        )
       )
     },
     {

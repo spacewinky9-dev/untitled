@@ -1,6 +1,10 @@
 import { INDICATOR_CONDITION_DEFINITIONS } from './indicator-conditions'
 import { TIME_FILTER_DEFINITIONS } from './time-filter-nodes'
 import { TRADE_ORDER_COUNT_DEFINITIONS } from './trade-order-count-nodes'
+import { TRADING_CONDITION_DEFINITIONS } from './trading-conditions-nodes'
+import { BUY_SELL_DEFINITIONS } from './buy-sell-nodes'
+import { BUCKET_DEFINITIONS } from './bucket-nodes'
+import { LOOP_DEFINITIONS } from './loop-nodes'
 
 export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced' | 'money_management' | 'graphical' | 'messaging' | 'file_ops' | 'terminal' | 'custom'
 
@@ -567,6 +571,10 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
   ...INDICATOR_CONDITION_DEFINITIONS,
   ...TIME_FILTER_DEFINITIONS,
   ...TRADE_ORDER_COUNT_DEFINITIONS,
+  ...TRADING_CONDITION_DEFINITIONS,
+  ...BUY_SELL_DEFINITIONS,
+  ...BUCKET_DEFINITIONS,
+  ...LOOP_DEFINITIONS,
   {
     id: 'on_init',
     type: 'event',
