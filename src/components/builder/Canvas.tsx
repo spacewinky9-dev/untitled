@@ -58,7 +58,7 @@ import { EditBlockLabelDialog } from './EditBlockLabelDialog'
 import { TemplatesDialog } from './TemplatesDialog'
 import { ValidationPanel } from './ValidationPanel'
 import { StrategyTemplate } from '@/lib/strategy-templates'
-import { NodeDefinition, EventCategory } from '@/constants/node-categories'
+import { NodeDefinition, EventCategory, getCategoryColors } from '@/constants/node-categories'
 import { useKV } from '@github/spark/hooks'
 import { useHistory } from '@/hooks/use-history'
 import { useClipboard } from '@/hooks/use-clipboard'
@@ -316,8 +316,21 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         return
       }
 
+      const categoryColors = getCategoryColors(sourceNode.type as any)
+      
+      const newEdge: Edge = {
+        ...connection,
+        id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'default',
+        animated: false,
+        style: {
+          stroke: categoryColors.accentColor,
+          strokeWidth: 2.5
+        }
+      }
+
       history.addHistory(nodes, edges, 'Connect blocks')
-      setEdges((eds) => addEdge(connection, eds))
+      setEdges((eds) => [...eds, newEdge])
       toast.success('Blocks connected')
     },
     [setEdges, nodes, edges, history]
@@ -676,6 +689,25 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
     })
   }, [nodes, showBlockNumbers, executionMap])
 
+  const styledEdges = useMemo(() => {
+    return edges.map(edge => {
+      const sourceNode = nodes.find(n => n.id === edge.source)
+      if (!sourceNode) return edge
+
+      const categoryColors = getCategoryColors(sourceNode.type as any)
+      
+      return {
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: edge.style?.stroke || categoryColors.accentColor,
+          strokeWidth: edge.selected ? 3 : 2.5
+        },
+        animated: edge.selected
+      }
+    })
+  }, [edges, nodes])
+
   return (
     <div className="w-full h-full flex flex-col">
       <EventTabs activeEvent={activeEvent} onEventChange={setActiveEvent} />
@@ -709,7 +741,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
           <div ref={reactFlowWrapper} className="flex-1 relative">
             <ReactFlow
               nodes={nodesWithBlockNumbers}
-              edges={edges}
+              edges={styledEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}

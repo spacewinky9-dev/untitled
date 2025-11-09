@@ -24,14 +24,8 @@
   @apply shadow-xl;
 }
 
-.react-flow__edge-path {
-  stroke: #f59e0b;
-  stroke-width: 2px;
-}
-
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #fbbf24;
-  stroke-width: 2.5px;
+  stroke-width: 3px;
 }
 
 .react-flow__edge.animated .react-flow__edge-path {
