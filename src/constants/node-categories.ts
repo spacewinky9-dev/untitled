@@ -344,7 +344,7 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
     type: 'indicator',
     category: 'indicator',
     subcategory: 'oscillators',
-    label: 'Stochastic',
+    label: 'Stoch',
     description: 'Stochastic Oscillator - momentum indicator (0-100)',
     icon: 'Waveform',
     outputs: [
@@ -455,7 +455,7 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
     type: 'indicator',
     category: 'indicator',
     subcategory: 'trend',
-    label: 'Ichimoku',
+    label: 'Ichi',
     description: 'Ichimoku Kinko Hyo - comprehensive trend system',
     icon: 'ChartLineUp',
     outputs: [
@@ -477,7 +477,7 @@ export const INDICATOR_DEFINITIONS: IndicatorNodeDefinition[] = [
     type: 'indicator',
     category: 'indicator',
     subcategory: 'support_resistance',
-    label: 'Pivots',
+    label: 'Pivot',
     description: 'Classic Pivot Points - support and resistance levels',
     icon: 'LineSegment',
     outputs: [
@@ -513,7 +513,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_init',
     type: 'event',
     category: 'event',
-    label: 'OnInit',
+    label: 'Init',
     description: 'Strategy initialization event - runs once at start',
     icon: 'Play',
     defaultParameters: {},
@@ -523,7 +523,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_tick',
     type: 'event',
     category: 'event',
-    label: 'OnTick',
+    label: 'Tick',
     description: 'Tick event - runs on every price update',
     icon: 'Activity',
     defaultParameters: {},
@@ -533,7 +533,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_timer',
     type: 'event',
     category: 'event',
-    label: 'OnTimer',
+    label: 'Timer',
     description: 'Timer event - runs at specified intervals',
     icon: 'Clock',
     defaultParameters: {
@@ -545,7 +545,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_trade',
     type: 'event',
     category: 'event',
-    label: 'OnTrade',
+    label: 'Trade',
     description: 'Trade event - runs when trade is opened/closed',
     icon: 'CurrencyCircleDollar',
     defaultParameters: {},
@@ -555,7 +555,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_chart',
     type: 'event',
     category: 'event',
-    label: 'OnChart',
+    label: 'Chart',
     description: 'Chart event - runs on chart events for visual updates',
     icon: 'ChartLineUp',
     defaultParameters: {},
@@ -565,7 +565,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'on_deinit',
     type: 'event',
     category: 'event',
-    label: 'OnDeinit',
+    label: 'Deinit',
     description: 'Deinitialization event - runs once at shutdown',
     icon: 'Stop',
     defaultParameters: {},
@@ -588,7 +588,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'mtf_condition',
     type: 'mtf',
     category: 'mtf',
-    label: 'Condition',
+    label: 'Cond',
     description: 'Multi-timeframe condition check',
     icon: 'Equalizer',
     defaultParameters: {
@@ -611,7 +611,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'candlestick_pattern',
     type: 'pattern',
     category: 'pattern',
-    label: 'Candlestick',
+    label: 'Candle',
     description: 'Detect candlestick patterns (engulfing, doji, hammer, etc.)',
     icon: 'Barcode',
     defaultParameters: {
@@ -622,7 +622,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'chart_pattern',
     type: 'pattern',
     category: 'pattern',
-    label: 'Pattern',
+    label: 'Chart',
     description: 'Detect chart patterns (head & shoulders, triangles, etc.)',
     icon: 'ChartLine',
     defaultParameters: {
@@ -645,7 +645,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'divergence',
     type: 'pattern',
     category: 'pattern',
-    label: 'Divergence',
+    label: 'Div',
     description: 'Detect price/indicator divergence',
     icon: 'ArrowsOutCardinal',
     defaultParameters: {
@@ -704,7 +704,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'break_even',
     type: 'advanced',
     category: 'advanced',
-    label: 'Breakeven',
+    label: 'BE',
     description: 'Move stop loss to break even after profit target',
     icon: 'Equals',
     defaultParameters: {
@@ -728,7 +728,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'trailing_stop',
     type: 'advanced',
     category: 'advanced',
-    label: 'Trailing',
+    label: 'Trail',
     description: 'Advanced trailing stop with activation level',
     icon: 'ShieldCheck',
     defaultParameters: {
@@ -778,7 +778,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'hedging',
     type: 'advanced',
     category: 'advanced',
-    label: 'Hedging',
+    label: 'Hedge',
     description: 'Open hedge position to protect profits',
     icon: 'ShieldChevron',
     defaultParameters: {
@@ -801,7 +801,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'comparison',
     type: 'condition',
     category: 'condition',
-    label: 'Compare',
+    label: 'Comp',
     description: 'Compare two values with various operators',
     icon: 'Equals',
     defaultParameters: {
@@ -823,7 +823,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'threshold',
     type: 'condition',
     category: 'condition',
-    label: 'Threshold',
+    label: 'Thresh',
     description: 'Check if value crosses a fixed threshold level',
     icon: 'LineSegment',
     defaultParameters: {
@@ -847,7 +847,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'pattern',
     type: 'condition',
     category: 'condition',
-    label: 'Pattern',
+    label: 'Pat',
     description: 'Detect candlestick patterns',
     icon: 'ChartLine',
     defaultParameters: {
@@ -945,7 +945,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'position-size',
     type: 'risk',
     category: 'risk',
-    label: 'Position',
+    label: 'Pos',
     description: 'Calculate position size based on risk',
     icon: 'Percent',
     defaultParameters: {
@@ -957,7 +957,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'stop-loss',
     type: 'risk',
     category: 'risk',
-    label: 'StopLoss',
+    label: 'SL',
     description: 'Set stop loss level',
     icon: 'WarningOctagon',
     defaultParameters: {
@@ -968,7 +968,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'take-profit',
     type: 'risk',
     category: 'risk',
-    label: 'TakeProfit',
+    label: 'TP',
     description: 'Set take profit level',
     icon: 'Target',
     defaultParameters: {
@@ -1005,7 +1005,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'buy_limit',
     type: 'action',
     category: 'action',
-    label: 'BuyLimit',
+    label: 'BuyLim',
     description: 'Place buy limit pending order',
     icon: 'ArrowDown',
     defaultParameters: {
@@ -1017,7 +1017,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'sell_limit',
     type: 'action',
     category: 'action',
-    label: 'SellLimit',
+    label: 'SellLim',
     description: 'Place sell limit pending order',
     icon: 'ArrowUp',
     defaultParameters: {
@@ -1053,7 +1053,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'modify_pending',
     type: 'action',
     category: 'action',
-    label: 'Modify',
+    label: 'Mod',
     description: 'Modify pending order parameters',
     icon: 'PencilSimple',
     defaultParameters: {}
@@ -1062,7 +1062,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'delete_pending',
     type: 'action',
     category: 'action',
-    label: 'Delete',
+    label: 'Del',
     description: 'Delete pending order',
     icon: 'Trash',
     defaultParameters: {}
@@ -1071,7 +1071,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'for_each_trade',
     type: 'logic',
     category: 'logic',
-    label: 'ForEach',
+    label: 'Each',
     description: 'Loop through all open trades',
     icon: 'ArrowsClockwise',
     defaultParameters: {
@@ -1083,7 +1083,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'for_each_pending',
     type: 'logic',
     category: 'logic',
-    label: 'Pending',
+    label: 'Pend',
     description: 'Loop through all pending orders',
     icon: 'ListDashes',
     defaultParameters: {}
@@ -1092,7 +1092,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'for_each_symbol',
     type: 'logic',
     category: 'logic',
-    label: 'Symbol',
+    label: 'Sym',
     description: 'Loop through multiple currency pairs',
     icon: 'Stack',
     defaultParameters: {
@@ -1123,7 +1123,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'math_subtract',
     type: 'variable',
     category: 'variable',
-    label: 'Subtract',
+    label: 'Sub',
     description: 'Subtract numbers',
     icon: 'Minus',
     defaultParameters: {}
@@ -1132,7 +1132,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'math_multiply',
     type: 'variable',
     category: 'variable',
-    label: 'Multiply',
+    label: 'Mult',
     description: 'Multiply numbers',
     icon: 'X',
     defaultParameters: {}
@@ -1141,7 +1141,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'math_divide',
     type: 'variable',
     category: 'variable',
-    label: 'Divide',
+    label: 'Div',
     description: 'Divide numbers',
     icon: 'Divide',
     defaultParameters: {}
@@ -1150,7 +1150,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'math_modulus',
     type: 'variable',
     category: 'variable',
-    label: 'Modulus',
+    label: 'Mod',
     description: 'Remainder after division',
     icon: 'Percent',
     defaultParameters: {}
@@ -1159,7 +1159,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'math_power',
     type: 'variable',
     category: 'variable',
-    label: 'Power',
+    label: 'Pow',
     description: 'Raise to power',
     icon: 'MathOperations',
     defaultParameters: {}
@@ -1204,7 +1204,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_balance',
     type: 'variable',
     category: 'variable',
-    label: 'Balance',
+    label: 'Bal',
     description: 'Get current account balance',
     icon: 'CurrencyDollar',
     defaultParameters: {}
@@ -1213,7 +1213,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_equity',
     type: 'variable',
     category: 'variable',
-    label: 'Equity',
+    label: 'Eq',
     description: 'Get current account equity',
     icon: 'Wallet',
     defaultParameters: {}
@@ -1222,7 +1222,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_margin',
     type: 'variable',
     category: 'variable',
-    label: 'Margin',
+    label: 'Mrg',
     description: 'Get available margin',
     icon: 'ChartLineUp',
     defaultParameters: {}
@@ -1231,7 +1231,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_profit',
     type: 'variable',
     category: 'variable',
-    label: 'Profit',
+    label: 'Prof',
     description: 'Get total floating profit/loss',
     icon: 'TrendUp',
     defaultParameters: {}
@@ -1262,7 +1262,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'symbol_spread',
     type: 'variable',
     category: 'variable',
-    label: 'Spread',
+    label: 'Sprd',
     description: 'Get current spread in pips',
     icon: 'ArrowsOutLineHorizontal',
     defaultParameters: {
@@ -1273,7 +1273,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'trades_count',
     type: 'condition',
     category: 'condition',
-    label: 'Count',
+    label: 'Cnt',
     description: 'Check number of open trades',
     icon: 'Hash',
     defaultParameters: {
@@ -1285,7 +1285,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'trade_exists',
     type: 'condition',
     category: 'condition',
-    label: 'Exists',
+    label: 'Exist',
     description: 'Check if trade exists',
     icon: 'Check',
     defaultParameters: {
@@ -1296,7 +1296,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'pending_exists',
     type: 'condition',
     category: 'condition',
-    label: 'PendingExists',
+    label: 'PendEx',
     description: 'Check if pending order exists',
     icon: 'Clock',
     defaultParameters: {}
@@ -1305,7 +1305,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'time_filter',
     type: 'condition',
     category: 'condition',
-    label: 'TimeFilter',
+    label: 'Time',
     description: 'Filter by time of day and day of week',
     icon: 'Clock',
     defaultParameters: {
@@ -1318,7 +1318,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'spread_filter',
     type: 'condition',
     category: 'condition',
-    label: 'SpreadFilter',
+    label: 'Spread',
     description: 'Check if spread is acceptable',
     icon: 'ArrowsOutLineHorizontal',
     defaultParameters: {
@@ -1340,7 +1340,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'comment',
     type: 'action',
     category: 'action',
-    label: 'Comment',
+    label: 'Comm',
     description: 'Display text on chart',
     icon: 'ChatText',
     defaultParameters: {
@@ -1362,7 +1362,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'trailing_stop_advanced',
     type: 'advanced',
     category: 'advanced',
-    label: 'AdvTrail',
+    label: 'AdvTr',
     description: 'Trail stop loss, take profit, or pending orders (MT4 compatible)',
     icon: 'TrendUp',
     defaultParameters: {
@@ -1378,7 +1378,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'trail_group',
     type: 'advanced',
     category: 'advanced',
-    label: 'TrailGroup',
+    label: 'TrGrp',
     description: 'Trail multiple trades collectively (MT4 group trailing)',
     icon: 'Stack',
     defaultParameters: {
@@ -1392,7 +1392,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'global_constant',
     type: 'variable',
     category: 'variable',
-    label: 'Constant',
+    label: 'Const',
     description: 'Project input parameter (constant value)',
     icon: 'Lock',
     defaultParameters: {
@@ -1407,7 +1407,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'global_variable',
     type: 'variable',
     category: 'variable',
-    label: 'Global',
+    label: 'Glob',
     description: 'Global variable accessible across events',
     icon: 'Database',
     defaultParameters: {
@@ -1436,7 +1436,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'fibonacci_lots',
     type: 'money_management',
     category: 'money_management',
-    label: 'Fibonacci',
+    label: 'Fib',
     description: 'Fibonacci-based position sizing',
     icon: 'ChartLineUp',
     defaultParameters: {
@@ -1451,7 +1451,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'martingale',
     type: 'money_management',
     category: 'money_management',
-    label: 'Martingale',
+    label: 'Mart',
     description: 'Fully customizable Martingale system',
     icon: 'ArrowsClockwise',
     defaultParameters: {
@@ -1468,7 +1468,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'anti_martingale',
     type: 'money_management',
     category: 'money_management',
-    label: 'AntiMart',
+    label: 'AntiM',
     description: 'Increase size on wins, decrease on losses',
     icon: 'TrendUp',
     defaultParameters: {
@@ -1483,7 +1483,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'custom_sequence',
     type: 'money_management',
     category: 'money_management',
-    label: 'Sequence',
+    label: 'Seq',
     description: 'Custom lot size sequence (e.g., 0.01, 0.02, 0.05, 0.1)',
     icon: 'ListNumbers',
     defaultParameters: {
@@ -1497,7 +1497,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'recovery_zones',
     type: 'money_management',
     category: 'money_management',
-    label: 'Recovery',
+    label: 'Recov',
     description: 'Zone recovery money management',
     icon: 'ShieldCheck',
     defaultParameters: {
@@ -1512,7 +1512,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'fixed_ratio',
     type: 'money_management',
     category: 'money_management',
-    label: 'FixedRatio',
+    label: 'FixRat',
     description: 'Fixed ratio money management (Ryan Jones)',
     icon: 'Equals',
     defaultParameters: {
@@ -1542,7 +1542,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'dynamic_value_check',
     type: 'condition',
     category: 'condition',
-    label: 'Dynamic',
+    label: 'Dyn',
     description: 'Check dynamic values from indicators easily',
     icon: 'Lightning',
     defaultParameters: {
@@ -1558,7 +1558,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'indicator_buffer',
     type: 'variable',
     category: 'variable',
-    label: 'Buffer',
+    label: 'Buf',
     description: 'Get indicator value from specific bar (shift)',
     icon: 'ChartLine',
     defaultParameters: {
@@ -1675,7 +1675,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'draw_rectangle',
     type: 'graphical',
     category: 'graphical',
-    label: 'Rectangle',
+    label: 'Rect',
     description: 'Draw rectangle zone on chart',
     icon: 'Rectangle',
     defaultParameters: {
@@ -1694,7 +1694,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'delete_object',
     type: 'graphical',
     category: 'graphical',
-    label: 'DelObject',
+    label: 'DelObj',
     description: 'Delete graphical object from chart',
     icon: 'Trash',
     defaultParameters: {
@@ -1735,7 +1735,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'webhook',
     type: 'messaging',
     category: 'messaging',
-    label: 'Webhook',
+    label: 'Hook',
     description: 'Send HTTP request to website/webhook',
     icon: 'Globe',
     defaultParameters: {
@@ -1750,7 +1750,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'telegram_message',
     type: 'messaging',
     category: 'messaging',
-    label: 'Telegram',
+    label: 'Tele',
     description: 'Send message to Telegram bot',
     icon: 'PaperPlaneTilt',
     defaultParameters: {
@@ -1793,7 +1793,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'file_exists',
     type: 'condition',
     category: 'condition',
-    label: 'FileExists',
+    label: 'FileEx',
     description: 'Check if file exists',
     icon: 'FileSearch',
     defaultParameters: {
@@ -1817,7 +1817,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'terminal_company',
     type: 'terminal',
     category: 'terminal',
-    label: 'Broker',
+    label: 'Brkr',
     description: 'Get broker company name',
     icon: 'Bank',
     defaultParameters: {},
@@ -1827,7 +1827,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'terminal_name',
     type: 'terminal',
     category: 'terminal',
-    label: 'Terminal',
+    label: 'Term',
     description: 'Get terminal name and version',
     icon: 'Desktop',
     defaultParameters: {},
@@ -1837,7 +1837,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_number',
     type: 'terminal',
     category: 'terminal',
-    label: 'AccNumber',
+    label: 'AccNum',
     description: 'Get account number',
     icon: 'IdentificationCard',
     defaultParameters: {},
@@ -1857,7 +1857,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_leverage',
     type: 'terminal',
     category: 'terminal',
-    label: 'Leverage',
+    label: 'Lev',
     description: 'Get account leverage',
     icon: 'ChartLineUp',
     defaultParameters: {},
@@ -1867,7 +1867,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'account_currency',
     type: 'terminal',
     category: 'terminal',
-    label: 'Currency',
+    label: 'Cur',
     description: 'Get account currency',
     icon: 'CurrencyDollar',
     defaultParameters: {},
@@ -1887,7 +1887,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'is_demo',
     type: 'terminal',
     category: 'terminal',
-    label: 'IsDemo',
+    label: 'Demo?',
     description: 'Check if running on demo account',
     icon: 'TestTube',
     defaultParameters: {},
@@ -1897,7 +1897,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
     id: 'is_connected',
     type: 'terminal',
     category: 'terminal',
-    label: 'Connected',
+    label: 'Conn?',
     description: 'Check if terminal is connected to server',
     icon: 'WifiHigh',
     defaultParameters: {},
