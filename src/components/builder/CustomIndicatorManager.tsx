@@ -13,7 +13,8 @@ import { Separator } from '@/components/ui/separator'
 import { useKV } from '@github/spark/hooks'
 import { CustomIndicator, CustomIndicatorInputParameter, CustomIndicatorOutputBuffer } from '@/types/custom-indicator'
 import { CustomIndicatorParser } from '@/lib/custom-indicator-parser'
-import { Plus, Upload, Code, Trash2, Edit, FileCode, Database, ArrowRight, Info } from '@phosphor-icons/react'
+import { CustomIndicatorBuilder } from './CustomIndicatorBuilder'
+import { Plus, Upload, Code, Trash2, Edit, FileCode, Database, ArrowRight, Info, Wrench } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface CustomIndicatorManagerProps {
@@ -26,6 +27,7 @@ export function CustomIndicatorManager({ open, onOpenChange, onIndicatorAdded }:
   const [customIndicators, setCustomIndicators] = useKV<CustomIndicator[]>('custom-indicators', [])
   const [activeTab, setActiveTab] = useState('library')
   const [editingIndicator, setEditingIndicator] = useState<CustomIndicator | null>(null)
+  const [showBuilder, setShowBuilder] = useState(false)
 
   const handleDeleteIndicator = (id: string) => {
     setCustomIndicators((current) => current.filter(ind => ind.id !== id))
@@ -34,75 +36,84 @@ export function CustomIndicatorManager({ open, onOpenChange, onIndicatorAdded }:
 
   const handleEditIndicator = (indicator: CustomIndicator) => {
     setEditingIndicator(indicator)
-    setActiveTab('manual')
+    setShowBuilder(true)
+  }
+
+  const handleBuilderSave = (indicator: CustomIndicator) => {
+    if (editingIndicator) {
+      setCustomIndicators((current) =>
+        current.map(ind => ind.id === editingIndicator.id ? indicator : ind)
+      )
+      setEditingIndicator(null)
+    } else {
+      setCustomIndicators((current) => [...current, indicator])
+    }
+    onIndicatorAdded?.(indicator)
+    setShowBuilder(false)
+    setActiveTab('library')
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Database className="w-5 h-5" />
-            Custom Indicator Library
-          </DialogTitle>
-          <DialogDescription>
-            Add and manage custom MetaTrader indicators from source code or manually
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl h-[80vh]">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2">
+                  <Database className="w-5 h-5" />
+                  Custom Indicator Library
+                </DialogTitle>
+                <DialogDescription>
+                  Add and manage custom MetaTrader indicators from source code or manually
+                </DialogDescription>
+              </div>
+              <Button onClick={() => setShowBuilder(true)} size="sm">
+                <Wrench className="w-4 h-4 mr-2" />
+                Builder
+              </Button>
+            </div>
+          </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="library">My Indicators</TabsTrigger>
-            <TabsTrigger value="source">From Source Code</TabsTrigger>
-            <TabsTrigger value="manual">Manual Entry</TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="library">My Indicators</TabsTrigger>
+              <TabsTrigger value="source">From Source Code</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="library" className="flex-1 overflow-hidden">
-            <IndicatorLibrary
-              indicators={customIndicators}
-              onDelete={handleDeleteIndicator}
-              onEdit={handleEditIndicator}
-              onAdd={onIndicatorAdded}
-            />
-          </TabsContent>
+            <TabsContent value="library" className="flex-1 overflow-hidden">
+              <IndicatorLibrary
+                indicators={customIndicators}
+                onDelete={handleDeleteIndicator}
+                onEdit={handleEditIndicator}
+                onAdd={onIndicatorAdded}
+              />
+            </TabsContent>
 
-          <TabsContent value="source" className="flex-1 overflow-hidden">
-            <FromSourceCode
-              indicators={customIndicators}
-              onIndicatorAdded={(indicator) => {
-                setCustomIndicators((current) => [...current, indicator])
-                onIndicatorAdded?.(indicator)
-                setActiveTab('library')
-              }}
-            />
-          </TabsContent>
-
-          <TabsContent value="manual" className="flex-1 overflow-hidden">
-            <ManualEntry
-              indicators={customIndicators}
-              editingIndicator={editingIndicator}
-              onIndicatorAdded={(indicator) => {
-                if (editingIndicator) {
-                  setCustomIndicators((current) =>
-                    current.map(ind => ind.id === editingIndicator.id ? indicator : ind)
-                  )
-                  setEditingIndicator(null)
-                  toast.success('Indicator updated')
-                } else {
+            <TabsContent value="source" className="flex-1 overflow-hidden">
+              <FromSourceCode
+                indicators={customIndicators}
+                onIndicatorAdded={(indicator) => {
                   setCustomIndicators((current) => [...current, indicator])
-                  toast.success('Indicator added')
-                }
-                onIndicatorAdded?.(indicator)
-                setActiveTab('library')
-              }}
-              onCancel={() => {
-                setEditingIndicator(null)
-              }}
-            />
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+                  onIndicatorAdded?.(indicator)
+                  setActiveTab('library')
+                }}
+              />
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      <CustomIndicatorBuilder
+        open={showBuilder}
+        onOpenChange={(open) => {
+          setShowBuilder(open)
+          if (!open) setEditingIndicator(null)
+        }}
+        editingIndicator={editingIndicator}
+        onSave={handleBuilderSave}
+      />
+    </>
   )
 }
 
@@ -401,304 +412,6 @@ function FromSourceCode({ indicators, onIndicatorAdded }: FromSourceCodeProps) {
             >
               <Code className="w-4 h-4 mr-2" />
               {parsing ? 'Parsing...' : 'Parse and Add Indicator'}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </ScrollArea>
-  )
-}
-
-interface ManualEntryProps {
-  indicators: CustomIndicator[]
-  editingIndicator: CustomIndicator | null
-  onIndicatorAdded: (indicator: CustomIndicator) => void
-  onCancel: () => void
-}
-
-function ManualEntry({ indicators, editingIndicator, onIndicatorAdded, onCancel }: ManualEntryProps) {
-  const [name, setName] = useState(editingIndicator?.name || '')
-  const [fileName, setFileName] = useState(editingIndicator?.fileName || '')
-  const [description, setDescription] = useState(editingIndicator?.description || '')
-  const [category, setCategory] = useState<'trend' | 'momentum' | 'volatility' | 'volume' | 'custom'>(
-    editingIndicator?.category || 'custom'
-  )
-  const [inputParameters, setInputParameters] = useState<CustomIndicatorInputParameter[]>(
-    editingIndicator?.inputParameters || []
-  )
-  const [outputBuffers, setOutputBuffers] = useState<CustomIndicatorOutputBuffer[]>(
-    editingIndicator?.outputBuffers || [{ index: 0, name: 'Value', description: 'Main output' }]
-  )
-
-  const handleAddParameter = () => {
-    setInputParameters([...inputParameters, {
-      name: `param${inputParameters.length + 1}`,
-      displayName: `Parameter ${inputParameters.length + 1}`,
-      dataType: 'int',
-      defaultValue: 0
-    }])
-  }
-
-  const handleRemoveParameter = (index: number) => {
-    setInputParameters(inputParameters.filter((_, i) => i !== index))
-  }
-
-  const handleUpdateParameter = (index: number, updates: Partial<CustomIndicatorInputParameter>) => {
-    setInputParameters(inputParameters.map((param, i) =>
-      i === index ? { ...param, ...updates } : param
-    ))
-  }
-
-  const handleAddBuffer = () => {
-    setOutputBuffers([...outputBuffers, {
-      index: outputBuffers.length,
-      name: `Buffer ${outputBuffers.length}`,
-      description: `Output buffer ${outputBuffers.length}`
-    }])
-  }
-
-  const handleRemoveBuffer = (index: number) => {
-    setOutputBuffers(outputBuffers.filter((_, i) => i !== index).map((buf, i) => ({ ...buf, index: i })))
-  }
-
-  const handleUpdateBuffer = (index: number, updates: Partial<CustomIndicatorOutputBuffer>) => {
-    setOutputBuffers(outputBuffers.map((buf, i) =>
-      i === index ? { ...buf, ...updates } : buf
-    ))
-  }
-
-  const handleSave = () => {
-    if (!name.trim()) {
-      toast.error('Please provide an indicator name')
-      return
-    }
-
-    if (!fileName.trim()) {
-      toast.error('Please provide a file name')
-      return
-    }
-
-    const nameValidation = CustomIndicatorParser.validateIndicatorName(name)
-    if (!nameValidation.valid) {
-      toast.error(nameValidation.error)
-      return
-    }
-
-    if (!editingIndicator) {
-      const existingIndicator = indicators.find(ind => ind.fileName === fileName)
-      if (existingIndicator) {
-        toast.error('An indicator with this filename already exists')
-        return
-      }
-    }
-
-    if (outputBuffers.length === 0) {
-      toast.error('Please add at least one output buffer')
-      return
-    }
-
-    const indicator: CustomIndicator = {
-      id: editingIndicator?.id || `custom-${Date.now()}`,
-      name,
-      fileName,
-      description,
-      category,
-      createdAt: editingIndicator?.createdAt || new Date(),
-      updatedAt: new Date(),
-      inputParameters,
-      outputBuffers,
-      isBuiltIn: false
-    }
-
-    onIndicatorAdded(indicator)
-
-    setName('')
-    setFileName('')
-    setDescription('')
-    setCategory('custom')
-    setInputParameters([])
-    setOutputBuffers([{ index: 0, name: 'Value', description: 'Main output' }])
-  }
-
-  return (
-    <ScrollArea className="h-full pr-4">
-      <div className="space-y-6">
-        <Card className="bg-muted/30">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Info className="w-4 h-4" />
-              Manual Entry
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm space-y-2 text-muted-foreground">
-            <p>Manually define your custom indicator by specifying its parameters and output buffers.</p>
-            <p>This is useful when you don't have access to the source code but know the indicator's structure.</p>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="manual-name">Indicator Name *</Label>
-              <Input
-                id="manual-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="My Custom Indicator"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="manual-filename">File Name *</Label>
-              <Input
-                id="manual-filename"
-                value={fileName}
-                onChange={(e) => setFileName(e.target.value)}
-                placeholder="MyIndicator.mq4"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="manual-category">Category</Label>
-              <Select value={category} onValueChange={(v: any) => setCategory(v)}>
-                <SelectTrigger id="manual-category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="trend">Trend</SelectItem>
-                  <SelectItem value="momentum">Momentum</SelectItem>
-                  <SelectItem value="volatility">Volatility</SelectItem>
-                  <SelectItem value="volume">Volume</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="manual-description">Description</Label>
-              <Input
-                id="manual-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Brief description..."
-              />
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label>Input Parameters ({inputParameters.length})</Label>
-              <Button size="sm" variant="outline" onClick={handleAddParameter}>
-                <Plus className="w-4 h-4 mr-1" />
-                Add Parameter
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              {inputParameters.map((param, index) => (
-                <Card key={index} className="p-3">
-                  <div className="grid grid-cols-4 gap-3">
-                    <Input
-                      value={param.name}
-                      onChange={(e) => handleUpdateParameter(index, { name: e.target.value })}
-                      placeholder="name"
-                      className="font-mono text-xs"
-                    />
-                    <Input
-                      value={param.displayName}
-                      onChange={(e) => handleUpdateParameter(index, { displayName: e.target.value })}
-                      placeholder="Display Name"
-                    />
-                    <Select
-                      value={param.dataType}
-                      onValueChange={(v: any) => handleUpdateParameter(index, { dataType: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="int">int</SelectItem>
-                        <SelectItem value="double">double</SelectItem>
-                        <SelectItem value="bool">bool</SelectItem>
-                        <SelectItem value="string">string</SelectItem>
-                        <SelectItem value="color">color</SelectItem>
-                        <SelectItem value="datetime">datetime</SelectItem>
-                        <SelectItem value="enum">enum</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="flex gap-1">
-                      <Input
-                        value={param.defaultValue}
-                        onChange={(e) => handleUpdateParameter(index, { defaultValue: e.target.value })}
-                        placeholder="default"
-                        className="flex-1"
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleRemoveParameter(index)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label>Output Buffers ({outputBuffers.length})</Label>
-              <Button size="sm" variant="outline" onClick={handleAddBuffer}>
-                <Plus className="w-4 h-4 mr-1" />
-                Add Buffer
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              {outputBuffers.map((buffer, index) => (
-                <Card key={index} className="p-3">
-                  <div className="grid grid-cols-4 gap-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="font-mono">
-                        #{buffer.index}
-                      </Badge>
-                    </div>
-                    <Input
-                      value={buffer.name}
-                      onChange={(e) => handleUpdateBuffer(index, { name: e.target.value })}
-                      placeholder="Buffer Name"
-                      className="col-span-2"
-                    />
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleRemoveBuffer(index)}
-                      disabled={outputBuffers.length === 1}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-4">
-            {editingIndicator && (
-              <Button variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-            )}
-            <Button onClick={handleSave} className="min-w-32">
-              {editingIndicator ? 'Update' : 'Add'} Indicator
             </Button>
           </div>
         </div>
