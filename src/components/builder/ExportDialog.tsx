@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,14 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Download, Copy, CheckCircle } from '@phosphor-icons/react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Download, Copy, CheckCircle, Warning, Info } from '@phosphor-icons/react'
 import { Strategy } from '@/types/strategy'
 import { ProjectConfig } from './NewProjectDialog'
-import { exportToMQL, MQLVersion } from '@/lib/mql-export'
+import { MQLCodeGenerator } from '@/lib/codegen/mql-generator'
 import { toast } from 'sonner'
+
+type MQLVersion = 'mql4' | 'mql5'
 
 interface ExportDialogProps {
   open: boolean
@@ -28,7 +31,7 @@ interface ExportDialogProps {
 export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: ExportDialogProps) {
   const [expertName, setExpertName] = useState('ForexFlowBot')
   const [magicNumber, setMagicNumber] = useState(12345)
-  const [selectedVersion, setSelectedVersion] = useState<MQLVersion>('mql4')
+  const [selectedVersion, setSelectedVersion] = useState<MQLVersion>('mql5')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -38,31 +41,35 @@ export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: Ex
     }
   }, [projectConfig])
 
-  const generatedCode = exportToMQL(strategy, {
-    version: selectedVersion,
-    expertName,
-    magicNumber
-  })
+  const generatedResult = useMemo(() => {
+    const generator = new MQLCodeGenerator(strategy, {
+      language: selectedVersion,
+      strategyName: expertName,
+      includeComments: true,
+      optimizeCode: true
+    })
+    
+    return generator.generate()
+  }, [strategy, selectedVersion, expertName])
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(generatedCode)
+    navigator.clipboard.writeText(generatedResult.source)
     setCopied(true)
     toast.success('Code copied to clipboard!')
     setTimeout(() => setCopied(false), 2000)
   }
 
   const handleDownload = () => {
-    const extension = selectedVersion === 'mql4' ? 'mq4' : 'mq5'
-    const blob = new Blob([generatedCode], { type: 'text/plain' })
+    const blob = new Blob([generatedResult.source], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${expertName}.${extension}`
+    a.download = generatedResult.filename
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    toast.success(`${expertName}.${extension} downloaded!`)
+    toast.success(`${generatedResult.filename} downloaded!`)
   }
 
   return (
@@ -97,6 +104,34 @@ export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: Ex
           </div>
         </div>
 
+        {generatedResult.warnings.length > 0 && (
+          <Alert className="mb-4 border-yellow-600 bg-yellow-900/20">
+            <Warning className="h-4 w-4 text-yellow-600" />
+            <AlertDescription>
+              <strong>Warnings:</strong>
+              <ul className="list-disc pl-4 mt-2 space-y-1">
+                {generatedResult.warnings.map((warning, i) => (
+                  <li key={i} className="text-sm">{warning}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {generatedResult.errors.length > 0 && (
+          <Alert variant="destructive" className="mb-4">
+            <Warning className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Errors:</strong>
+              <ul className="list-disc pl-4 mt-2 space-y-1">
+                {generatedResult.errors.map((error, i) => (
+                  <li key={i} className="text-sm">{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Tabs value={selectedVersion} onValueChange={(v) => setSelectedVersion(v as MQLVersion)} className="flex-1 flex flex-col min-h-0">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="mql4" className="gap-2">
@@ -127,7 +162,7 @@ export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: Ex
             </div>
             <ScrollArea className="flex-1 border border-border rounded-lg bg-muted/30">
               <pre className="p-4 text-xs font-mono">
-                <code>{generatedCode}</code>
+                <code>{generatedResult.source}</code>
               </pre>
             </ScrollArea>
           </TabsContent>
@@ -150,7 +185,7 @@ export function ExportDialog({ open, onOpenChange, strategy, projectConfig }: Ex
             </div>
             <ScrollArea className="flex-1 border border-border rounded-lg bg-muted/30">
               <pre className="p-4 text-xs font-mono">
-                <code>{generatedCode}</code>
+                <code>{generatedResult.source}</code>
               </pre>
             </ScrollArea>
           </TabsContent>

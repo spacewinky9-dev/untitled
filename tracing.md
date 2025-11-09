@@ -3,9 +3,9 @@
 ## 🎯 Project Mission
 Build a next-generation visual Forex bot builder (desktop web app) that is feature-compatible with FXDreema and strictly more powerful, enabling traders to design, test, and deploy automated trading strategies without coding.
 
-## 📊 Development Status: PHASE 11 - PRODUCTION REFINEMENT IN PROGRESS
+## 📊 Development Status: PHASE 12 - MQL CODE GENERATION & EXPORT
 
-**Current Session Focus:** Fix drag-and-drop issues, refine fxDreema-style UI, optimize node organization, ensure production-ready quality
+**Current Session Focus:** Implement MQL4/MQL5 code generation engine, strategy export functionality, and ensure complete EA generation from visual nodes
 
 ---
 
@@ -749,17 +749,36 @@ Build a next-generation visual Forex bot builder (desktop web app) that is featu
 **AUTONOMOUS DEVELOPMENT MODE: ACTIVE**
 **MAJOR MILESTONE:** Production-ready strategy execution and backtesting engines implemented!
 
-**LATEST SESSION (Continuation Development):**
-- ✅ Fixed drag and drop event handlers in FxDreemaNodePalette
-- ✅ Improved draggable node styling (pointer-events, webkit-user-drag)
-- ✅ Enhanced drag event flow with proper stopPropagation
-- ✅ Verified ReactFlow drop handlers are properly configured
-- ✅ Node names already simplified (SMA, EMA, RSI, etc.)
-- ✅ Node categories organized following fxDreema structure (20+ categories)
-- ✅ Color scheme matches fxDreema (#404040 bg, #555 borders, proper category colors)
-- ✅ Collapsible category system with expand/collapse working
-- ✅ 200px compact sidebar with search functionality
-- 📝 Created CONTINUATION_FIXES.md for tracking ongoing improvements
+**LATEST SESSION (Continuation Development - Session 57):**
+- ✅ Implemented MQLCodeGenerator class for MQL4/MQL5 code generation
+- ✅ Created comprehensive code generation engine with proper structure:
+  - Header generation with metadata
+  - Input parameters from strategy nodes
+  - Global variables declaration
+  - OnInit() function with initialization logic
+  - OnDeinit() function with cleanup logic
+  - OnTick() function with main trading logic
+  - OnTimer() function for timer-based logic
+  - Indicator calculations (SMA, EMA, RSI, MACD, BB, ATR)
+  - Condition evaluation and logic flow
+  - Trade execution (Buy, Sell, Close orders)
+  - Helper functions
+- ✅ Enhanced ExportDialog to use new MQLCodeGenerator
+- ✅ Added warning and error display in export UI
+- ✅ Implemented proper code indentation and formatting
+- ✅ Added support for both MQL4 and MQL5 syntax differences
+- ✅ Created node-to-code mapping logic
+- ✅ Implemented execution chain building from node graph
+- ✅ Added variable name sanitization and type mapping
+- 📝 Code generator produces compile-ready MQL4/MQL5 files
+- 📝 Export functionality now includes proper file naming and download
+
+**System Capabilities:**
+- Users can now design strategies visually and export working MQL code
+- Generated code includes all necessary functions for MetaTrader EAs
+- Proper error handling and validation warnings
+- Code is commented and structured for readability
+- Supports complex multi-node strategies
 
 Users can now:
 - ✅ Design strategies visually with 22+ node types
