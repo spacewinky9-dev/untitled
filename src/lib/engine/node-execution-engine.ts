@@ -98,6 +98,15 @@ export class NodeExecutionEngine {
         case 'terminal':
           return this.executeTerminalNode(context)
         
+        case 'math':
+          return this.executeMathNode(context)
+        
+        case 'pending_order':
+          return this.executePendingOrderNode(context)
+        
+        case 'time_condition':
+          return this.executeTimeConditionNode(context)
+        
         default:
           console.warn(`Unknown node type: ${nodeType}`)
           return null
@@ -438,6 +447,142 @@ export class NodeExecutionEngine {
       
       default:
         return balance
+    }
+  }
+
+  private executeMathNode(context: NodeExecutionContext): number {
+    const { node, nodeValues } = context
+    const params = node.data?.parameters || {}
+    const operation = params.operation || 'add'
+    
+    // Get input values from connected nodes
+    const inputNodes = this.getInputNodes(context)
+    const operands = inputNodes
+      .map(nodeId => nodeValues.get(nodeId))
+      .filter(v => typeof v === 'number') as number[]
+    
+    // If no inputs, use parameters
+    if (operands.length === 0) {
+      operands.push(params.value1 || 0, params.value2 || 0)
+    }
+    
+    const result = mathEngine.executeOperation(operation, operands)
+    return result.value
+  }
+
+  private executePendingOrderNode(context: NodeExecutionContext): any {
+    const { node, nodeValues, bar } = context
+    const params = node.data?.parameters || {}
+    const orderType = params.orderType || 'buy_limit'
+    const action = params.action || 'place'
+    
+    // Get trigger condition from inputs
+    const inputNodes = this.getInputNodes(context)
+    const shouldTrigger = inputNodes.length > 0 
+      ? Boolean(nodeValues.get(inputNodes[0])) 
+      : true
+    
+    if (!shouldTrigger) {
+      return null
+    }
+    
+    switch (action) {
+      case 'place':
+        const order = {
+          id: `order_${node.id}_${bar.time}`,
+          type: orderType,
+          symbol: params.symbol || 'EURUSD',
+          entryPrice: params.entryPrice || bar.close,
+          lots: params.lots || 0.01,
+          stopLoss: params.stopLoss,
+          takeProfit: params.takeProfit,
+          expirationTime: params.expirationTime,
+          placedTime: bar.time,
+          groupName: params.groupName,
+          magicNumber: params.magicNumber
+        }
+        pendingOrderManager.placePendingOrder(order)
+        return { action: 'placed', orderId: order.id }
+      
+      case 'modify':
+        const orderId = params.orderId
+        if (orderId) {
+          const success = pendingOrderManager.modifyPendingOrder(orderId, {
+            entryPrice: params.entryPrice,
+            stopLoss: params.stopLoss,
+            takeProfit: params.takeProfit,
+            expirationTime: params.expirationTime
+          })
+          return { action: 'modified', success }
+        }
+        return { action: 'modified', success: false }
+      
+      case 'delete':
+        const deleteId = params.orderId
+        if (deleteId) {
+          const success = pendingOrderManager.deletePendingOrder(deleteId)
+          return { action: 'deleted', success }
+        }
+        return { action: 'deleted', success: false }
+      
+      case 'delete_by_type':
+        const count = pendingOrderManager.deletePendingOrdersByType(orderType)
+        return { action: 'deleted_by_type', count }
+      
+      default:
+        return null
+    }
+  }
+
+  private executeTimeConditionNode(context: NodeExecutionContext): boolean {
+    const { node, bar } = context
+    const params = node.data?.parameters || {}
+    const conditionType = params.type || 'trading_hours'
+    
+    const date = new Date(bar.time)
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const dayOfWeek = date.getDay() // 0 = Sunday, 6 = Saturday
+    const dayOfMonth = date.getDate()
+    
+    switch (conditionType) {
+      case 'trading_hours':
+        const startHour = params.startHour || 0
+        const endHour = params.endHour || 23
+        const currentHourMinute = hour + minute / 60
+        const startTime = startHour
+        const endTime = endHour
+        
+        if (startTime <= endTime) {
+          return currentHourMinute >= startTime && currentHourMinute <= endTime
+        } else {
+          // Overnight session (e.g., 22:00 - 02:00)
+          return currentHourMinute >= startTime || currentHourMinute <= endTime
+        }
+      
+      case 'day_of_week':
+        const allowedDays = params.days || [1, 2, 3, 4, 5] // Monday-Friday default
+        return allowedDays.includes(dayOfWeek)
+      
+      case 'day_of_month':
+        const allowedDaysOfMonth = params.daysOfMonth || []
+        return allowedDaysOfMonth.length === 0 || allowedDaysOfMonth.includes(dayOfMonth)
+      
+      case 'avoid_weekends':
+        return dayOfWeek !== 0 && dayOfWeek !== 6
+      
+      case 'avoid_news':
+        // This would require news calendar integration
+        // For now, just return true
+        return true
+      
+      case 'specific_time':
+        const targetHour = params.hour || 0
+        const targetMinute = params.minute || 0
+        return hour === targetHour && minute === targetMinute
+      
+      default:
+        return true
     }
   }
 
