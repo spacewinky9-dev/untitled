@@ -78,14 +78,22 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
       category: 'timefilters',
       label: 'Time Filters',
       color: '#C4DC96',
-      nodes: NODE_DEFINITIONS.filter(n => n.id === 'time_filter')
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('_filter') && (
+          n.id.includes('time') || n.id.includes('month') || n.id.includes('weekday') ||
+          n.id.includes('hours') || n.id.includes('minutes') || n.id.includes('seconds') ||
+          n.id.includes('spread')
+        ) || n.id.includes('once_') || n.id.includes('every_n')
+      )
     },
     {
       category: 'trades_count',
       label: 'Check Trades & Orders Count',
       color: '#D9BD6A',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['trades_count', 'trade_exists', 'pending_exists'].includes(n.id)
+        n.id.includes('check_trades') || n.id.includes('check_pending') ||
+        n.id.includes('if_trade') || n.id.includes('if_pending') ||
+        n.id.includes('no_trade') || n.id.includes('no_pending')
       )
     },
     {
