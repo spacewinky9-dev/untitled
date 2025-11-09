@@ -147,14 +147,13 @@ export function CompactNodePalette({ activeEvent, onDragStart }: CompactNodePale
                         draggable
                         onDragStart={(e) => onDragStart(e, node)}
                         className={`
-                          px-2 py-1.5 text-[11px] rounded cursor-move
+                          px-2 py-1.5 text-xs rounded cursor-move font-medium
                           border border-l-2
                           ${categoryColors[categoryId]}
                           hover:bg-opacity-30 transition-all
                           flex items-center gap-1.5
                         `}
                       >
-                        <span className="text-base">{node.icon}</span>
                         <span className="flex-1 truncate">{node.label}</span>
                       </div>
                     ))}
