@@ -26,11 +26,28 @@ export class ConnectionValidator {
     sourceNode: Node,
     targetNode: Node,
     sourceHandle: string | null,
-    targetHandle: string | null
+    targetHandle: string | null,
+    existingEdges?: Edge[]
   ): { valid: boolean; reason?: string } {
     
     if (!sourceNode.data || !targetNode.data) {
       return { valid: false, reason: 'Invalid node data' }
+    }
+
+    // Check for self-connection
+    if (sourceNode.id === targetNode.id) {
+      return { valid: false, reason: 'Cannot connect a node to itself' }
+    }
+
+    // Check for circular dependencies
+    if (existingEdges) {
+      const wouldCreateCycle = this.wouldCreateCycle(sourceNode.id, targetNode.id, existingEdges)
+      if (wouldCreateCycle) {
+        return { 
+          valid: false, 
+          reason: 'This connection would create a circular dependency. Circular dependencies can cause infinite loops in strategy execution.' 
+        }
+      }
     }
 
     const sourceCategory = sourceNode.data.category as NodeCategory
@@ -61,10 +78,11 @@ export class ConnectionValidator {
     if (!allowedTargets.includes(targetCategory)) {
       return {
         valid: false,
-        reason: `Cannot connect ${sourceCategory} to ${targetCategory}. Valid targets: ${allowedTargets.join(', ')}`
+        reason: this.getConnectionErrorMessage(sourceCategory, targetCategory, allowedTargets)
       }
     }
 
+    // Check data type compatibility
     const sourceType = this.getPortType(sourceNode, sourceHandle, 'output')
     const targetType = this.getPortType(targetNode, targetHandle, 'input')
 
@@ -72,12 +90,101 @@ export class ConnectionValidator {
       if (sourceType !== targetType) {
         return {
           valid: false,
-          reason: `Type mismatch: ${sourceType} cannot connect to ${targetType}`
+          reason: `Data type mismatch: Cannot connect ${sourceType} output to ${targetType} input. ${this.getTypeConversionHint(sourceType, targetType)}`
+        }
+      }
+    }
+
+    // Check for duplicate connections
+    if (existingEdges) {
+      const duplicateConnection = existingEdges.some(
+        edge => edge.source === sourceNode.id && edge.target === targetNode.id
+      )
+      if (duplicateConnection) {
+        return {
+          valid: false,
+          reason: 'A connection already exists between these nodes'
         }
       }
     }
 
     return { valid: true }
+  }
+
+  private static wouldCreateCycle(
+    sourceId: string,
+    targetId: string,
+    edges: Edge[]
+  ): boolean {
+    // Build adjacency list with the new edge included
+    const graph = new Map<string, string[]>()
+    
+    edges.forEach(edge => {
+      if (!graph.has(edge.source)) {
+        graph.set(edge.source, [])
+      }
+      graph.get(edge.source)!.push(edge.target)
+    })
+    
+    // Add the proposed new edge
+    if (!graph.has(sourceId)) {
+      graph.set(sourceId, [])
+    }
+    graph.get(sourceId)!.push(targetId)
+    
+    // Check if we can reach sourceId from targetId (which would create a cycle)
+    const visited = new Set<string>()
+    const queue = [targetId]
+    
+    while (queue.length > 0) {
+      const current = queue.shift()!
+      
+      if (current === sourceId) {
+        return true // Cycle detected
+      }
+      
+      if (visited.has(current)) {
+        continue
+      }
+      
+      visited.add(current)
+      const neighbors = graph.get(current) || []
+      queue.push(...neighbors)
+    }
+    
+    return false
+  }
+
+  private static getConnectionErrorMessage(
+    sourceCategory: NodeCategory,
+    targetCategory: NodeCategory,
+    allowedTargets: NodeCategory[]
+  ): string {
+    const hints: Record<string, string> = {
+      'event-action': 'Events should connect to indicators or conditions first, not directly to actions.',
+      'indicator-action': 'Indicators should connect to conditions that evaluate their values before triggering actions.',
+      'action-indicator': 'Actions come at the end of the flow. They cannot feed back into indicators.',
+      'action-condition': 'Actions come at the end of the flow. They cannot feed back into conditions.',
+      'risk-condition': 'Risk management nodes should connect to actions, not back to conditions.',
+    }
+    
+    const key = `${sourceCategory}-${targetCategory}`
+    const hint = hints[key] || ''
+    
+    return `Cannot connect ${sourceCategory} to ${targetCategory}. ${hint} Valid targets for ${sourceCategory}: ${allowedTargets.join(', ')}.`
+  }
+
+  private static getTypeConversionHint(sourceType: string, targetType: string): string {
+    if (sourceType === 'number' && targetType === 'boolean') {
+      return 'Use a condition node to convert numeric values to boolean (true/false).'
+    }
+    if (sourceType === 'boolean' && targetType === 'number') {
+      return 'Boolean values cannot be used where numbers are expected.'
+    }
+    if (sourceType === 'string' && (targetType === 'number' || targetType === 'boolean')) {
+      return 'String values cannot be directly used in numeric or boolean operations.'
+    }
+    return 'Consider adding a conversion or transformation node.'
   }
 
   static getPortType(node: Node, handle: string | null, direction: 'input' | 'output'): string {
