@@ -14,6 +14,24 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { X, Info } from '@phosphor-icons/react'
 import { getNodeDefinition, type IndicatorNodeDefinition, NODE_CATEGORIES } from '@/constants/node-categories'
 
+interface NodeParameter {
+  key: string
+  label: string
+  type: 'number' | 'select' | 'boolean'
+  default: string | number | boolean
+  min?: number
+  max?: number
+  step?: number
+  description?: string
+  options?: Array<{ label: string; value: string | number | boolean }>
+}
+
+interface NodeDataType extends Record<string, unknown> {
+  label?: string
+  parameters?: Record<string, string | number | boolean>
+  [key: string]: unknown
+}
+
 interface PropertiesPanelProps {
   selectedNode: Node | null
   onClose: () => void
@@ -21,7 +39,7 @@ interface PropertiesPanelProps {
 
 export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps) {
   const { setNodes } = useReactFlow()
-  const [nodeData, setNodeData] = useState<any>(selectedNode?.data || {})
+  const [nodeData, setNodeData] = useState<NodeDataType>(selectedNode?.data as NodeDataType || {})
 
   useEffect(() => {
     if (selectedNode) {
@@ -43,7 +61,7 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
   const nodeDefinition = getNodeDefinition((selectedNode.data.indicatorType || selectedNode.type) as string)
   const indicatorDef = nodeDefinition as IndicatorNodeDefinition | undefined
 
-  const updateNodeData = (key: string, value: any) => {
+  const updateNodeData = (key: string, value: unknown) => {
     const newData = { ...nodeData, [key]: value }
     setNodeData(newData)
     
@@ -57,10 +75,10 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
     )
   }
 
-  const renderParameterField = (param: any) => {
+  const renderParameterField = (param: NodeParameter) => {
     const currentValue = nodeData.parameters?.[param.key] ?? param.default
 
-    const updateParameter = (value: any) => {
+    const updateParameter = (value: string | number | boolean) => {
       const newParams = { ...nodeData.parameters, [param.key]: value }
       updateNodeData('parameters', newParams)
     }
@@ -90,7 +108,7 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {param.options.map((opt: any) => (
+              {param.options.map((opt: { label: string; value: string | number | boolean }) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
@@ -187,7 +205,7 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
     return null
   }
 
-  const renderLegacyField = (key: string, value: any) => {
+  const renderLegacyField = (key: string, value: unknown) => {
     if (key === 'label') {
       return (
         <div key={key} className="space-y-2">
