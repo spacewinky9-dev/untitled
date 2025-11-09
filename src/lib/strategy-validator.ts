@@ -90,9 +90,9 @@ export class StrategyValidator {
   }
 
   private validateConnections(strategy: Strategy, issues: ValidationIssue[]): void {
-    const nodeMap = new Map(strategy.nodes.map(n => [n.id, n]))
+    const nodeMap = new Map((strategy.nodes || []).map(n => [n.id, n]))
 
-    strategy.edges.forEach(edge => {
+    (strategy.edges || []).forEach(edge => {
       const sourceNode = nodeMap.get(edge.source)
       const targetNode = nodeMap.get(edge.target)
 
