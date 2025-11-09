@@ -8,6 +8,7 @@ import { MultiTimeframeAnalyzer, Timeframe } from './mtf-analyzer'
 import { AdvancedTradeManager } from './advanced-trade-manager'
 import { EventSystem } from './event-system'
 import { VariableStorage } from './variable-storage'
+import { NodeExecutionEngine } from './node-execution-engine'
 
 export interface ExecutionContext {
   bar: OHLCV
@@ -61,6 +62,7 @@ export class StrategyExecutor {
   private tradeManager: AdvancedTradeManager
   private eventSystem: EventSystem
   private variables: VariableStorage
+  private nodeExecutionEngine: NodeExecutionEngine
 
   constructor(private strategy: Strategy, enableVisualization: boolean = false) {
     this.nodes = new Map(strategy.nodes.map(n => [n.id, n]))
@@ -75,6 +77,7 @@ export class StrategyExecutor {
     this.tradeManager = new AdvancedTradeManager()
     this.eventSystem = new EventSystem()
     this.variables = new VariableStorage()
+    this.nodeExecutionEngine = new NodeExecutionEngine()
   }
 
   getVisualizer(): ExecutionVisualizer {
@@ -188,13 +191,42 @@ export class StrategyExecutor {
     this.nodeValues.clear()
 
     const sorted = this.topologicalSort()
+    this.nodeExecutionEngine.setEdges(this.edges)
 
     for (const nodeId of sorted) {
       const node = this.nodes.get(nodeId)
       if (!node) continue
 
-      const value = this.evaluateNode(node, context)
-      this.nodeValues.set(nodeId, value)
+      try {
+        const executionContext = {
+          node,
+          bar: context.bar,
+          index: context.index,
+          allBars: context.allBars,
+          balance: context.balance,
+          openPositions: context.openPositions,
+          variables: context.variables || this.variables,
+          nodeValues: this.nodeValues,
+          indicatorCache: this.indicatorCache,
+          symbol: 'EURUSD',
+          timeframe: 'M15',
+          edges: this.edges
+        }
+
+        const value = this.nodeExecutionEngine.executeNode(executionContext)
+        this.nodeValues.set(nodeId, value)
+
+        if (this.enableVisualization) {
+          const state = value === true || value === false ? (value ? 'triggered' : 'inactive') : 
+                       value !== null && value !== undefined ? 'success' : 'idle'
+          this.stateManager.updateNodeState(nodeId, state, value)
+        }
+      } catch (error) {
+        console.error(`Error evaluating node ${nodeId}:`, error)
+        if (this.enableVisualization) {
+          this.stateManager.updateNodeState(nodeId, 'failed', null)
+        }
+      }
     }
   }
 
