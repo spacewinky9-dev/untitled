@@ -119,9 +119,9 @@ export class StrategyValidator {
       }
     })
 
-    strategy.nodes.forEach(node => {
-      const incomingEdges = strategy.edges.filter(e => e.target === node.id)
-      const outgoingEdges = strategy.edges.filter(e => e.source === node.id)
+    (strategy.nodes || []).forEach(node => {
+      const incomingEdges = (strategy.edges || []).filter(e => e.target === node.id)
+      const outgoingEdges = (strategy.edges || []).filter(e => e.source === node.id)
 
       if (node.type === 'condition' && incomingEdges.length === 0) {
         issues.push({
@@ -199,7 +199,7 @@ export class StrategyValidator {
   }
 
   private validateNodeParameters(strategy: Strategy, issues: ValidationIssue[]): void {
-    strategy.nodes.forEach(node => {
+    (strategy.nodes || []).forEach(node => {
       const params = node.data?.parameters || {}
 
       switch (node.type) {
@@ -335,7 +335,7 @@ export class StrategyValidator {
   }
 
   private validateLogicFlow(strategy: Strategy, issues: ValidationIssue[]): void {
-    const nodeMap = new Map(strategy.nodes.map(n => [n.id, n]))
+    const nodeMap = new Map((strategy.nodes || []).map(n => [n.id, n]))
     const visited = new Set<string>()
     const recursionStack = new Set<string>()
 
@@ -357,7 +357,7 @@ export class StrategyValidator {
       visited.add(nodeId)
       recursionStack.add(nodeId)
 
-      const outgoingEdges = strategy.edges.filter(e => e.source === nodeId)
+      const outgoingEdges = (strategy.edges || []).filter(e => e.source === nodeId)
       for (const edge of outgoingEdges) {
         if (detectCycle(edge.target)) {
           return true
@@ -368,11 +368,11 @@ export class StrategyValidator {
       return false
     }
 
-    strategy.nodes.forEach(node => {
+    (strategy.nodes || []).forEach(node => {
       detectCycle(node.id)
     })
 
-    const eventNodes = strategy.nodes.filter(n => n.type === 'event')
+    const eventNodes = (strategy.nodes || []).filter(n => n.type === 'event')
     eventNodes.forEach(eventNode => {
       const reachableNodes = this.getReachableNodes(eventNode.id, strategy)
       const hasAction = reachableNodes.some(id => {
@@ -392,8 +392,8 @@ export class StrategyValidator {
   }
 
   private validatePerformance(strategy: Strategy, issues: ValidationIssue[]): void {
-    const indicatorCount = strategy.nodes.filter(n => n.type === 'indicator').length
-    const nodeCount = strategy.nodes.length
+    const indicatorCount = (strategy.nodes || []).filter(n => n.type === 'indicator').length
+    const nodeCount = (strategy.nodes || []).length
 
     if (indicatorCount > 20) {
       issues.push({
@@ -411,7 +411,7 @@ export class StrategyValidator {
       })
     }
 
-    const mtfNodes = strategy.nodes.filter(n => n.type === 'mtf')
+    const mtfNodes = (strategy.nodes || []).filter(n => n.type === 'mtf')
     if (mtfNodes.length > 5) {
       issues.push({
         severity: 'warning',
@@ -431,7 +431,7 @@ export class StrategyValidator {
 
       reachable.add(currentId)
 
-      const outgoingEdges = strategy.edges.filter(e => e.source === currentId)
+      const outgoingEdges = (strategy.edges || []).filter(e => e.source === currentId)
       outgoingEdges.forEach(edge => {
         if (!reachable.has(edge.target)) {
           queue.push(edge.target)
