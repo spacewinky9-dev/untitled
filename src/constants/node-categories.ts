@@ -2041,3 +2041,7 @@ export function getCategoryColors(category: NodeCategory) {
     accentColor: '#f59e0b'
   }
 }
+
+export function getCategoryInfo(category: NodeCategory) {
+  return NODE_CATEGORIES.find(cat => cat.id === category)
+}
