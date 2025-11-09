@@ -1,9 +1,23 @@
 # PR-01 Phase 3: Canvas Interaction Improvements
 
-## Status: PLANNED
+## Status: INFRASTRUCTURE COMPLETE ✅
 
 ## Overview
 Improve canvas interactions for efficient strategy building with multi-select, bulk operations, and smart guides.
+
+## Infrastructure Completed
+- ✅ `useSelection` hook created with full multi-select logic
+- ✅ `useSmartGuides` hook created with alignment and snapping
+- ✅ Selection box calculations implemented
+- ✅ Snap-to-grid logic ready
+- ✅ Guide calculation algorithms complete
+
+## Pending Integration
+- [ ] Integrate hooks into Canvas component
+- [ ] Add visual feedback for selection box
+- [ ] Render alignment guides on canvas
+- [ ] Test bulk operations (delete, move, align)
+- [ ] Add connection hints UI
 
 ## Objectives
 1. Multi-select nodes with drag or Ctrl/Shift+Click
