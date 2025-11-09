@@ -25,6 +25,23 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
   const onDragStart = (event: React.DragEvent, nodeDefinition: NodeDefinition) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeDefinition))
     event.dataTransfer.effectAllowed = 'move'
+    
+    const dragImage = document.createElement('div')
+    dragImage.style.cssText = `
+      position: absolute;
+      top: -1000px;
+      padding: 8px 12px;
+      background: ${nodeDefinition.type === 'indicator' ? '#F4D88A' : '#D9BD6A'};
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    `
+    dragImage.textContent = nodeDefinition.label
+    document.body.appendChild(dragImage)
+    event.dataTransfer.setDragImage(dragImage, 0, 0)
+    setTimeout(() => document.body.removeChild(dragImage), 0)
   }
 
   const toggleCategory = (category: string) => {
