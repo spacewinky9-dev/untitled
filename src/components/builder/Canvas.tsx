@@ -44,7 +44,7 @@ import { FileOpsNode } from './nodes/FileOpsNode'
 import { TerminalNode } from './nodes/TerminalNode'
 import { CustomBlockNode } from './nodes/CustomBlockNode'
 import { NodePaletteWorkflow } from './NodePaletteWorkflow'
-import { CompactNodePalette } from './CompactNodePalette'
+import { FxDreemaNodePalette } from './FxDreemaNodePalette'
 import { EventTabs } from './EventTabs'
 import { PropertiesPanel } from './PropertiesPanel'
 import { AIStrategyBuilder } from './AIStrategyBuilder'
@@ -737,7 +737,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
       <EventTabs activeEvent={activeEvent} onEventChange={setActiveEvent} />
       
       <div className="flex-1 flex overflow-hidden">
-        <CompactNodePalette activeEvent={activeEvent} onDragStart={onDragStart} />
+        <FxDreemaNodePalette onNodeAdd={onNodeAdd} />
         
         <ContextMenuWrapper
           nodes={nodes}
