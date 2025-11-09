@@ -1,6 +1,7 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { cn } from '@/lib/utils'
+import { InlineNodeEditor } from '../InlineNodeEditor'
 
 export interface FileOpsNodeData extends Record<string, unknown> {
   label: string
@@ -9,13 +10,19 @@ export interface FileOpsNodeData extends Record<string, unknown> {
   blockNumber?: number | string
 }
 
-export const FileOpsNode = memo(({ data, selected }: NodeProps) => {
+export const FileOpsNode = memo(({ data, selected, id }: NodeProps) => {
   const nodeData = data as FileOpsNodeData
   const isDisabled = nodeData.disabled || false
   const isRead = nodeData.fileOpType === 'read'
+  const [isEditingLabel, setIsEditingLabel] = useState(false)
   
   const inputs = isRead ? [] : [{ id: 'trigger', label: 'Trigger' }]
   const outputs = [{ id: 'output', label: isRead ? 'Data' : 'Done' }]
+  
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditingLabel(true)
+  }
   
   return (
     <div className={cn(
@@ -45,10 +52,13 @@ export const FileOpsNode = memo(({ data, selected }: NodeProps) => {
         />
       ))}
       
-      <div className="flex items-center justify-center">
-        <div className="font-semibold text-xs text-foreground text-center leading-tight">
-          {nodeData.label}
-        </div>
+      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick}>
+        <InlineNodeEditor
+          nodeId={id}
+          currentLabel={nodeData.label}
+          isEditing={isEditingLabel}
+          onEditComplete={() => setIsEditingLabel(false)}
+        />
       </div>
       
       {outputs.map((output, idx) => (

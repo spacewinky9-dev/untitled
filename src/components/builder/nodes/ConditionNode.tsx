@@ -1,6 +1,7 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { cn } from '@/lib/utils'
+import { InlineNodeEditor } from '../InlineNodeEditor'
 
 export interface ConditionNodeData extends Record<string, unknown> {
   label: string
@@ -11,9 +12,10 @@ export interface ConditionNodeData extends Record<string, unknown> {
   executionOrder?: number
 }
 
-export const ConditionNode = memo(({ data, selected }: NodeProps) => {
+export const ConditionNode = memo(({ data, selected, id }: NodeProps) => {
   const nodeData = data as ConditionNodeData
   const isDisabled = nodeData.disabled || false
+  const [isEditingLabel, setIsEditingLabel] = useState(false)
   
   const inputs = nodeData.inputs || [{ id: 'input-a', label: 'A' }, { id: 'input-b', label: 'B' }]
   const outputs = nodeData.outputs || [
@@ -23,6 +25,11 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
   
   const getHandleColor = (type: 'normal' | 'inverted') => {
     return type === 'normal' ? '#16a34a' : '#facc15'
+  }
+  
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditingLabel(true)
   }
   
   return (
@@ -53,10 +60,13 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
         />
       ))}
       
-      <div className="flex items-center justify-center">
-        <div className="font-semibold text-xs text-foreground text-center leading-tight">
-          {nodeData.label}
-        </div>
+      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick}>
+        <InlineNodeEditor
+          nodeId={id}
+          currentLabel={nodeData.label}
+          isEditing={isEditingLabel}
+          onEditComplete={() => setIsEditingLabel(false)}
+        />
       </div>
       
       {outputs.map((output, idx) => (

@@ -1,6 +1,7 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { cn } from '@/lib/utils'
+import { InlineNodeEditor } from '../InlineNodeEditor'
 
 export interface EventNodeData extends Record<string, unknown> {
   label: string
@@ -10,9 +11,15 @@ export interface EventNodeData extends Record<string, unknown> {
   executionOrder?: number
 }
 
-export const EventNode = memo(({ data, selected }: NodeProps) => {
+export const EventNode = memo(({ data, selected, id }: NodeProps) => {
   const nodeData = data as EventNodeData
   const isDisabled = nodeData.disabled || false
+  const [isEditingLabel, setIsEditingLabel] = useState(false)
+  
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditingLabel(true)
+  }
   
   return (
     <div className={cn(
@@ -29,10 +36,13 @@ export const EventNode = memo(({ data, selected }: NodeProps) => {
         </div>
       )}
       
-      <div className="flex items-center justify-center">
-        <div className="font-semibold text-xs text-foreground text-center leading-tight">
-          {nodeData.label}
-        </div>
+      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick}>
+        <InlineNodeEditor
+          nodeId={id}
+          currentLabel={nodeData.label}
+          isEditing={isEditingLabel}
+          onEditComplete={() => setIsEditingLabel(false)}
+        />
       </div>
       
       <Handle

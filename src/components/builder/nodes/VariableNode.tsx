@@ -1,6 +1,7 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
 import { cn } from '@/lib/utils'
+import { InlineNodeEditor } from '../InlineNodeEditor'
 
 export interface VariableNodeData extends Record<string, unknown> {
   label: string
@@ -9,13 +10,19 @@ export interface VariableNodeData extends Record<string, unknown> {
   blockNumber?: number | string
 }
 
-export const VariableNode = memo(({ data, selected }: NodeProps) => {
+export const VariableNode = memo(({ data, selected, id }: NodeProps) => {
   const nodeData = data as VariableNodeData
   const isGetter = nodeData.variableType === 'get_variable'
   const isDisabled = nodeData.disabled || false
+  const [isEditingLabel, setIsEditingLabel] = useState(false)
   
   const inputs = isGetter ? [] : [{ id: 'input', label: 'Value' }]
   const outputs = [{ id: 'output', label: 'Value' }]
+  
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditingLabel(true)
+  }
   
   return (
     <div className={cn(
@@ -45,10 +52,13 @@ export const VariableNode = memo(({ data, selected }: NodeProps) => {
         />
       ))}
       
-      <div className="flex items-center justify-center">
-        <div className="font-semibold text-xs text-foreground text-center leading-tight">
-          {nodeData.label}
-        </div>
+      <div className="flex items-center justify-center" onDoubleClick={handleDoubleClick}>
+        <InlineNodeEditor
+          nodeId={id}
+          currentLabel={nodeData.label}
+          isEditing={isEditingLabel}
+          onEditComplete={() => setIsEditingLabel(false)}
+        />
       </div>
       
       {outputs.map((output, idx) => (
