@@ -265,12 +265,12 @@ export function BacktestView() {
               <Card>
                 <CardHeader>
                   <CardTitle>Trade History</CardTitle>
-                  <CardDescription>{result.trades.length} trades executed</CardDescription>
+                  <CardDescription>{result.trades?.length || 0} trades executed</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[300px]">
                     <div className="space-y-2">
-                      {result.trades.map((trade, idx) => (
+                      {(result.trades || []).map((trade, idx) => (
                         <div key={trade.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                           <div className="flex items-center gap-3">
                             <Badge variant={trade.type === 'buy' ? 'default' : 'secondary'}>

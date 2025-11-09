@@ -2003,18 +2003,18 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
 ]
 
 export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
-  return NODE_DEFINITIONS.filter(node => node.category === category)
+  return (NODE_DEFINITIONS || []).filter(node => node.category === category)
 }
 
 export function getNodeDefinition(id: string): NodeDefinition | undefined {
-  return NODE_DEFINITIONS.find(node => node.id === id)
+  return (NODE_DEFINITIONS || []).find(node => node.id === id)
 }
 
 export function getNodesByEventContext(eventContext: EventCategory): NodeDefinition[] {
   if (eventContext === 'all') {
-    return NODE_DEFINITIONS
+    return NODE_DEFINITIONS || []
   }
-  return NODE_DEFINITIONS.filter(node => 
+  return (NODE_DEFINITIONS || []).filter(node => 
     !node.eventContext || 
     node.eventContext.includes(eventContext) || 
     node.eventContext.includes('all')

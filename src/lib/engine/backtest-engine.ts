@@ -26,19 +26,20 @@ export class BacktestEngine {
   }
 
   private calculateStatistics(trades: Trade[]): any {
-    const durations = trades
+    const safeTrades = trades || []
+    const durations = safeTrades
       .filter(t => t.exitTime && t.entryTime)
       .map(t => (t.exitTime! - t.entryTime) / 1000 / 60)
 
-    const winningTrades = trades.filter(t => (t.profit || 0) > 0)
-    const losingTrades = trades.filter(t => (t.profit || 0) < 0)
+    const winningTrades = safeTrades.filter(t => (t.profit || 0) > 0)
+    const losingTrades = safeTrades.filter(t => (t.profit || 0) < 0)
 
     let longestWinStreak = 0
     let longestLossStreak = 0
     let currentWinStreak = 0
     let currentLossStreak = 0
 
-    for (const trade of trades) {
+    for (const trade of safeTrades) {
       if ((trade.profit || 0) > 0) {
         currentWinStreak++
         currentLossStreak = 0
@@ -50,19 +51,23 @@ export class BacktestEngine {
       }
     }
 
+    const tradeProfits = safeTrades.map(t => t.profit || 0)
+    const bestTrade = tradeProfits.length > 0 ? Math.max(...tradeProfits, 0) : 0
+    const worstTrade = tradeProfits.length > 0 ? Math.min(...tradeProfits, 0) : 0
+
     return {
       longestWinStreak,
       longestLossStreak,
       avgTradeDuration: durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0,
-      bestTrade: Math.max(...trades.map(t => t.profit || 0), 0),
-      worstTrade: Math.min(...trades.map(t => t.profit || 0), 0),
+      bestTrade,
+      worstTrade,
       avgWinDuration: 0,
       avgLossDuration: 0
     }
   }
 
   private applyTradingCosts(trades: Trade[], config: BacktestConfig): Trade[] {
-    return trades.map(trade => {
+    return (trades || []).map(trade => {
       if (!trade.exitPrice) return trade
 
       const spreadCost = (config.spread / 10000) * trade.lots * 10
@@ -80,13 +85,14 @@ export class BacktestEngine {
 
   private calculateEquityCurve(trades: Trade[], initialBalance: number, data: OHLCV[]): EquityPoint[] {
     const curve: EquityPoint[] = []
+    const safeTrades = trades || []
     let balance = initialBalance
     let peak = initialBalance
     let tradeIndex = 0
 
-    for (const bar of data) {
-      while (tradeIndex < trades.length && trades[tradeIndex].exitTime === bar.time) {
-        balance += trades[tradeIndex].profit || 0
+    for (const bar of (data || [])) {
+      while (tradeIndex < safeTrades.length && safeTrades[tradeIndex].exitTime === bar.time) {
+        balance += safeTrades[tradeIndex].profit || 0
         tradeIndex++
       }
 
@@ -110,11 +116,11 @@ export class BacktestEngine {
   }
 
   private calculateMetrics(trades: Trade[], equityCurve: EquityPoint[], initialBalance: number): PerformanceMetrics {
-    const totalTrades = trades.length
-    const winningTrades = trades.filter(t => (t.profit || 0) > 0)
-    const losingTrades = trades.filter(t => (t.profit || 0) < 0)
+    const totalTrades = (trades || []).length
+    const winningTrades = (trades || []).filter(t => (t.profit || 0) > 0)
+    const losingTrades = (trades || []).filter(t => (t.profit || 0) < 0)
 
-    const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0)
+    const totalProfit = (trades || []).reduce((sum, t) => sum + (t.profit || 0), 0)
     const totalReturn = ((totalProfit / initialBalance) * 100)
     
     const grossProfit = winningTrades.reduce((sum, t) => sum + (t.profit || 0), 0)
@@ -126,8 +132,8 @@ export class BacktestEngine {
     const avgWin = winningTrades.length > 0 ? grossProfit / winningTrades.length : 0
     const avgLoss = losingTrades.length > 0 ? grossLoss / losingTrades.length : 0
 
-    const maxDrawdown = Math.max(...equityCurve.map(p => p.drawdown), 0)
-    const maxDrawdownPercent = Math.max(...equityCurve.map(p => p.drawdownPercent), 0)
+    const maxDrawdown = (equityCurve || []).length > 0 ? Math.max(...equityCurve.map(p => p.drawdown), 0) : 0
+    const maxDrawdownPercent = (equityCurve || []).length > 0 ? Math.max(...equityCurve.map(p => p.drawdownPercent), 0) : 0
 
     const returns = this.calculateReturns(equityCurve)
     const sharpeRatio = this.calculateSharpeRatio(returns)
@@ -141,7 +147,7 @@ export class BacktestEngine {
     let currentWinStreak = 0
     let currentLossStreak = 0
 
-    for (const trade of trades) {
+    for (const trade of (trades || [])) {
       if ((trade.profit || 0) > 0) {
         currentWinStreak++
         currentLossStreak = 0
@@ -178,28 +184,31 @@ export class BacktestEngine {
 
   private calculateReturns(equityCurve: EquityPoint[]): number[] {
     const returns: number[] = []
-    for (let i = 1; i < equityCurve.length; i++) {
-      const ret = (equityCurve[i].balance - equityCurve[i - 1].balance) / equityCurve[i - 1].balance
+    const safeCurve = equityCurve || []
+    for (let i = 1; i < safeCurve.length; i++) {
+      const ret = (safeCurve[i].balance - safeCurve[i - 1].balance) / safeCurve[i - 1].balance
       returns.push(ret)
     }
     return returns
   }
 
   private calculateSharpeRatio(returns: number[]): number {
-    if (returns.length === 0) return 0
+    const safeReturns = returns || []
+    if (safeReturns.length === 0) return 0
 
-    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length
-    const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length
+    const avgReturn = safeReturns.reduce((a, b) => a + b, 0) / safeReturns.length
+    const variance = safeReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / safeReturns.length
     const stdDev = Math.sqrt(variance)
 
     return stdDev > 0 ? (avgReturn / stdDev) * Math.sqrt(252) : 0
   }
 
   private calculateSortinoRatio(returns: number[]): number {
-    if (returns.length === 0) return 0
+    const safeReturns = returns || []
+    if (safeReturns.length === 0) return 0
 
-    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length
-    const negativeReturns = returns.filter(r => r < 0)
+    const avgReturn = safeReturns.reduce((a, b) => a + b, 0) / safeReturns.length
+    const negativeReturns = safeReturns.filter(r => r < 0)
 
     if (negativeReturns.length === 0) return 0
 
