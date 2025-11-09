@@ -1,7 +1,5 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { Function } from '@phosphor-icons/react'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 export interface IndicatorNodeData extends Record<string, unknown> {
@@ -16,52 +14,57 @@ export interface IndicatorNodeData extends Record<string, unknown> {
 
 export const IndicatorNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as IndicatorNodeData
+  const isDisabled = nodeData.disabled || false
+  
+  const inputs = nodeData.inputs || []
+  const outputs = nodeData.outputs || [{ id: 'output', label: 'Value' }]
   
   return (
     <div className={cn(
-      "px-4 py-3 rounded-lg bg-[#505050] min-w-[140px] transition-all relative shadow-lg border-2",
-      selected ? "border-[#ff1493]" : "border-[#606060]"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
       {nodeData.blockNumber !== undefined && (
         <div 
-          className="absolute -top-3 left-3 h-5 px-2 flex items-center justify-center rounded text-[10px] font-mono font-bold text-white"
-          style={{ backgroundColor: '#ff6b1a' }}
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#70a0ff' }}
         >
           {nodeData.blockNumber}
         </div>
       )}
       
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input"
-        className="!w-3 !h-3 !bg-white !border-2 !border-gray-500 !rounded-full"
-        style={{ 
-          top: -6
-        }}
-      />
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
       
-      <div className="flex items-center justify-center gap-2 mb-1">
-        <div className="font-medium text-xs text-white text-center">
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
           {nodeData.label}
         </div>
       </div>
       
-      {nodeData.indicatorType && (
-        <div className="text-[10px] text-gray-300 text-center">
-          {nodeData.indicatorType}
-        </div>
-      )}
-      
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="output"
-        className="!w-3 !h-3 !bg-[#ff8c00] !border-2 !border-gray-500 !rounded-full"
-        style={{ 
-          bottom: -6
-        }}
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#70a0ff] !border-2 !border-[#5080d0] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

@@ -1,61 +1,68 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { 
-  FloppyDisk, 
-  FileText, 
-  Trash
-} from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface FileOpsNodeData extends Record<string, unknown> {
   label: string
   fileOpType: 'write' | 'read' | 'delete'
   parameters?: Record<string, any>
-}
-
-const ICONS = {
-  write: FloppyDisk,
-  read: FileText,
-  delete: Trash
+  blockNumber?: number | string
 }
 
 export const FileOpsNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as FileOpsNodeData
-  const Icon = ICONS[nodeData.fileOpType] || FileText
+  const isDisabled = nodeData.disabled || false
+  const isRead = nodeData.fileOpType === 'read'
+  
+  const inputs = isRead ? [] : [{ id: 'trigger', label: 'Trigger' }]
+  const outputs = [{ id: 'output', label: isRead ? 'Data' : 'Done' }]
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-lg border-2 bg-card min-w-[140px] transition-all",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-amber-500"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="trigger"
-        className="w-2.5 h-2.5 !bg-amber-500 border-2 !border-amber-500"
-      />
-      
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1 rounded bg-amber-500/20">
-          <Icon size={12} weight="bold" className="text-amber-400" />
+      {nodeData.blockNumber !== undefined && (
+        <div 
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-black border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#f59e0b' }}
+        >
+          {nodeData.blockNumber}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-            File Ops
-          </div>
+      )}
+      
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
+      
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
+          {nodeData.label}
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="w-2.5 h-2.5 !bg-amber-500 border-2 !border-amber-500"
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#f59e0b] !border-2 !border-[#ea580c] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

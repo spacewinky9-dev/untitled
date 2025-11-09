@@ -1,61 +1,67 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { ChartLine, Equalizer, TrendUp } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface MTFNodeData extends Record<string, unknown> {
   label: string
   mtfType: 'mtf_indicator' | 'mtf_condition' | 'higher_timeframe_trend'
   parameters?: Record<string, any>
+  blockNumber?: number | string
 }
 
 export const MTFNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as MTFNodeData
+  const isDisabled = nodeData.disabled || false
   
-  const getIcon = () => {
-    switch (nodeData.mtfType) {
-      case 'mtf_indicator': return ChartLine
-      case 'mtf_condition': return Equalizer
-      case 'higher_timeframe_trend': return TrendUp
-      default: return ChartLine
-    }
-  }
-  
-  const Icon = getIcon()
+  const inputs = [{ id: 'input', label: 'Input' }]
+  const outputs = [{ id: 'output', label: 'Value' }]
   
   return (
     <div className={cn(
-      "px-4 py-3 rounded-lg border-2 bg-card min-w-[180px] transition-all",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-cyan-500"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input"
-        className="w-3 h-3 !bg-cyan-500 border-2 !border-cyan-500"
-      />
-      
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1.5 rounded bg-cyan-500/20">
-          <Icon size={16} weight="bold" className="text-cyan-400" />
+      {nodeData.blockNumber !== undefined && (
+        <div 
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#06b6d4' }}
+        >
+          {nodeData.blockNumber}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5 truncate">
-            Multi-Timeframe
-          </div>
+      )}
+      
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
+      
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
+          {nodeData.label}
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="w-3 h-3 !bg-cyan-500 border-2 !border-cyan-500"
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#06b6d4] !border-2 !border-[#0891b2] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

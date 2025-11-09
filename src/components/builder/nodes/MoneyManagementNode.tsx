@@ -1,72 +1,67 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { 
-  CurrencyDollar, 
-  ChartLineUp, 
-  ArrowsClockwise, 
-  TrendUp,
-  ListNumbers,
-  ShieldCheck,
-  Equals,
-  MathOperations,
-  Percent
-} from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface MoneyManagementNodeData extends Record<string, unknown> {
   label: string
   moneyManagementType: 'risk_percent' | 'fibonacci' | 'martingale' | 'anti_martingale' | 'custom_sequence' | 'recovery_zones' | 'fixed_ratio' | 'kelly_criterion'
   parameters?: Record<string, any>
-}
-
-const ICONS = {
-  risk_percent: Percent,
-  fibonacci: ChartLineUp,
-  martingale: ArrowsClockwise,
-  anti_martingale: TrendUp,
-  custom_sequence: ListNumbers,
-  recovery_zones: ShieldCheck,
-  fixed_ratio: Equals,
-  kelly_criterion: MathOperations
+  blockNumber?: number | string
 }
 
 export const MoneyManagementNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as MoneyManagementNodeData
-  const Icon = ICONS[nodeData.moneyManagementType] || CurrencyDollar
+  const isDisabled = nodeData.disabled || false
+  
+  const inputs = [{ id: 'trigger', label: 'Trigger' }]
+  const outputs = [{ id: 'lot_size', label: 'Lot Size' }]
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-lg border-2 bg-card min-w-[140px] transition-all",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-emerald-500"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="trigger"
-        className="w-2.5 h-2.5 !bg-emerald-500 border-2 !border-emerald-500"
-      />
-      
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1 rounded bg-emerald-500/20">
-          <Icon size={12} weight="bold" className="text-emerald-400" />
+      {nodeData.blockNumber !== undefined && (
+        <div 
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#10b981' }}
+        >
+          {nodeData.blockNumber}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-            Money Mgmt
-          </div>
+      )}
+      
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
+      
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
+          {nodeData.label}
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="lot_size"
-        className="w-2.5 h-2.5 !bg-emerald-500 border-2 !border-emerald-500"
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#10b981] !border-2 !border-[#059669] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

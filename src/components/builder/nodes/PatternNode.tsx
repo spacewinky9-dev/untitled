@@ -1,62 +1,67 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { Barcode, ChartLine, LineSegment, ArrowsOutCardinal } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface PatternNodeData extends Record<string, unknown> {
   label: string
   patternType: 'candlestick_pattern' | 'chart_pattern' | 'support_resistance' | 'divergence'
   parameters?: Record<string, any>
+  blockNumber?: number | string
 }
 
 export const PatternNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as PatternNodeData
+  const isDisabled = nodeData.disabled || false
   
-  const getIcon = () => {
-    switch (nodeData.patternType) {
-      case 'candlestick_pattern': return Barcode
-      case 'chart_pattern': return ChartLine
-      case 'support_resistance': return LineSegment
-      case 'divergence': return ArrowsOutCardinal
-      default: return Barcode
-    }
-  }
-  
-  const Icon = getIcon()
+  const inputs = [{ id: 'input', label: 'Input' }]
+  const outputs = [{ id: 'output', label: 'Detected' }]
   
   return (
     <div className={cn(
-      "px-4 py-3 rounded-lg border-2 bg-card min-w-[180px] transition-all",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-green-500"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="input"
-        className="w-3 h-3 !bg-green-500 border-2 !border-green-500"
-      />
-      
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1.5 rounded bg-green-500/20">
-          <Icon size={16} weight="bold" className="text-green-400" />
+      {nodeData.blockNumber !== undefined && (
+        <div 
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#22c55e' }}
+        >
+          {nodeData.blockNumber}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5 truncate">
-            Pattern Detection
-          </div>
+      )}
+      
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
+      
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
+          {nodeData.label}
         </div>
       </div>
       
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="output"
-        className="w-3 h-3 !bg-green-500 border-2 !border-green-500"
-      />
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#22c55e] !border-2 !border-[#16a34a] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

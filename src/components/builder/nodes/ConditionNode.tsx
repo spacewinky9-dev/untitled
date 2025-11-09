@@ -1,7 +1,5 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { GitBranch } from '@phosphor-icons/react'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 export interface ConditionNodeData extends Record<string, unknown> {
@@ -17,77 +15,63 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as ConditionNodeData
   const isDisabled = nodeData.disabled || false
   
+  const inputs = nodeData.inputs || [{ id: 'input-a', label: 'A' }, { id: 'input-b', label: 'B' }]
   const outputs = nodeData.outputs || [
-    { id: 'true', label: 'Normal', type: 'normal' as const },
-    { id: 'false', label: 'Inverted', type: 'inverted' as const }
+    { id: 'true', label: 'True', type: 'normal' as const },
+    { id: 'false', label: 'False', type: 'inverted' as const }
   ]
   
   const getHandleColor = (type: 'normal' | 'inverted') => {
-    return type === 'normal' ? '#f97316' : '#facc15'
+    return type === 'normal' ? '#16a34a' : '#facc15'
   }
   
   return (
     <div className={cn(
-      "px-4 py-3 rounded-xl border-2 bg-[oklch(0.35_0.015_260)] min-w-[160px] transition-all relative shadow-lg",
-      selected ? "border-[#f59e0b] shadow-xl shadow-[#f59e0b]/30" : "border-[oklch(0.40_0.015_260)]",
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
       isDisabled && "opacity-50"
     )}>
       {nodeData.blockNumber !== undefined && (
         <div 
-          className="absolute -top-3 left-3 h-6 px-2 flex items-center justify-center rounded-md text-[11px] font-mono font-bold text-black border-2 border-[oklch(0.25_0.01_260)]"
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-black border-2 border-[oklch(0.25_0.01_260)] shadow-md"
           style={{ backgroundColor: '#fbbf24' }}
         >
           {nodeData.blockNumber}
         </div>
       )}
       
-      <Handle
-        type="target"
-        position={Position.Top}
-        id="input"
-        className="!w-[14px] !h-[14px] !bg-white !border-2 !border-[#9ca3af] !rounded-full"
-        style={{ 
-          top: -7,
-          left: '50%',
-          transform: 'translateX(-50%)'
-        }}
-      />
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
       
-      <div className="flex items-center gap-2 mb-2">
-        <div className="font-semibold text-sm text-foreground">
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
           {nodeData.label}
         </div>
       </div>
       
-      {nodeData.operator && (
-        <div className="text-[11px] text-muted-foreground mb-2">
-          {nodeData.operator}
-        </div>
-      )}
-      
-      <div className="flex gap-4 justify-center pt-2">
-        {outputs.map((output, index) => (
-          <div key={output.id} className="relative flex flex-col items-center gap-1">
-            <div className="text-[10px] text-muted-foreground">
-              {output.label}
-            </div>
-            <Handle
-              type="source"
-              position={Position.Bottom}
-              id={output.id}
-              className="!w-[14px] !h-[14px] !rounded-full !border-2 !border-[oklch(0.25_0.01_260)]"
-              style={{ 
-                backgroundColor: getHandleColor(output.type),
-                position: 'relative',
-                bottom: 'auto',
-                left: 'auto',
-                transform: 'none',
-                marginTop: 0
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      {outputs.map((output, idx) => (
+        <Handle
+          key={output.id}
+          type="source"
+          position={Position.Right}
+          id={output.id}
+          className="!w-2.5 !h-2.5 !rounded-sm !border-2 !border-[oklch(0.25_0.01_260)]"
+          style={{ 
+            backgroundColor: getHandleColor(output.type),
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
     </div>
   )
 })

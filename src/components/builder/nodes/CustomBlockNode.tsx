@@ -1,9 +1,5 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { 
-  Package, 
-  Cube
-} from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface CustomBlockNodeData extends Record<string, unknown> {
@@ -12,77 +8,61 @@ export interface CustomBlockNodeData extends Record<string, unknown> {
   parameters?: Record<string, any>
   inputs?: Array<{ id: string; label: string }>
   outputs?: Array<{ id: string; label: string }>
+  blockNumber?: number | string
 }
 
 export const CustomBlockNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as CustomBlockNodeData
-  const Icon = nodeData.customBlockType === 'create' ? Package : Cube
-  const inputs = nodeData.inputs || []
-  const outputs = nodeData.outputs || []
+  const isDisabled = nodeData.disabled || false
+  const inputs = nodeData.inputs || [{ id: 'input', label: 'Input' }]
+  const outputs = nodeData.outputs || [{ id: 'output', label: 'Output' }]
   
   return (
     <div className={cn(
-      "px-3 py-2 rounded-lg border-2 bg-card min-w-[140px] transition-all",
-      selected ? "border-primary shadow-lg shadow-primary/20" : "border-border",
-      "border-l-4 border-l-rose-500"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
-      {inputs.length > 0 ? (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-          {inputs.map((input, idx) => (
-            <Handle
-              key={input.id}
-              type="target"
-              position={Position.Left}
-              id={input.id}
-              style={{ top: `${((idx + 1) / (inputs.length + 1)) * 100}%` }}
-              className="w-2.5 h-2.5 !bg-rose-500 border-2 !border-rose-500"
-            />
-          ))}
+      {nodeData.blockNumber !== undefined && (
+        <div 
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
+          style={{ backgroundColor: '#f43f5e' }}
+        >
+          {nodeData.blockNumber}
         </div>
-      ) : (
-        <Handle
-          type="target"
-          position={Position.Left}
-          id="input"
-          className="w-2.5 h-2.5 !bg-rose-500 border-2 !border-rose-500"
-        />
       )}
       
-      <div className="flex items-start gap-2">
-        <div className="flex-shrink-0 p-1 rounded bg-rose-500/20">
-          <Icon size={12} weight="bold" className="text-rose-400" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-xs text-foreground truncate">
-            {nodeData.label}
-          </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-            Custom Block
-          </div>
+      {inputs.map((input, idx) => (
+        <Handle
+          key={input.id}
+          type="target"
+          position={Position.Left}
+          id={input.id}
+          className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (inputs.length - 1) / 2) * 16}%`
+          }}
+        />
+      ))}
+      
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-foreground text-center leading-tight">
+          {nodeData.label}
         </div>
       </div>
       
-      {outputs.length > 0 ? (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-          {outputs.map((output, idx) => (
-            <Handle
-              key={output.id}
-              type="source"
-              position={Position.Right}
-              id={output.id}
-              style={{ top: `${((idx + 1) / (outputs.length + 1)) * 100}%` }}
-              className="w-2.5 h-2.5 !bg-rose-500 border-2 !border-rose-500"
-            />
-          ))}
-        </div>
-      ) : (
+      {outputs.map((output, idx) => (
         <Handle
+          key={output.id}
           type="source"
           position={Position.Right}
-          id="output"
-          className="w-2.5 h-2.5 !bg-rose-500 border-2 !border-rose-500"
+          id={output.id}
+          className="!w-2.5 !h-2.5 !bg-[#f43f5e] !border-2 !border-[#e11d48] !rounded-sm"
+          style={{ 
+            top: `${50 + (idx - (outputs.length - 1) / 2) * 16}%`
+          }}
         />
-      )}
+      ))}
     </div>
   )
 })

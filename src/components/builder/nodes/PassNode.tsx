@@ -1,7 +1,5 @@
 import { memo } from 'react'
 import { Handle, Position, NodeProps } from '@xyflow/react'
-import { Circle } from '@phosphor-icons/react'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 export interface PassNodeData extends Record<string, unknown> {
@@ -12,15 +10,17 @@ export interface PassNodeData extends Record<string, unknown> {
 
 export const PassNode = memo(({ data, selected }: NodeProps) => {
   const nodeData = data as PassNodeData
+  const isDisabled = nodeData.disabled || false
   
   return (
     <div className={cn(
-      "px-4 py-3 rounded-xl border-2 border-dashed bg-[oklch(0.35_0.015_260)] min-w-[140px] transition-all relative shadow-lg",
-      selected ? "border-[#f59e0b] shadow-xl shadow-[#f59e0b]/30" : "border-[oklch(0.40_0.015_260)]"
+      "px-3 py-1.5 rounded-md bg-[oklch(0.35_0.015_260)] min-w-[120px] transition-all relative border border-dashed border-[oklch(0.45_0.015_260)]",
+      selected ? "ring-2 ring-[#f59e0b] ring-offset-1 ring-offset-[oklch(0.25_0.01_260)]" : "",
+      isDisabled && "opacity-50"
     )}>
       {nodeData.blockNumber !== undefined && (
         <div 
-          className="absolute -top-3 left-3 h-6 px-2 flex items-center justify-center rounded-md text-[11px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)]"
+          className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-mono font-bold text-white border-2 border-[oklch(0.25_0.01_260)] shadow-md"
           style={{ backgroundColor: '#6b7280' }}
         >
           {nodeData.blockNumber}
@@ -29,47 +29,29 @@ export const PassNode = memo(({ data, selected }: NodeProps) => {
       
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         id="input"
-        className="!w-[14px] !h-[14px] !bg-white !border-2 !border-[#9ca3af] !rounded-full"
+        className="!w-2.5 !h-2.5 !bg-white !border-2 !border-[#6b7280] !rounded-sm"
         style={{ 
-          top: -7,
-          left: '50%',
-          transform: 'translateX(-50%)'
+          top: '50%'
         }}
       />
       
-      <div className="flex items-center gap-2 mb-2">
-        <div className="font-semibold text-sm text-foreground">
+      <div className="flex items-center justify-center">
+        <div className="font-semibold text-xs text-muted-foreground text-center leading-tight italic">
           {nodeData.label}
         </div>
       </div>
       
-      <div className="text-[11px] text-muted-foreground mb-2 italic">
-        Empty block
-      </div>
-      
-      <div className="flex justify-center pt-2">
-        <div className="relative flex flex-col items-center gap-1">
-          <div className="text-[10px] text-muted-foreground">
-            Output
-          </div>
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="output"
-            className="!w-[14px] !h-[14px] !rounded-full !border-2 !border-[oklch(0.25_0.01_260)]"
-            style={{ 
-              backgroundColor: '#f97316',
-              position: 'relative',
-              bottom: 'auto',
-              left: 'auto',
-              transform: 'none',
-              marginTop: 0
-            }}
-          />
-        </div>
-      </div>
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="output"
+        className="!w-2.5 !h-2.5 !bg-[#6b7280] !border-2 !border-[#52525b] !rounded-sm"
+        style={{ 
+          top: '50%'
+        }}
+      />
     </div>
   )
 })
