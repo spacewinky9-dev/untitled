@@ -5,6 +5,8 @@ import { TRADING_CONDITION_DEFINITIONS } from './trading-conditions-nodes'
 import { BUY_SELL_DEFINITIONS } from './buy-sell-nodes'
 import { BUCKET_DEFINITIONS } from './bucket-nodes'
 import { LOOP_DEFINITIONS } from './loop-nodes'
+import { TRAILING_STOP_DEFINITIONS } from './trailing-stop-nodes'
+import { TRADING_ACTIONS_DEFINITIONS } from './trading-actions-nodes'
 
 export type NodeCategory = 'indicator' | 'condition' | 'action' | 'logic' | 'risk' | 'event' | 'pattern' | 'mtf' | 'variable' | 'advanced' | 'money_management' | 'graphical' | 'messaging' | 'file_ops' | 'terminal' | 'custom'
 
@@ -575,6 +577,8 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
   ...BUY_SELL_DEFINITIONS,
   ...BUCKET_DEFINITIONS,
   ...LOOP_DEFINITIONS,
+  ...TRAILING_STOP_DEFINITIONS,
+  ...TRADING_ACTIONS_DEFINITIONS,
   {
     id: 'on_init',
     type: 'event',

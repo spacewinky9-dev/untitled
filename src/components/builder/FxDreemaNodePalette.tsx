@@ -142,9 +142,19 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
     {
       category: 'trailing',
       label: 'Trailing Stop / Break Even',
-      color: '#D4AC6E',
+      color: '#7BA5C8',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['trailing_stop', 'break_even', 'trailing_stop_advanced', 'trail_group'].includes(n.id)
+        n.id.includes('break_even') || n.id.includes('trailing_stop') ||
+        n.id.includes('trailing_money') || n.id.includes('trailing_pending')
+      )
+    },
+    {
+      category: 'trading_actions',
+      label: 'Trading Actions',
+      color: '#5A8FB0',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('modify_stops') || n.id.includes('close_') ||
+        n.id.includes('delete_pending')
       )
     },
     {
