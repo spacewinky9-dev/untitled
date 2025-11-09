@@ -116,9 +116,22 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
   const [currentProject, setCurrentProject] = useKV<ProjectConfig | null>('currentProject', null)
   const [showLoadDialog, setShowLoadDialog] = useState(false)
+  const [hasSeenRenameTip, setHasSeenRenameTip] = useKV<boolean>('hasSeenRenameTip', false)
   
   const history = useHistory()
   const clipboard = useClipboard()
+
+  useEffect(() => {
+    if (!hasSeenRenameTip && nodes.length === 0) {
+      const timer = setTimeout(() => {
+        toast.info('💡 Tip: Double-click or press F2 to rename any node!', {
+          duration: 5000
+        })
+        setHasSeenRenameTip(true)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [hasSeenRenameTip, setHasSeenRenameTip, nodes.length])
 
   useEffect(() => {
     if (pendingLoadStrategyId) {
@@ -169,6 +182,11 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
         handleDuplicate()
       }
       
+      if (event.key === 'F2' && !isInputField && selectedNode) {
+        event.preventDefault()
+        setShowEditLabelDialog(true)
+      }
+      
       if ((event.key === 'Delete' || event.key === 'Backspace') && !isInputField) {
         event.preventDefault()
         onDeleteSelected()
@@ -177,7 +195,7 @@ export function Canvas({ pendingLoadStrategyId, onStrategyLoaded }: CanvasProps 
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [nodes, edges, clipboard])
+  }, [nodes, edges, clipboard, selectedNode])
 
   const handleUndo = useCallback(() => {
     const state = history.undo()

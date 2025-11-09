@@ -79,7 +79,7 @@ export function InlineNodeEditor({
       onBlur={handleSave}
       onKeyDown={handleKeyDown}
       className={cn(
-        "h-auto px-1 py-0 text-xs font-semibold text-center border-primary bg-background/90",
+        "h-auto px-1 py-0 text-xs font-semibold text-center border-2 border-primary bg-background shadow-lg ring-2 ring-primary/20",
         className
       )}
       onClick={(e) => e.stopPropagation()}

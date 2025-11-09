@@ -80,6 +80,7 @@ export function ContextMenuWrapper({
             <ContextMenuItem onClick={onEditTitle} className="gap-2">
               <PencilSimple size={16} />
               Edit Title
+              <span className="ml-auto text-xs text-muted-foreground">F2</span>
             </ContextMenuItem>
             <ContextMenuItem onClick={onShowInfo} className="gap-2">
               <Info size={16} />
