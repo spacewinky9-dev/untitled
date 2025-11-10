@@ -16,6 +16,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -fopenmp")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 
+# Add AVX2 flags if enabled
+if(USE_AVX2)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
+  add_definitions(-D__AVX2__)
+  message(STATUS "AVX2 vectorization enabled")
+endif()
+
 # Options
 option(BUILD_TESTS "Build test suite" ON)
 option(BUILD_PYTHON_BINDINGS "Build Python bindings with pybind11" ON)
@@ -91,6 +98,9 @@ endif()
 # Kernel library (C++ kernels)
 set(VGPU_KERNEL_SOURCES
   src/cpp/kernels/matmul_basic.cpp
+  src/cpp/kernels/matmul_blocked.cpp
+  src/cpp/kernels/matmul_avx2.cpp
+  src/cpp/runtime/autotuner.cpp
 )
 
 add_library(vgpu_kernels STATIC ${VGPU_KERNEL_SOURCES})

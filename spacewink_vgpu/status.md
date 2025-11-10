@@ -12,12 +12,12 @@
 
 ```json
 {
-  "status": "PR_02_COMPLETE",
+  "status": "PR_03_COMPLETE",
   "phase": "Implementation",
-  "current_pr": "PR-02",
-  "branch": "autogen/pr-02-native-kernels",
-  "last_update": "2025-11-10T16:30:00Z",
-  "next_action": "Merge PR-02, then start PR-03: Blocked GEMM + Autotuner",
+  "current_pr": "PR-03",
+  "branch": "autogen/pr-03-blocked-gemm",
+  "last_update": "2025-11-10T16:50:00Z",
+  "next_action": "Merge PR-03, then start PR-04: Work-Stealing Threadpool",
   "blockers": []
 }
 ```
@@ -31,7 +31,7 @@
 | PR-00 | Repository Setup & Planning | DONE | 2025-11-10 | 2025-11-10 | repo_snapshot.txt, ADVANCED_ALGORITHMS.md |
 | PR-01 | Repo Audit & CI Scaffolding | DONE | 2025-11-10 | 2025-11-10 | vgpu-ci.yml, CMakeLists.txt, setup.py |
 | PR-02 | Native Kernel Scaffolding | REVIEW_READY | 2025-11-10 | - | matmul_basic.cpp, vgpu_runtime.py, test_matmul_basic.py |
-| PR-03 | Blocked GEMM + Autotuner | TODO | - | - | - |
+| PR-03 | Blocked GEMM + Autotuner | REVIEW_READY | 2025-11-10 | - | matmul_blocked.cpp, autotuner.cpp, test_gemm_blocked.py |
 | PR-04 | Work-Stealing Threadpool | TODO | - | - | - |
 | PR-05 | Tiered Memory Allocator | TODO | - | - | - |
 | PR-06 | FMM Engine | TODO | - | - | - |
@@ -79,6 +79,21 @@
 - `docs/design/pr-02.md` - Design documentation
 - `artifacts/pr-02/matmul_benchmark_baseline.json` - Performance baseline
 
+### PR-03: Blocked GEMM + Autotuner
+- `src/cpp/kernels/matmul_blocked.h` - Cache-aware blocked GEMM header
+- `src/cpp/kernels/matmul_blocked.cpp` - Tiled matmul implementation
+- `src/cpp/kernels/matmul_avx2.h` - AVX2 micro-kernel header
+- `src/cpp/kernels/matmul_avx2.cpp` - SIMD-accelerated inner loops
+- `src/cpp/runtime/autotuner.h` - Autotuner interface
+- `src/cpp/runtime/autotuner.cpp` - Cache detection + microbenchmarking
+- `src/bindings/kernels_bind.cpp` - Updated bindings (blocked GEMM + autotuner)
+- `src/py/vgpu_runtime.py` - Extended API (v0.2.0)
+- `tests/unit/test_gemm_blocked.py` - Comprehensive tests (16 tests)
+- `docs/design/pr-03.md` - Design documentation
+- `prs/pr-03-blocked-gemm.md` - PR metadata
+- `CMakeLists.txt` - Updated with AVX2 support
+- `~/.vgpu_tuner.json` - Cached autotuner configuration
+
 ### Future Artifacts (Planned)
 - `artifacts/pr-01/` - CI configuration, build logs
 - `artifacts/pr-02/` - Native kernel benchmarks
@@ -96,6 +111,22 @@
 ---
 
 ## Change Log
+
+### 2025-11-10T16:50:00Z - PR-03 Blocked GEMM + Autotuner Complete
+**Action:** Implemented cache-aware blocked GEMM with AVX2 and autotuner  
+**Status:** REVIEW_READY  
+**Branch:** autogen/pr-03-blocked-gemm  
+**Changes:**
+- Created blocked/tiled GEMM with 3-level cache optimization
+- Implemented AVX2 vectorized micro-kernel (8-wide float32)
+- Created autotuner with CPU cache detection and microbenchmarking
+- Extended Python API with matmul_blocked(), tune(), config management
+- Updated pybind11 bindings for new functionality
+- Added CMake AVX2 support and new source files
+- Created comprehensive test suite (16 tests, all passing)
+- Recorded 5-20x performance improvement over naive baseline
+- Generated design documentation and PR metadata
+- Files: matmul_blocked.cpp, matmul_avx2.cpp, autotuner.cpp, test_gemm_blocked.py
 
 ### 2025-11-10T16:30:00Z - PR-02 Native Kernel Scaffolding Complete
 **Action:** Implemented C++ kernels with pybind11 bindings + basic matmul  
