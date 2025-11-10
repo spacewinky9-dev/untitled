@@ -12,12 +12,12 @@
 
 ```json
 {
-  "status": "PR_03_COMPLETE",
+  "status": "PR_04_COMPLETE",
   "phase": "Implementation",
-  "current_pr": "PR-03",
-  "branch": "autogen/pr-03-blocked-gemm",
-  "last_update": "2025-11-10T16:50:00Z",
-  "next_action": "Merge PR-03, then start PR-04: Work-Stealing Threadpool",
+  "current_pr": "PR-04",
+  "branch": "autogen/pr-04-threadpool",
+  "last_update": "2025-11-10T17:33:00Z",
+  "next_action": "Merge PR-04, then start PR-05: Tiered Memory Allocator",
   "blockers": []
 }
 ```
@@ -32,7 +32,7 @@
 | PR-01 | Repo Audit & CI Scaffolding | DONE | 2025-11-10 | 2025-11-10 | vgpu-ci.yml, CMakeLists.txt, setup.py |
 | PR-02 | Native Kernel Scaffolding | REVIEW_READY | 2025-11-10 | - | matmul_basic.cpp, vgpu_runtime.py, test_matmul_basic.py |
 | PR-03 | Blocked GEMM + Autotuner | REVIEW_READY | 2025-11-10 | - | matmul_blocked.cpp, autotuner.cpp, test_gemm_blocked.py |
-| PR-04 | Work-Stealing Threadpool | TODO | - | - | - |
+| PR-04 | Work-Stealing Threadpool | REVIEW_READY | 2025-11-10 | - | threadpool.cpp, numa_utils.cpp, test_threadpool.py |
 | PR-05 | Tiered Memory Allocator | TODO | - | - | - |
 | PR-06 | FMM Engine | TODO | - | - | - |
 | PR-07 | FFT Engine | TODO | - | - | - |
@@ -93,6 +93,19 @@
 - `prs/pr-03-blocked-gemm.md` - PR metadata
 - `CMakeLists.txt` - Updated with AVX2 support
 - `~/.vgpu_tuner.json` - Cached autotuner configuration
+
+### PR-04: Work-Stealing Threadpool
+- `src/cpp/runtime/threadpool.h` - Thread pool interface
+- `src/cpp/runtime/threadpool.cpp` - Work-stealing implementation
+- `src/cpp/runtime/numa_utils.h` - NUMA detection interface
+- `src/cpp/runtime/numa_utils.cpp` - NUMA topology parsing
+- `src/cpp/runtime/task.h` - Task and Future abstractions
+- `src/bindings/kernels_bind.cpp` - Updated bindings (threadpool)
+- `src/py/vgpu_runtime.py` - Extended API (v0.3.0)
+- `tests/unit/test_threadpool.py` - Comprehensive tests (14 tests)
+- `docs/design/pr-04.md` - Design documentation
+- `prs/pr-04-threadpool.md` - PR metadata
+- `CMakeLists.txt` - Updated with pthread linking
 
 ### Future Artifacts (Planned)
 - `artifacts/pr-01/` - CI configuration, build logs
