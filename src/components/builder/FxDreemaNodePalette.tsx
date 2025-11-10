@@ -84,76 +84,155 @@ export function FxDreemaNodePalette({ onNodeAdd }: FxDreemaNodePaletteProps) {
       category: 'indicators',
       label: 'Conditions for Indicators',
       color: '#F4D88A',
-      nodes: NODE_DEFINITIONS.filter(n => n.category === 'indicator')
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('indicator_') || 
+        n.id.includes('price_above_indicator') ||
+        n.id.includes('price_below_indicator') ||
+        n.id.includes('two_indicators_cross')
+      )
     },
     {
       category: 'timefilters',
       label: 'Time Filters',
       color: '#C4DC96',
-      nodes: NODE_DEFINITIONS.filter(n => n.id === 'time_filter')
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('_filter') && (
+          n.id.includes('time') || n.id.includes('month') || n.id.includes('weekday') ||
+          n.id.includes('hours') || n.id.includes('minutes') || n.id.includes('seconds') ||
+          n.id.includes('spread')
+        ) || n.id.includes('once_') || n.id.includes('every_n')
+      )
     },
     {
       category: 'trades_count',
       label: 'Check Trades & Orders Count',
       color: '#D9BD6A',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['trades_count', 'trade_exists', 'pending_exists'].includes(n.id)
+        n.id.includes('check_trades') || n.id.includes('check_pending') ||
+        n.id.includes('if_trade') || n.id.includes('if_pending') ||
+        n.id.includes('no_trade') || n.id.includes('no_pending')
       )
     },
     {
       category: 'trading_conditions',
       label: 'Check Trading Conditions',
-      color: '#D9BD6A',
-      nodes: NODE_DEFINITIONS.filter(n => ['spread_filter', 'dynamic_value_check'].includes(n.id))
+      color: '#B3D9FF',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('balance_') || n.id.includes('equity_') ||
+        n.id.includes('margin_') || n.id.includes('free_margin_') ||
+        n.id.includes('profit_') || n.id.includes('floating_profit_')
+      )
     },
     {
       category: 'buysell',
       label: 'Buy / Sell',
-      color: '#E74C3C',
-      nodes: NODE_DEFINITIONS.filter(n => ['buy', 'sell', 'close'].includes(n.id))
+      color: '#00FF00',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('buy_market') || n.id.includes('sell_market') ||
+        n.id.includes('buy_limit') || n.id.includes('sell_limit') ||
+        n.id.includes('buy_stop') || n.id.includes('sell_stop')
+      )
     },
     {
       category: 'bucket',
       label: 'Bucket of Trades & Orders',
-      color: '#5DADE2',
-      nodes: NODE_DEFINITIONS.filter(n => ['trade_group', 'for_each_trade'].includes(n.id))
+      color: '#6B8EFF',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('all_trades') || n.id.includes('all_buy_trades') ||
+        n.id.includes('all_sell_trades') || n.id.includes('oldest_') ||
+        n.id.includes('newest_') || n.id.includes('most_profitable') ||
+        n.id.includes('least_profitable') || n.id.includes('all_pending') ||
+        n.id.includes('all_buy_orders') || n.id.includes('all_sell_orders') ||
+        n.id.includes('trades_by_magic')
+      )
     },
     {
       category: 'loop',
       label: 'Loop for Trades & Orders',
-      color: '#BB8FCE',
+      color: '#FF00FF',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['for_each_trade', 'for_each_pending', 'for_each_symbol', 'repeat_n'].includes(n.id)
+        n.id.includes('loop_') && (
+          n.id.includes('trades') || n.id.includes('orders')
+        )
       )
     },
     {
       category: 'trailing',
       label: 'Trailing Stop / Break Even',
-      color: '#D4AC6E',
+      color: '#7BA5C8',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['trailing_stop', 'break_even', 'trailing_stop_advanced', 'trail_group'].includes(n.id)
+        n.id.includes('break_even') || n.id.includes('trailing_stop') ||
+        n.id.includes('trailing_money') || n.id.includes('trailing_pending')
       )
     },
     {
       category: 'trading_actions',
       label: 'Trading Actions',
-      color: '#F39C12',
+      color: '#5A8FB0',
       nodes: NODE_DEFINITIONS.filter(n => 
-        ['buy_limit', 'sell_limit', 'buy_stop', 'sell_stop', 'modify_pending', 
-         'delete_pending', 'stop-loss', 'take-profit', 'position-size', 'trailing-stop'].includes(n.id)
+        n.id.includes('modify_stops') || n.id.includes('close_') ||
+        n.id.includes('delete_pending')
       )
     },
     {
       category: 'chart_objects',
       label: 'Chart & Objects',
-      color: '#CD853F',
-      nodes: NODE_DEFINITIONS.filter(n => n.category === 'graphical')
+      color: '#FF8C69',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('draw_') || n.id.includes('delete_chart')
+      )
     },
     {
       category: 'loop_chart',
       label: 'Loop for Chart Objects',
-      color: '#E67E22',
-      nodes: NODE_DEFINITIONS.filter(n => n.id === 'delete_object')
+      color: '#FF9955',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('loop_chart_') || n.id.includes('loop_all_chart') ||
+        n.id.includes('loop_chart_lines') || n.id.includes('loop_chart_shapes')
+      )
+    },
+    {
+      category: 'output',
+      label: 'Output & Communication',
+      color: '#FFEB3B',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('send_') || n.id.includes('print_') ||
+        n.id.includes('comment_') || n.id.includes('play_sound')
+      )
+    },
+    {
+      category: 'signals',
+      label: 'Various Signals',
+      color: '#FFD700',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('signal_')
+      )
+    },
+    {
+      category: 'controls',
+      label: 'Controlling Blocks',
+      color: '#E6D5B8',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('if_else') || n.id.includes('while_') ||
+        n.id.includes('for_loop') || n.id.includes('break') ||
+        n.id.includes('continue') || n.id.includes('wait')
+      )
+    },
+    {
+      category: 'flags',
+      label: 'Flags',
+      color: '#98D98E',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('flag_')
+      )
+    },
+    {
+      category: 'counters',
+      label: 'Counters',
+      color: '#7BC8A4',
+      nodes: NODE_DEFINITIONS.filter(n => 
+        n.id.includes('counter_')
+      )
     },
     {
       category: 'output',
