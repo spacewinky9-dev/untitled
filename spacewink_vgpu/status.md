@@ -12,12 +12,12 @@
 
 ```json
 {
-  "status": "PR_01_COMPLETE",
+  "status": "PR_02_COMPLETE",
   "phase": "Implementation",
-  "current_pr": "PR-01",
-  "branch": "autogen/pr-01-ci",
-  "last_update": "2025-11-10T16:12:00Z",
-  "next_action": "Merge PR-01, then start PR-02: Native kernel scaffolding",
+  "current_pr": "PR-02",
+  "branch": "autogen/pr-02-native-kernels",
+  "last_update": "2025-11-10T16:30:00Z",
+  "next_action": "Merge PR-02, then start PR-03: Blocked GEMM + Autotuner",
   "blockers": []
 }
 ```
@@ -29,8 +29,8 @@
 | PR # | Title | Status | Started | Completed | Artifacts |
 |------|-------|--------|---------|-----------|-----------|
 | PR-00 | Repository Setup & Planning | DONE | 2025-11-10 | 2025-11-10 | repo_snapshot.txt, ADVANCED_ALGORITHMS.md |
-| PR-01 | Repo Audit & CI Scaffolding | REVIEW_READY | 2025-11-10 | - | vgpu-ci.yml, CMakeLists.txt, setup.py |
-| PR-02 | Native Kernel Scaffolding | TODO | - | - | - |
+| PR-01 | Repo Audit & CI Scaffolding | DONE | 2025-11-10 | 2025-11-10 | vgpu-ci.yml, CMakeLists.txt, setup.py |
+| PR-02 | Native Kernel Scaffolding | REVIEW_READY | 2025-11-10 | - | matmul_basic.cpp, vgpu_runtime.py, test_matmul_basic.py |
 | PR-03 | Blocked GEMM + Autotuner | TODO | - | - | - |
 | PR-04 | Work-Stealing Threadpool | TODO | - | - | - |
 | PR-05 | Tiered Memory Allocator | TODO | - | - | - |
@@ -70,6 +70,15 @@
 - `spacewink_vgpu/prd.md` - Product requirements with PR breakdown
 - `spacewink_vgpu/README.md` - Project documentation
 
+### PR-02: Native Kernel Scaffolding
+- `src/cpp/kernels/matmul_basic.h` - Matrix multiplication header
+- `src/cpp/kernels/matmul_basic.cpp` - Naive matmul implementation
+- `src/bindings/kernels_bind.cpp` - pybind11 bindings
+- `src/py/vgpu_runtime.py` - Python API
+- `tests/unit/test_matmul_basic.py` - Comprehensive tests (13 tests)
+- `docs/design/pr-02.md` - Design documentation
+- `artifacts/pr-02/matmul_benchmark_baseline.json` - Performance baseline
+
 ### Future Artifacts (Planned)
 - `artifacts/pr-01/` - CI configuration, build logs
 - `artifacts/pr-02/` - Native kernel benchmarks
@@ -87,6 +96,21 @@
 ---
 
 ## Change Log
+
+### 2025-11-10T16:30:00Z - PR-02 Native Kernel Scaffolding Complete
+**Action:** Implemented C++ kernels with pybind11 bindings + basic matmul  
+**Status:** REVIEW_READY  
+**Branch:** autogen/pr-02-native-kernels  
+**Changes:**
+- Created C++ kernel infrastructure (matmul_basic.cpp, .h)
+- Implemented pybind11 bindings for NumPy integration
+- Created high-level Python API (vgpu_runtime.py)
+- Updated CMakeLists.txt to compile kernel library
+- Updated setup.py to build Python extensions
+- Created comprehensive unit tests (13 tests, all passing)
+- Recorded performance baseline
+- PR metadata: `prs/pr-02-native-kernels.md`
+- Design document: `docs/design/pr-02.md`
 
 ### 2025-11-10T16:12:00Z - PR-01 CI Scaffolding Complete
 **Action:** Established CI/CD pipeline and build infrastructure  

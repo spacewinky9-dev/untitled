@@ -66,9 +66,39 @@ class CMakeBuild(build_ext):
         if not isinstance(ext, CMakeExtension):
             return super().build_extension(ext)
         
-        # Will be implemented in PR-02 when we have actual C++ sources
-        print("CMake build will be added in PR-02")
-        pass
+        import subprocess
+        import shutil
+        
+        # Check if cmake is available
+        if shutil.which('cmake') is None:
+            print("WARNING: CMake not found - C++ extensions will not be built")
+            return
+        
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        
+        cmake_args = [
+            f'-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}',
+            f'-DPYTHON_EXECUTABLE={sys.executable}',
+            f'-DCMAKE_BUILD_TYPE=Release',
+        ]
+        
+        build_args = ['--config', 'Release']
+        
+        # Build directory
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+        
+        # Run CMake configure
+        subprocess.check_call(
+            ['cmake', ext.sourcedir] + cmake_args,
+            cwd=self.build_temp
+        )
+        
+        # Run CMake build
+        subprocess.check_call(
+            ['cmake', '--build', '.'] + build_args,
+            cwd=self.build_temp
+        )
 
 # Package setup
 setup(
@@ -105,8 +135,8 @@ setup(
     python_requires=">=3.8",
     install_requires=install_requires,
     extras_require=extras_require,
-    # ext_modules=[CMakeExtension('vgpu_bindings')],  # Will be enabled in PR-02
-    # cmdclass={"build_ext": CMakeBuild},  # Will be enabled in PR-02
+    ext_modules=[CMakeExtension('_vgpu_kernels', sourcedir='.')],
+    cmdclass={"build_ext": CMakeBuild},
     entry_points={
         "console_scripts": [
             "vgpu-cli=vgpu_runtime:main",  # Will be implemented in future PRs

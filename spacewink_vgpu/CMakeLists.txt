@@ -88,23 +88,39 @@ if(Eigen3_FOUND)
   include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
 
-# Source files (will be populated as we implement)
-set(VGPU_SOURCES
-  # Placeholder - sources will be added in future PRs
+# Kernel library (C++ kernels)
+set(VGPU_KERNEL_SOURCES
+  src/cpp/kernels/matmul_basic.cpp
 )
 
-# Create a header-only target for now
-add_library(vgpu_headers INTERFACE)
-target_include_directories(vgpu_headers INTERFACE 
+add_library(vgpu_kernels STATIC ${VGPU_KERNEL_SOURCES})
+target_include_directories(vgpu_kernels PUBLIC 
   ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp
 )
 
+if(USE_OPENMP AND OpenMP_CXX_FOUND)
+  target_link_libraries(vgpu_kernels PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# Link BLAS if available
+if(BLAS_FOUND)
+  target_link_libraries(vgpu_kernels PUBLIC ${BLAS_LIBRARIES})
+endif()
+
 # Python bindings (if enabled)
 if(BUILD_PYTHON_BINDINGS AND pybind11_FOUND)
-  # Python module placeholder
-  # pybind11_add_module(vgpu_bindings src/bindings/vgpu_bind.cpp)
-  # target_link_libraries(vgpu_bindings PRIVATE vgpu_core)
-  message(STATUS "Python bindings will be added in PR-02")
+  pybind11_add_module(_vgpu_kernels src/bindings/kernels_bind.cpp)
+  target_link_libraries(_vgpu_kernels PRIVATE vgpu_kernels)
+  target_include_directories(_vgpu_kernels PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+  
+  message(STATUS "Python bindings enabled for _vgpu_kernels module")
+  
+  # Install the Python extension
+  install(TARGETS _vgpu_kernels
+    LIBRARY DESTINATION ${Python3_SITEARCH}
+  )
 endif()
 
 # Tests
