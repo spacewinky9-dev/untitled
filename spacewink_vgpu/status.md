@@ -12,12 +12,12 @@
 
 ```json
 {
-  "status": "ROADMAP_CREATED",
-  "phase": "Discovery",
-  "current_pr": "PR-00",
-  "branch": "autogen/staging",
-  "last_update": "2025-11-10T10:52:00Z",
-  "next_action": "Create PR-01: Repo audit & CI scaffolding",
+  "status": "PR_01_COMPLETE",
+  "phase": "Implementation",
+  "current_pr": "PR-01",
+  "branch": "autogen/pr-01-ci",
+  "last_update": "2025-11-10T16:12:00Z",
+  "next_action": "Merge PR-01, then start PR-02: Native kernel scaffolding",
   "blockers": []
 }
 ```
@@ -28,8 +28,8 @@
 
 | PR # | Title | Status | Started | Completed | Artifacts |
 |------|-------|--------|---------|-----------|-----------|
-| PR-00 | Repository Setup & Planning | IN_PROGRESS | 2025-11-10 | - | repo_snapshot.txt |
-| PR-01 | Repo Audit & CI Scaffolding | TODO | - | - | - |
+| PR-00 | Repository Setup & Planning | DONE | 2025-11-10 | 2025-11-10 | repo_snapshot.txt, ADVANCED_ALGORITHMS.md |
+| PR-01 | Repo Audit & CI Scaffolding | REVIEW_READY | 2025-11-10 | - | vgpu-ci.yml, CMakeLists.txt, setup.py |
 | PR-02 | Native Kernel Scaffolding | TODO | - | - | - |
 | PR-03 | Blocked GEMM + Autotuner | TODO | - | - | - |
 | PR-04 | Work-Stealing Threadpool | TODO | - | - | - |
@@ -48,6 +48,22 @@
 
 ### PR-00: Repository Setup
 - `spacewink_vgpu/repo_snapshot.txt` - SHA256 checksums of all files
+- `spacewink_vgpu/roadmap.md` - Development roadmap
+- `spacewink_vgpu/requirements.md` - Technical requirements
+- `spacewink_vgpu/prd.md` - Product requirements document
+- `spacewink_vgpu/README.md` - Project documentation
+- `spacewink_vgpu/ADVANCED_ALGORITHMS.md` - 20 algorithm specifications
+- `spacewink_vgpu/IMPLEMENTATION_PRIORITIES.md` - Implementation roadmap
+
+### PR-01: CI Scaffolding
+- `.github/workflows/vgpu-ci.yml` - GitHub Actions CI pipeline
+- `spacewink_vgpu/CMakeLists.txt` - CMake build system
+- `spacewink_vgpu/setup.py` - Python packaging
+- `spacewink_vgpu/requirements.txt` - Python dependencies
+- `spacewink_vgpu/pytest.ini` - Pytest configuration
+- `spacewink_vgpu/tests/unit/test_tensor_network.py` - Tensor network tests
+- `spacewink_vgpu/tests/unit/test_spectral_methods.py` - Spectral methods tests
+- `spacewink_vgpu/scripts/check_dependencies.py` - Dependency checker
 - `spacewink_vgpu/roadmap.md` - Complete development roadmap
 - `spacewink_vgpu/requirements.md` - Technical requirements
 - `spacewink_vgpu/status.md` - This status file
@@ -71,6 +87,19 @@
 ---
 
 ## Change Log
+
+### 2025-11-10T16:12:00Z - PR-01 CI Scaffolding Complete
+**Action:** Established CI/CD pipeline and build infrastructure  
+**Status:** REVIEW_READY  
+**Branch:** autogen/pr-01-ci  
+**Changes:**
+- Created GitHub Actions CI pipeline (lint, build, test, security)
+- Implemented CMake build system with package detection
+- Created Python packaging (setup.py, requirements.txt)
+- Added pytest configuration and test infrastructure
+- Implemented dependency checker script
+- Created unit tests for tensor network and spectral methods
+- PR metadata: `prs/pr-01-ci-scaffolding.md`
 
 ### 2025-11-10T10:52:00Z - Initial Project Setup
 **Action:** Repository structure created  
