@@ -1,0 +1,27 @@
+# Core dependencies for Spacewink vGPU
+# Updated: 2025-11-10
+
+# Numerical computing
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Sparse matrices and optimization
+# scipy provides these, but listing explicitly for documentation
+
+# Optional but recommended
+# Uncomment as needed:
+
+# pybind11>=2.9.0  # For Python-C++ bindings (PR-02)
+# sympy>=1.9  # For symbolic mathematics (PR-09)
+# opt-einsum>=3.3.0  # For tensor contraction optimization (PR-08)
+
+# Development dependencies (install with: pip install -e ".[dev]")
+# pytest>=6.2.0
+# pytest-cov>=2.12.0
+# black>=21.0
+# flake8>=3.9.0
+# pylint>=2.9.0
+
+# ML framework integration (optional, install with: pip install -e ".[ml]")
+# torch>=1.10.0
+# tensorflow>=2.6.0
