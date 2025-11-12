@@ -6,7 +6,583 @@
 # Status: Foundation Phase - PR #1
 # ══════════════════════════════════════════════════════════════════════════════
 
+---
+
+## 🤖 AUTONOMOUS DEVELOPMENT PROTOCOL FOR CODING AGENTS
+
+### Purpose
+This protocol enables coding agents to autonomously develop, test, and deploy the Damday Village Smart Village WebApp from foundation to production without human intervention. Follow these steps sequentially to generate production-ready, deployment-ready source code.
+
+---
+
+### 🎯 EXECUTION PRINCIPLES
+
+1. **Zero Placeholder Code**: Never use placeholders, TODOs, or incomplete implementations
+2. **Production-First**: Every line of code must be production-ready and fully functional
+3. **Self-Verification**: Test and validate each component before proceeding
+4. **Documentation-Driven**: Update truth.md and screenshots.md after each implementation
+5. **Incremental Deployment**: Each PR should be independently deployable
+6. **Security-First**: Implement security measures from the start, not as an afterthought
+7. **No Human Touch**: System must be fully functional without manual intervention
+
+---
+
+### 📋 10-STEP AUTONOMOUS DEVELOPMENT CYCLE
+
+#### **STEP 1: Deep Codebase Analysis**
+```
+GOAL: Understand current state and dependencies
+ACTIONS:
+  1. Scan entire repository structure
+  2. Read all existing files (truth.md, screenshots.md, package.json, etc.)
+  3. Identify what's implemented vs planned
+  4. Map all dependencies and their versions
+  5. Check for conflicts or blockers
+  
+OUTPUT: Create analysis report in /tmp/analysis-{timestamp}.md
+VALIDATION: Confirm all files are readable and parseable
+NEXT: Proceed to Step 2 only after complete understanding
+```
+
+#### **STEP 2: Generate Implementation Blueprint**
+```
+GOAL: Create detailed implementation plan for current PR
+ACTIONS:
+  1. Read PR objectives from truth.md roadmap
+  2. Break down into atomic tasks (max 50 lines per file change)
+  3. Define file structure (exact paths and filenames)
+  4. Specify dependencies to install
+  5. List environment variables needed
+  6. Define test cases for each component
+  
+OUTPUT: Create blueprint at /tmp/blueprint-PR{N}.md with:
+  - File tree structure
+  - Dependency list with exact versions
+  - Implementation order (sequence matters)
+  - Test scenarios
+  - Success criteria
+  
+VALIDATION: Blueprint covers 100% of PR scope
+NEXT: Proceed only after blueprint is complete and verified
+```
+
+#### **STEP 3: Environment Setup & Dependencies**
+```
+GOAL: Set up development environment with all required tools
+ACTIONS:
+  1. Initialize project structure (if PR #2):
+     - npm create next-app@latest . --typescript --tailwind --app --no-src-dir
+     - Install all required packages with EXACT versions
+  2. For subsequent PRs:
+     - npm install {new-packages} with exact versions
+  3. Set up configuration files:
+     - tsconfig.json, next.config.js, tailwind.config.js, etc.
+  4. Create .env.example with all required variables
+  5. Set up Prisma (if database PR):
+     - npx prisma init
+     - Configure schema
+     - Create initial migration
+  
+OUTPUT: Fully configured development environment
+VALIDATION: 
+  - npm install completes without errors
+  - TypeScript compilation succeeds
+  - All config files are valid
+NEXT: Proceed only after successful build
+```
+
+#### **STEP 4: Database & Schema Implementation**
+```
+GOAL: Implement database models and migrations
+ACTIONS (if applicable to PR):
+  1. Update prisma/schema.prisma with new models
+  2. Add relations, indexes, and constraints
+  3. Create migration: npx prisma migrate dev --name {descriptive-name}
+  4. Generate Prisma Client: npx prisma generate
+  5. Create seed script at prisma/seed.ts
+  6. Seed database: npx prisma db seed
+  
+OUTPUT: Database ready with schema and test data
+VALIDATION:
+  - Migration runs successfully
+  - Seed data populates correctly
+  - Prisma Studio shows all tables: npx prisma studio
+NEXT: Database ready for API implementation
+```
+
+#### **STEP 5: Backend API Implementation**
+```
+GOAL: Build fully functional API endpoints
+ACTIONS:
+  1. Create API routes in app/api/ directory
+  2. Implement business logic with error handling
+  3. Add input validation (Zod schemas)
+  4. Implement authentication/authorization
+  5. Add rate limiting and security headers
+  6. Create API documentation
+  7. Write integration tests for each endpoint
+  
+EXAMPLE FILE STRUCTURE:
+  app/api/
+    auth/
+      login/route.ts          # POST /api/auth/login
+      register/route.ts       # POST /api/auth/register
+    products/
+      route.ts                # GET /api/products, POST /api/products
+      [id]/route.ts           # GET, PUT, DELETE /api/products/:id
+    
+VALIDATION FOR EACH ENDPOINT:
+  - Test with curl or API client
+  - Verify response format matches spec
+  - Test error cases (invalid input, unauthorized, etc.)
+  - Check database changes persist correctly
+  
+NEXT: All APIs tested and working before frontend
+```
+
+#### **STEP 6: Smart Contract Implementation (Blockchain PRs)**
+```
+GOAL: Deploy production-ready smart contracts
+ACTIONS (for PR #7, #8):
+  1. Create contracts/ directory with Hardhat setup
+  2. Write Solidity contracts (TreeNFT.sol, CarbonToken.sol, etc.)
+  3. Add comprehensive test suite (Hardhat tests)
+  4. Create deployment scripts
+  5. Deploy to testnet (Polygon Mumbai)
+  6. Verify contracts on block explorer
+  7. Save contract addresses to .env
+  8. Generate TypeScript types: npx hardhat typechain
+  
+VALIDATION:
+  - All tests pass: npx hardhat test
+  - Gas optimization verified
+  - Contracts verified on explorer
+  - Integration tests with Web3 provider work
+  
+NEXT: Frontend can interact with deployed contracts
+```
+
+#### **STEP 7: Frontend Component Implementation**
+```
+GOAL: Build pixel-perfect, accessible UI components
+ACTIONS:
+  1. Create reusable UI components (Shadcn/ui)
+  2. Build page layouts following design system
+  3. Implement state management (React hooks, Context, or Zustand)
+  4. Add form validation and error handling
+  5. Implement responsive design (mobile-first)
+  6. Add loading states and skeletons
+  7. Implement accessibility (ARIA labels, keyboard nav)
+  8. Add animations (Framer Motion)
+  
+COMPONENT CHECKLIST (for each component):
+  - [ ] TypeScript types defined
+  - [ ] Props validated
+  - [ ] Error boundaries implemented
+  - [ ] Loading states handled
+  - [ ] Mobile responsive (test at 375px, 768px, 1920px)
+  - [ ] Accessibility tested (keyboard + screen reader)
+  - [ ] Screenshot captured for screenshots.md
+  
+VALIDATION:
+  - npm run dev works without errors
+  - All pages render correctly
+  - No console errors or warnings
+  - Lighthouse score > 90 for accessibility
+  
+NEXT: Frontend fully functional and tested
+```
+
+#### **STEP 8: Integration & End-to-End Testing**
+```
+GOAL: Verify entire system works together seamlessly
+ACTIONS:
+  1. Set up Playwright testing framework
+  2. Write E2E tests for critical user flows:
+     - User registration → login → dashboard
+     - Product browsing → add to cart → checkout → payment
+     - Homestay search → booking → confirmation
+     - Wallet connect → carbon credit transaction
+  3. Create test data fixtures
+  4. Run all tests in CI/CD pipeline simulation
+  5. Test error scenarios and edge cases
+  6. Performance testing (load time < 3s)
+  7. Security testing (OWASP top 10)
+  
+TEST EXECUTION:
+  npx playwright test
+  npm run test:e2e
+  npm run test:integration
+  
+VALIDATION:
+  - 100% of critical paths pass
+  - No flaky tests
+  - Performance metrics meet targets
+  - Security scans show no high/critical issues
+  
+NEXT: System ready for documentation
+```
+
+#### **STEP 9: Documentation & Screenshots**
+```
+GOAL: Complete documentation for maintainability
+ACTIONS:
+  1. Update truth.md:
+     - Mark completed features as ✅
+     - Update verification table
+     - Add code references (file:line numbers)
+     - Document API endpoints with examples
+  2. Update screenshots.md:
+     - Run Playwright screenshot automation
+     - Capture all UI states (default, hover, error, loading)
+     - Document user flows with numbered screenshots
+     - Add before/after comparisons
+  3. Update README.md:
+     - Installation instructions
+     - Environment setup guide
+     - Development workflow
+     - Deployment steps
+  4. Generate API documentation (Swagger/OpenAPI)
+  5. Create inline code documentation (JSDoc/TSDoc)
+  
+SCREENSHOT AUTOMATION:
+  node scripts/capture-screenshots.js
+  # Generates 100+ screenshots automatically
+  
+VALIDATION:
+  - truth.md reflects current implementation
+  - All screenshots captured and linked
+  - README instructions work for new developer
+  - API docs auto-generated and accurate
+  
+NEXT: Documentation complete and verified
+```
+
+#### **STEP 10: Deployment Preparation & Validation**
+```
+GOAL: Ensure code is production-deployment-ready
+ACTIONS:
+  1. Build for production: npm run build
+  2. Fix all build warnings and errors
+  3. Run production build locally: npm run start
+  4. Create deployment configuration:
+     - Docker: Dockerfile + docker-compose.yml
+     - CapRover: captain-definition
+     - Vercel/Netlify: vercel.json/netlify.toml
+  5. Set up environment variables template
+  6. Create database migration strategy
+  7. Set up monitoring and logging
+  8. Security hardening:
+     - Update dependencies
+     - Run npm audit fix
+     - Add security headers
+     - Configure CORS properly
+  9. Performance optimization:
+     - Image optimization
+     - Code splitting
+     - Caching strategy
+  10. Create rollback plan
+  
+DEPLOYMENT CHECKLIST:
+  - [ ] Production build succeeds
+  - [ ] All environment variables documented
+  - [ ] Database migrations tested
+  - [ ] Backup/restore procedures documented
+  - [ ] Health check endpoint implemented (/api/health)
+  - [ ] Error monitoring configured (Sentry optional)
+  - [ ] SSL/HTTPS configured
+  - [ ] CDN configured for static assets
+  
+VALIDATION:
+  - Production build runs without errors
+  - Docker container starts successfully
+  - Health check returns 200 OK
+  - All critical features work in production mode
+  
+NEXT: Ready for deployment
+```
+
+---
+
+### 🔄 PR-SPECIFIC IMPLEMENTATION GUIDES
+
+#### **PR #1: Documentation Foundation** (CURRENT - COMPLETE ✅)
+```
+STATUS: Complete
+FILES: truth.md, screenshots.md
+VALIDATION: Files created and committed
+```
+
+#### **PR #2: Admin Panel Core System**
+```
+SEQUENCE:
+  1. Initialize Next.js 14 project with TypeScript + Tailwind
+  2. Set up Prisma with PostgreSQL (User, Role, Permission models)
+  3. Implement NextAuth.js authentication
+  4. Create admin layout with sidebar navigation
+  5. Build dashboard with stats cards
+  6. Implement user management (CRUD)
+  7. Add role-based access control
+  8. Create settings page
+  
+DELIVERABLES:
+  - Working admin login at /admin
+  - Dashboard with real-time stats
+  - User management interface
+  - Role assignment system
+  - Security: JWT tokens, CSRF protection
+  
+VALIDATION:
+  - Admin can login
+  - Create/edit/delete users
+  - Assign roles
+  - Settings persist to database
+```
+
+#### **PR #3: User Panel & Authentication**
+```
+SEQUENCE:
+  1. Extend Prisma schema (Profile, Wallet models)
+  2. Create public authentication pages (/login, /register)
+  3. Implement email verification flow
+  4. Build user dashboard at /dashboard
+  5. Create profile management page
+  6. Add password reset functionality
+  7. Implement OAuth (Google, GitHub optional)
+  
+DELIVERABLES:
+  - User registration with email verification
+  - Login with remember me
+  - Profile editing with avatar upload
+  - Password reset via email
+  - Protected routes with middleware
+  
+VALIDATION:
+  - Complete registration flow works
+  - Email verification required
+  - Password reset sends email
+  - Profile updates persist
+```
+
+#### **PR #4: Marketplace Module**
+```
+SEQUENCE:
+  1. Prisma models: Product, Category, Order, OrderItem
+  2. Admin: Product management CRUD
+  3. API: Product listing, filtering, search
+  4. Frontend: Product grid with filters
+  5. Product detail page with image gallery
+  6. Shopping cart (React Context + localStorage)
+  7. Checkout flow (multi-step form)
+  8. Payment integration (Razorpay/Stripe)
+  9. Order confirmation and email
+  10. Order tracking page
+  
+DELIVERABLES:
+  - 22+ seeded products
+  - Working shopping cart
+  - Complete checkout process
+  - Payment gateway integrated
+  - Order history page
+  - Admin order management
+  
+VALIDATION:
+  - Browse products
+  - Add to cart
+  - Complete purchase
+  - Receive order confirmation email
+  - Track order status
+```
+
+#### **PR #5-12: Continue Similar Pattern**
+```
+Each PR follows the 10-step cycle:
+  Analyze → Blueprint → Setup → Database → Backend → 
+  Smart Contracts (if needed) → Frontend → Testing → 
+  Documentation → Deployment Prep
+```
+
+---
+
+### 🛡️ QUALITY GATES (Must Pass Before PR Completion)
+
+#### **Code Quality**
+- [ ] TypeScript strict mode enabled, no `any` types
+- [ ] ESLint passes with zero warnings
+- [ ] Prettier formatting applied
+- [ ] No console.log statements in production code
+- [ ] All functions have JSDoc comments
+
+#### **Testing**
+- [ ] Unit test coverage > 80%
+- [ ] All integration tests pass
+- [ ] E2E tests for critical paths pass
+- [ ] No flaky tests (run 3 times, all pass)
+
+#### **Security**
+- [ ] No secrets in code (use env variables)
+- [ ] Input validation on all API endpoints
+- [ ] SQL injection prevention (Prisma ORM)
+- [ ] XSS prevention (React escaping)
+- [ ] CSRF tokens implemented
+- [ ] Rate limiting on APIs
+- [ ] npm audit shows no high/critical vulnerabilities
+
+#### **Performance**
+- [ ] Lighthouse performance score > 90
+- [ ] First Contentful Paint < 1.5s
+- [ ] Time to Interactive < 3s
+- [ ] Bundle size optimized (code splitting)
+- [ ] Images optimized (Next.js Image component)
+
+#### **Accessibility**
+- [ ] Lighthouse accessibility score > 95
+- [ ] Keyboard navigation works
+- [ ] Screen reader tested
+- [ ] Color contrast ratio > 4.5:1
+- [ ] ARIA labels on interactive elements
+
+#### **Documentation**
+- [ ] truth.md updated with implementation details
+- [ ] screenshots.md has all UI screenshots
+- [ ] README.md installation steps work
+- [ ] API endpoints documented
+- [ ] Code comments explain complex logic
+
+---
+
+### 🚀 DEPLOYMENT AUTOMATION SCRIPT
+
+```bash
+#!/bin/bash
+# deploy.sh - Autonomous deployment script
+
+set -e  # Exit on error
+
+echo "🚀 Starting autonomous deployment..."
+
+# Step 1: Environment check
+echo "📋 Checking environment..."
+if [ ! -f .env ]; then
+  echo "❌ .env file missing"
+  exit 1
+fi
+
+# Step 2: Install dependencies
+echo "📦 Installing dependencies..."
+npm ci
+
+# Step 3: Database migration
+echo "🗄️ Running database migrations..."
+npx prisma migrate deploy
+npx prisma generate
+
+# Step 4: Build application
+echo "🔨 Building application..."
+npm run build
+
+# Step 5: Run tests
+echo "🧪 Running tests..."
+npm run test:ci
+
+# Step 6: Security scan
+echo "🔒 Running security scan..."
+npm audit --production
+
+# Step 7: Deploy
+echo "🌐 Deploying to production..."
+# Docker deployment
+docker-compose -f docker-compose.prod.yml up -d
+
+# Or CapRover
+# caprover deploy
+
+# Or Vercel
+# vercel --prod
+
+# Step 8: Health check
+echo "🏥 Running health check..."
+sleep 10
+curl -f http://localhost:3000/api/health || exit 1
+
+# Step 9: Smoke tests
+echo "🔥 Running smoke tests..."
+npm run test:smoke
+
+echo "✅ Deployment complete!"
+echo "🌍 Application live at https://damdayvillage.com"
+```
+
+---
+
+### 📊 PROGRESS TRACKING
+
+Use this table to track autonomous development progress:
+
+| PR | Module | Status | Build | Tests | Deploy | Agent Hours |
+|----|--------|--------|-------|-------|--------|-------------|
+| 1  | Documentation | ✅ Complete | ✅ | ✅ | ✅ | 0.5 |
+| 2  | Admin Panel | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 4 |
+| 3  | User Auth | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 3 |
+| 4  | Marketplace | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 6 |
+| 5  | Homestay | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 5 |
+| 6  | Blog | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 3 |
+| 7  | Blockchain | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 8 |
+| 8  | Carbon Marketplace | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 6 |
+| 9  | Sustainability | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 4 |
+| 10 | Community | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 4 |
+| 11 | UI/UX Polish | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 5 |
+| 12 | Final Release | ⏳ Planned | ⬜ | ⬜ | ⬜ | Est: 3 |
+
+**Total Estimated Agent Hours**: 51.5 hours
+**Target Completion**: 100% autonomous, zero human intervention
+
+---
+
+### 🎓 LEARNING & ADAPTATION
+
+After each PR, the agent should:
+1. Analyze what worked well
+2. Identify bottlenecks or issues
+3. Update this protocol with improvements
+4. Optimize future PRs based on learnings
+
+---
+
+### ⚠️ CRITICAL SUCCESS FACTORS
+
+1. **Never Skip Steps**: Follow the 10-step cycle religiously
+2. **Test Before Commit**: Every commit must be tested
+3. **Document Everything**: Future agents rely on this documentation
+4. **Security First**: Don't compromise on security for speed
+5. **Production Quality**: No MVP mindset, only production-ready code
+6. **Self-Sufficient**: Don't assume human intervention is available
+
+---
+
+### 🔗 AGENT COORDINATION
+
+For multi-agent scenarios:
+- **Agent A**: Backend development (APIs, database, auth)
+- **Agent B**: Frontend development (UI, components, pages)
+- **Agent C**: Blockchain development (smart contracts, Web3)
+- **Agent D**: Testing & QA (E2E, integration, security)
+- **Agent E**: Documentation & deployment
+
+All agents must:
+- Read truth.md before starting
+- Update truth.md after completing tasks
+- Communicate via git commits
+- Never overwrite each other's work
+
+---
+
+**END OF AUTONOMOUS DEVELOPMENT PROTOCOL**
+
+═══════════════════════════════════════════════════════════════════════════════
+
 ## 📋 TABLE OF CONTENTS
+0. [🤖 Autonomous Development Protocol](#-autonomous-development-protocol-for-coding-agents)
 1. [Project Overview](#project-overview)
 2. [Architecture](#architecture)
 3. [Technology Stack](#technology-stack)
