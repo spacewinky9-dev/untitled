@@ -21,6 +21,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   profile       Profile?
+  orders        Order[]
 
   @@map("users")
 }
@@ -45,4 +46,80 @@ model Settings {
   value String
   
   @@map("settings")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String      @id @default(uuid())
+  name           String
+  slug           String      @unique
+  description    String?
+  price          Float
+  compareAtPrice Float?      // Original price for showing discounts
+  cost           Float?      // Cost price for profit tracking
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id])
+  sku            String?     @unique
+  barcode        String?
+  quantity       Int         @default(0)
+  trackInventory Boolean     @default(true)
+  images         String?     // JSON array of image URLs
+  weight         Float?      // Weight in kg
+  dimensions     String?     // JSON: {length, width, height}
+  featured       Boolean     @default(false)
+  active         Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  status          String      @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  total           Float
+  subtotal        Float
+  tax             Float       @default(0)
+  shipping        Float       @default(0)
+  shippingAddress String      // JSON: {name, address, city, state, zip, country, phone}
+  billingAddress  String?     // JSON: {name, address, city, state, zip, country}
+  paymentMethod   String?     // RAZORPAY, STRIPE, COD
+  paymentStatus   String      @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  trackingNumber  String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float    // Price at time of purchase
+  createdAt DateTime @default(now())
+
+  @@map("order_items")
 }
