@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { MapPin, Users, Star, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -75,8 +75,8 @@ export default async function HomestaysPage() {
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{homestay.description}</p>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center">
-                        <Star className={`h-5 w-5 mr-1 ${homestay.rating >= 4.5 ? 'text-yellow-500' : 'text-gray-400'}`} fill="currentColor" />
-                        <span className="font-semibold">{homestay.rating.toFixed(1)}</span>
+                        <Star className={`h-5 w-5 mr-1 ${(homestay.rating || 0) >= 4.5 ? 'text-yellow-500' : 'text-gray-400'}`} fill="currentColor" />
+                        <span className="font-semibold">{(homestay.rating || 0).toFixed(1)}</span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <Users className="h-4 w-4 mr-1" />
@@ -128,8 +128,8 @@ export default async function HomestaysPage() {
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">{homestay.description}</p>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <Star className={`h-5 w-5 mr-1 ${homestay.rating >= 4.5 ? 'text-yellow-500' : homestay.rating >= 4.0 ? 'text-yellow-400' : 'text-gray-400'}`} fill="currentColor" />
-                      <span className="font-semibold">{homestay.rating.toFixed(1)}</span>
+                      <Star className={`h-5 w-5 mr-1 ${(homestay.rating || 0) >= 4.5 ? 'text-yellow-500' : (homestay.rating || 0) >= 4.0 ? 'text-yellow-400' : 'text-gray-400'}`} fill="currentColor" />
+                      <span className="font-semibold">{(homestay.rating || 0).toFixed(1)}</span>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Users className="h-4 w-4 mr-1" />
