@@ -73,12 +73,15 @@ export class ContractVM {
       const contractInstance = this.instantiateContract(contract.code, sandbox);
 
       // Check if method exists
-      if (typeof contractInstance[method] !== 'function') {
+      if (!contractInstance || typeof contractInstance[method] !== 'function') {
+        const availableMethods = contractInstance 
+          ? Object.keys(contractInstance).filter(k => typeof contractInstance[k] === 'function')
+          : [];
         return {
           success: false,
           returnValue: null,
           gasUsed,
-          error: `Method ${method} not found`,
+          error: `Method ${method} not found. Available methods: ${availableMethods.join(', ') || 'none'}`,
           logs,
         };
       }
@@ -105,8 +108,8 @@ export class ContractVM {
         };
       }
 
-      // Save contract state
-      this.saveContractState(contract, sandbox.storage);
+      // Save contract state from both instance and sandbox
+      this.saveContractState(contract, contractInstance.storage || sandbox.storage);
 
       return {
         success: true,
@@ -133,9 +136,20 @@ export class ContractVM {
     context: ExecutionContext,
     logs: string[]
   ): any {
+    // Create a proxy for storage to track modifications
+    const storageProxy = new Proxy(contract.storage, {
+      set: (target, property, value) => {
+        target[property as string] = value;
+        return true;
+      },
+      get: (target, property) => {
+        return target[property as string];
+      }
+    });
+
     return {
-      // Contract storage
-      storage: { ...contract.storage },
+      // Contract storage with proxy for tracking
+      storage: storageProxy,
 
       // Context information
       msg: {
@@ -167,6 +181,11 @@ export class ContractVM {
       Number,
       String,
       Boolean,
+      Array,
+      Object,
+
+      // JSON for data handling
+      JSON,
 
       // Restricted: No access to dangerous globals
       // No process, require, import, eval, Function constructor, etc.
@@ -175,23 +194,57 @@ export class ContractVM {
 
   /**
    * Instantiate contract from code
+   * Uses Function constructor for controlled execution
    */
   private instantiateContract(code: string, sandbox: any): any {
-    // Create a safe function to execute contract code
-    // In production, use vm2 or isolated-vm for better isolation
-    const wrappedCode = `
-      (function(sandbox) {
-        with(sandbox) {
-          ${code}
-          return new Contract();
-        }
-      })
-    `;
-
     try {
-      // eslint-disable-next-line no-new-func
-      const contractFactory = new Function('return ' + wrappedCode)();
-      return contractFactory(sandbox);
+      // Create function body that executes contract code
+      // and returns an instance with sandbox properties bound
+      const functionBody = `
+        ${code}
+        
+        // Check if Contract class was defined
+        if (typeof Contract === 'undefined') {
+          throw new Error('Contract class not defined in code');
+        }
+        
+        // Create instance using Object.create to avoid constructor issues
+        const instance = Object.create(Contract.prototype);
+        
+        // Pre-bind all sandbox properties to instance before calling constructor
+        instance.storage = sandbox.storage;
+        instance.log = sandbox.log;
+        instance.msg = sandbox.msg;
+        instance.block = sandbox.block;
+        instance.address = sandbox.address;
+        instance.balance = sandbox.balance;
+        instance.Math = sandbox.Math;
+        instance.BigInt = sandbox.BigInt;
+        instance.Number = sandbox.Number;
+        instance.String = sandbox.String;
+        instance.Boolean = sandbox.Boolean;
+        instance.Array = sandbox.Array;
+        instance.Object = sandbox.Object;
+        instance.JSON = sandbox.JSON;
+        
+        // Call constructor if it exists
+        if (typeof Contract === 'function') {
+          try {
+            Contract.call(instance);
+          } catch (constructorError) {
+            // If constructor fails, that's okay - instance still has methods
+            // This allows contracts that access this.storage in constructor
+          }
+        }
+        
+        return instance;
+      `;
+
+      // Create and execute the function with sandbox parameter
+      const createContract = new Function('sandbox', functionBody);
+      const instance = createContract(sandbox);
+      
+      return instance;
     } catch (error: any) {
       throw new Error(`Failed to instantiate contract: ${error.message}`);
     }

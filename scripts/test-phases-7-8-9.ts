@@ -78,16 +78,25 @@ async function runTests() {
   console.log(`   Success: ${setResult.success}`);
   console.log(`   Gas used: ${setResult.gasUsed}`);
   console.log(`   Logs: ${setResult.logs.join(', ')}`);
+  if (setResult.error) {
+    console.log(`   Error: ${setResult.error}`);
+  }
 
   // Get value
   const getResult = await vm.execute(storageContract, 'getValue', [], context);
   console.log(`✅ getValue() executed`);
   console.log(`   Returned: ${getResult.returnValue}`);
+  if (getResult.error) {
+    console.log(`   Error: ${getResult.error}`);
+  }
 
   // Increment
   const incResult = await vm.execute(storageContract, 'increment', [], context);
   console.log(`✅ increment() executed`);
   console.log(`   New value: ${incResult.returnValue}`);
+  if (incResult.error) {
+    console.log(`   Error: ${incResult.error}`);
+  }
 
   console.log('\n📝 Test 7.3: Deploy Token Contract');
   const tokenContractCode = `
