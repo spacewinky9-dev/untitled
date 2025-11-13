@@ -12,7 +12,8 @@ import {
   TreePine,
   ShoppingBag,
   Home,
-  Newspaper
+  Newspaper,
+  Map
 } from 'lucide-react'
 
 const navItems = [
@@ -32,6 +33,16 @@ const navItems = [
     icon: ShoppingBag,
   },
   {
+    title: 'Homestays',
+    href: '/admin/homestays',
+    icon: Home,
+  },
+  {
+    title: 'Tours',
+    href: '/admin/tours',
+    icon: Map,
+  },
+  {
     title: 'Settings',
     href: '/admin/settings',
     icon: Settings,
@@ -39,7 +50,6 @@ const navItems = [
 ]
 
 const futureModules = [
-  { title: 'Homestays', icon: Home, status: 'Coming in PR #5' },
   { title: 'Blog', icon: Newspaper, status: 'Coming in PR #6' },
   { title: 'Carbon Credits', icon: TreePine, status: 'Coming in PR #7' },
 ]
