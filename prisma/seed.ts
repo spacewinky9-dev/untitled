@@ -502,6 +502,234 @@ async function main() {
   console.log(`   Categories: ${categories.length}`)
   console.log(`   Products: ${createdCount}`)
   console.log('   Total inventory value: ₹' + products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toLocaleString())
+  
+  // ==========================================
+  // HOMESTAYS & TOURS SEEDING
+  // ==========================================
+  
+  console.log('\n🏡 Seeding homestays...')
+  
+  const homestays = [
+    {
+      name: 'Devbhumi Heritage Home',
+      slug: 'devbhumi-heritage-home',
+      description: 'Experience authentic Himalayan village life in our traditional stone and wood homestay. Enjoy panoramic mountain views, organic home-cooked meals, and warm hospitality.',
+      location: 'Damday Village, Uttarakhand',
+      address: 'Main Village Road, Damday, Tehri Garhwal, Uttarakhand - 249155',
+      amenities: JSON.stringify(['Mountain View', 'Organic Meals', 'Bonfire', 'Village Tours', 'WiFi', 'Hot Water', 'Traditional Architecture']),
+      images: JSON.stringify(['/homestays/heritage-1.jpg', '/homestays/heritage-2.jpg', '/homestays/heritage-3.jpg']),
+      pricePerNight: 2000,
+      maxGuests: 6,
+      rooms: 3,
+      featured: true,
+      active: true,
+      rating: 4.8,
+    },
+    {
+      name: 'Mountain View Cottage',
+      slug: 'mountain-view-cottage',
+      description: 'Cozy cottage perched on the hillside with breathtaking views of the Himalayas. Perfect for nature lovers and peace seekers.',
+      location: 'Upper Damday, Uttarakhand',
+      address: 'Upper Village, Damday, Tehri Garhwal, Uttarakhand - 249155',
+      amenities: JSON.stringify(['Himalayan View', 'Garden', 'Terrace', 'Home-cooked Food', 'Parking', 'Hot Water']),
+      images: JSON.stringify(['/homestays/mountain-1.jpg', '/homestays/mountain-2.jpg']),
+      pricePerNight: 1800,
+      maxGuests: 4,
+      rooms: 2,
+      featured: true,
+      active: true,
+      rating: 4.7,
+    },
+    {
+      name: 'Eco-Friendly Village Stay',
+      slug: 'eco-friendly-village-stay',
+      description: 'Sustainable homestay built with eco-friendly materials. Solar powered, rainwater harvesting, and organic farming.',
+      location: 'Damday Village, Uttarakhand',
+      address: 'Eco Lane, Damday, Tehri Garhwal, Uttarakhand - 249155',
+      amenities: JSON.stringify(['Solar Power', 'Rainwater Harvesting', 'Organic Farm', 'Nature Walks', 'Bird Watching', 'Yoga Space']),
+      images: JSON.stringify(['/homestays/eco-1.jpg', '/homestays/eco-2.jpg']),
+      pricePerNight: 2200,
+      maxGuests: 5,
+      rooms: 2,
+      featured: false,
+      active: true,
+      rating: 4.9,
+    },
+    {
+      name: 'Traditional Garhwali House',
+      slug: 'traditional-garhwali-house',
+      description: 'Authentic 100-year-old Garhwali house with traditional architecture, hand-carved woodwork, and cultural experiences.',
+      location: 'Old Damday, Uttarakhand',
+      address: 'Heritage Lane, Damday, Tehri Garhwal, Uttarakhand - 249155',
+      amenities: JSON.stringify(['Traditional Architecture', 'Cultural Programs', 'Local Cuisine', 'Folklore Sessions', 'Craft Workshops']),
+      images: JSON.stringify(['/homestays/traditional-1.jpg', '/homestays/traditional-2.jpg']),
+      pricePerNight: 2500,
+      maxGuests: 8,
+      rooms: 4,
+      featured: true,
+      active: true,
+      rating: 4.9,
+    },
+    {
+      name: 'Riverside Retreat',
+      slug: 'riverside-retreat',
+      description: 'Peaceful homestay near the flowing river. Perfect for meditation, reading, and connecting with nature.',
+      location: 'Damday Riverside, Uttarakhand',
+      address: 'River Road, Damday, Tehri Garhwal, Uttarakhand - 249155',
+      amenities: JSON.stringify(['Riverside Location', 'Meditation Space', 'Library', 'Fishing', 'Nature Trails', 'Quiet Environment']),
+      images: JSON.stringify(['/homestays/riverside-1.jpg']),
+      pricePerNight: 1900,
+      maxGuests: 4,
+      rooms: 2,
+      featured: false,
+      active: true,
+      rating: 4.6,
+    },
+  ]
+  
+  let homestayCount = 0
+  for (const homestayData of homestays) {
+    const homestay = await prisma.homestay.upsert({
+      where: { slug: homestayData.slug },
+      update: {},
+      create: homestayData,
+    })
+    homestayCount++
+  }
+  
+  console.log(`✅ Created ${homestayCount} homestays`)
+  
+  console.log('\n🗺️ Seeding tours...')
+  
+  const tours = [
+    {
+      name: 'Himalayan Village Trek',
+      slug: 'himalayan-village-trek',
+      description: 'A 3-day guided trek through pristine Himalayan villages, ancient temples, and breathtaking mountain trails.',
+      duration: '3 days 2 nights',
+      price: 8500,
+      maxGuests: 10,
+      highlights: JSON.stringify([
+        'Trek to 3000m altitude',
+        'Visit 5 traditional villages',
+        'Explore ancient temples',
+        'Panoramic Himalayan views',
+        'Cultural interactions with locals',
+        'Traditional village meals'
+      ]),
+      itinerary: JSON.stringify([
+        {day: 1, title: 'Arrival & Village Tour', activities: 'Arrive at Damday, orientation, village walk, local market visit, traditional dinner'},
+        {day: 2, title: 'Mountain Trek', activities: 'Early morning trek to high altitude village, temple visit, packed lunch, return by evening'},
+        {day: 3, title: 'Cultural Experience', activities: 'Cooking class, craft workshop, farewell lunch, departure'}
+      ]),
+      includes: JSON.stringify(['Accommodation', 'All Meals', 'Guide', 'Permits', 'First Aid']),
+      excludes: JSON.stringify(['Transportation to Damday', 'Personal Expenses', 'Insurance']),
+      images: JSON.stringify(['/tours/trek-1.jpg', '/tours/trek-2.jpg', '/tours/trek-3.jpg']),
+      featured: true,
+      active: true,
+      rating: 4.9,
+    },
+    {
+      name: 'Organic Farm Experience',
+      slug: 'organic-farm-experience',
+      description: 'Learn organic farming techniques, harvest your own vegetables, and cook traditional meals with fresh produce.',
+      duration: '2 days 1 night',
+      price: 5000,
+      maxGuests: 8,
+      highlights: JSON.stringify([
+        'Hands-on organic farming',
+        'Harvest fresh vegetables',
+        'Cooking class with local chef',
+        'Visit to dairy farm',
+        'Learn composting techniques',
+        'Take home organic produce'
+      ]),
+      itinerary: JSON.stringify([
+        {day: 1, title: 'Farm Immersion', activities: 'Farm tour, planting session, lunch, dairy visit, evening bonfire'},
+        {day: 2, title: 'Harvest & Cook', activities: 'Morning harvest, cooking class, traditional feast, departure'}
+      ]),
+      includes: JSON.stringify(['Homestay Accommodation', 'All Meals', 'Farm Activities', 'Organic Produce Sample']),
+      excludes: JSON.stringify(['Transportation', 'Personal Expenses']),
+      images: JSON.stringify(['/tours/farm-1.jpg', '/tours/farm-2.jpg']),
+      featured: true,
+      active: true,
+      rating: 4.8,
+    },
+    {
+      name: 'Spiritual & Wellness Retreat',
+      slug: 'spiritual-wellness-retreat',
+      description: 'A rejuvenating 5-day retreat combining yoga, meditation, Ayurvedic treatments, and spiritual practices.',
+      duration: '5 days 4 nights',
+      price: 15000,
+      maxGuests: 12,
+      highlights: JSON.stringify([
+        'Daily yoga sessions',
+        'Meditation by the river',
+        'Ayurvedic consultations',
+        'Natural therapy treatments',
+        'Spiritual temple visits',
+        'Sattvic organic meals',
+        'Nature walks'
+      ]),
+      itinerary: JSON.stringify([
+        {day: 1, title: 'Arrival & Orientation', activities: 'Welcome, orientation, yoga, meditation, sattvic dinner'},
+        {day: 2, title: 'Detox & Cleanse', activities: 'Morning yoga, Ayurvedic consultation, treatments, light meals'},
+        {day: 3, title: 'Spiritual Journey', activities: 'Temple visits, spiritual discourse, meditation, pranayama'},
+        {day: 4, title: 'Nature Connection', activities: 'Forest walk, outdoor yoga, sound healing, bonfire'},
+        {day: 5, title: 'Integration & Departure', activities: 'Final yoga, closing ceremony, farewell'}
+      ]),
+      includes: JSON.stringify(['Accommodation', 'All Meals', 'Yoga & Meditation', 'Ayurvedic Consultation', 'Treatments', 'Guide']),
+      excludes: JSON.stringify(['Transportation', 'Additional Treatments', 'Personal Expenses']),
+      images: JSON.stringify(['/tours/spiritual-1.jpg', '/tours/spiritual-2.jpg']),
+      featured: true,
+      active: true,
+      rating: 5.0,
+    },
+    {
+      name: 'Weekend Nature Escape',
+      slug: 'weekend-nature-escape',
+      description: 'Perfect weekend getaway with nature walks, bird watching, and relaxation in the lap of Himalayas.',
+      duration: '2 days 1 night',
+      price: 4500,
+      maxGuests: 15,
+      highlights: JSON.stringify([
+        'Guided nature walks',
+        'Bird watching session',
+        'Riverside picnic',
+        'Bonfire evening',
+        'Star gazing',
+        'Photography opportunities'
+      ]),
+      itinerary: JSON.stringify([
+        {day: 1, title: 'Nature Immersion', activities: 'Arrival, nature walk, bird watching, riverside lunch, evening bonfire'},
+        {day: 2, title: 'Exploration', activities: 'Early morning bird watching, breakfast, village tour, departure'}
+      ]),
+      includes: JSON.stringify(['Homestay', 'All Meals', 'Guide', 'Binoculars', 'Nature Kit']),
+      excludes: JSON.stringify(['Transportation', 'Camera Equipment']),
+      images: JSON.stringify(['/tours/nature-1.jpg']),
+      featured: false,
+      active: true,
+      rating: 4.7,
+    },
+  ]
+  
+  let tourCount = 0
+  for (const tourData of tours) {
+    const tour = await prisma.tour.upsert({
+      where: { slug: tourData.slug },
+      update: {},
+      create: tourData,
+    })
+    tourCount++
+  }
+  
+  console.log(`✅ Created ${tourCount} tours`)
+  
+  console.log('\n🏡 Homestay & Tourism Data:')
+  console.log(`   Homestays: ${homestayCount}`)
+  console.log(`   Tours: ${tourCount}`)
+  console.log(`   Featured Homestays: ${homestays.filter(h => h.featured).length}`)
+  console.log(`   Featured Tours: ${tours.filter(t => t.featured).length}`)
 }
 
 main()
