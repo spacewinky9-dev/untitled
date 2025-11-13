@@ -27,6 +27,11 @@ const navItems = [
     icon: Users,
   },
   {
+    title: 'Products',
+    href: '/admin/products',
+    icon: ShoppingBag,
+  },
+  {
     title: 'Settings',
     href: '/admin/settings',
     icon: Settings,
@@ -34,7 +39,6 @@ const navItems = [
 ]
 
 const futureModules = [
-  { title: 'Marketplace', icon: ShoppingBag, status: 'Coming in PR #4' },
   { title: 'Homestays', icon: Home, status: 'Coming in PR #5' },
   { title: 'Blog', icon: Newspaper, status: 'Coming in PR #6' },
   { title: 'Carbon Credits', icon: TreePine, status: 'Coming in PR #7' },
