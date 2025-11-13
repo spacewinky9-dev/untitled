@@ -730,6 +730,174 @@ async function main() {
   console.log(`   Tours: ${tourCount}`)
   console.log(`   Featured Homestays: ${homestays.filter(h => h.featured).length}`)
   console.log(`   Featured Tours: ${tours.filter(t => t.featured).length}`)
+
+  // Seed Blog Posts
+  console.log('\n📝 Seeding blog posts...')
+  
+  const blogPosts = [
+    {
+      title: 'Damday Village Achieves Carbon Neutrality Milestone',
+      slug: 'carbon-neutrality-milestone',
+      excerpt: 'India\'s first smart carbon-free village marks a historic achievement in sustainable development.',
+      content: `Damday Village has officially achieved carbon neutrality, becoming India's first village to reach this remarkable milestone. Through a comprehensive approach combining renewable energy, sustainable agriculture, and community participation, we have successfully offset our carbon emissions.
+
+Our journey began with installing solar panels across all households, eliminating dependence on conventional power sources. We planted over 12,500 trees, which not only absorb CO2 but also provide fruit and timber for the community.
+
+The village's commitment to organic farming has reduced chemical fertilizer use to zero, while our waste management system ensures proper composting and recycling. Every resident has embraced these changes, making Damday a model for sustainable rural development.
+
+Looking ahead, we aim to plant 25,000 trees by 2025 and help neighboring villages adopt similar practices. This achievement proves that with determination and community cooperation, even small villages can make a significant impact on climate change.`,
+      categories: ['Sustainability', 'Achievements', 'Carbon Credits'],
+      tags: ['carbon-free', 'green-village', 'climate-action', 'renewable-energy'],
+      published: true,
+    },
+    {
+      title: 'New Organic Products Now Available in Damday Marketplace',
+      slug: 'new-organic-products-marketplace',
+      excerpt: 'Fresh Himalayan produce and artisan goods join our growing collection of locally-sourced organic items.',
+      content: `We're excited to announce the addition of new organic products to the Damday Marketplace! Our farmers have been working tirelessly to expand their offerings while maintaining the highest quality standards.
+
+New additions include:
+- Himalayan Red Rice: Grown at high altitudes, rich in nutrients
+- Wild Berries: Hand-picked from forest areas
+- Organic Turmeric Powder: Freshly ground from farm-grown turmeric
+- Pure Mountain Honey: From chemical-free bee farms
+- Village Paneer: Made fresh daily using traditional methods
+
+All products are 100% organic, certified by local agricultural authorities, and support our farming community directly. Prices are kept fair for both farmers and consumers, ensuring sustainable livelihoods.
+
+Visit our marketplace to explore these new offerings and support local farmers while enjoying the freshest Himalayan produce.`,
+      categories: ['Marketplace', 'Products', 'Agriculture'],
+      tags: ['organic', 'local-produce', 'farmers', 'himalayan-products'],
+      published: true,
+    },
+    {
+      title: 'Community Tree Plantation Drive: 500 Saplings Planted',
+      slug: 'tree-plantation-drive-500-saplings',
+      excerpt: 'Villagers come together for massive afforestation initiative, bringing us closer to our 25,000 tree goal.',
+      content: `This weekend, the Damday Village community united for one of our largest tree plantation drives yet, successfully planting 500 saplings across various locations.
+
+The drive was a true community effort:
+- Over 100 villagers participated
+- Students from local schools joined enthusiastically
+- Mix of fruit trees, timber trees, and native species
+- Expert guidance from forestry department
+
+We planted apple, pear, walnut, and oak trees that will provide fruit, timber, and ecological benefits for generations. Each sapling was carefully selected for the local climate and soil conditions.
+
+This brings our total to 13,000 trees, marking significant progress toward our goal of 25,000 trees by 2025. These trees will sequester approximately 65 tons of CO2 annually when mature.
+
+The plantation sites include:
+- Hillside slopes for erosion control
+- Village common areas for shade
+- School and community center grounds
+- Agricultural field boundaries
+
+Thank you to all participants who made this event successful. Together, we're growing a greener future!`,
+      categories: ['Environment', 'Community', 'Events'],
+      tags: ['tree-plantation', 'afforestation', 'community-event', 'climate-action'],
+      published: true,
+    },
+    {
+      title: 'Traditional Garhwali Homestay Wins National Tourism Award',
+      slug: 'homestay-wins-national-award',
+      excerpt: 'Our heritage homestay recognized for excellence in sustainable tourism and cultural preservation.',
+      content: `We're proud to announce that the Traditional Garhwali House, one of Damday's heritage homestays, has won the National Award for Sustainable Tourism!
+
+This 100-year-old property, carefully restored while preserving traditional architecture, exemplifies our commitment to cultural heritage and sustainable tourism. The award recognizes:
+
+- Authentic cultural experiences for guests
+- Zero-waste operations
+- Support for local artisans and craftspeople
+- Preservation of traditional building techniques
+- Community employment and skill development
+
+The homestay features hand-carved woodwork, traditional Garhwali murals, and eco-friendly amenities. Guests enjoy organic home-cooked meals prepared using traditional recipes passed down through generations.
+
+This achievement validates our approach to tourism that benefits both visitors and the local community. Revenue from homestays directly supports village families and helps preserve our cultural heritage.
+
+Visit our homestays to experience authentic Himalayan hospitality and contribute to sustainable rural tourism.`,
+      categories: ['Tourism', 'Achievements', 'Culture'],
+      tags: ['homestay', 'award', 'sustainable-tourism', 'heritage'],
+      published: true,
+    },
+    {
+      title: 'Damday Village Hosts Solar Energy Workshop for Neighboring Villages',
+      slug: 'solar-energy-workshop',
+      excerpt: 'Sharing knowledge and experience with nearby communities to accelerate renewable energy adoption.',
+      content: `Damday Village hosted a two-day solar energy workshop, attended by representatives from 15 neighboring villages. The event focused on sharing our experience with renewable energy adoption and helping other communities transition to sustainable power sources.
+
+Workshop Highlights:
+- Technical training on solar panel installation
+- Maintenance and troubleshooting sessions
+- Financial planning and government subsidy information
+- Case studies from Damday's 100% solar transition
+- Hands-on demonstrations
+
+Participants learned how Damday achieved complete energy independence through rooftop solar installations on every household and community building. We shared insights on:
+
+- Choosing the right solar system size
+- Battery storage solutions
+- Cost-benefit analysis
+- Common challenges and solutions
+- Community financing models
+
+Several villages expressed commitment to starting their solar journey within the next six months. We've established a support network to assist them during implementation.
+
+This knowledge-sharing initiative aligns with our mission to create a network of sustainable villages across Uttarakhand. When communities work together, the transition to renewable energy becomes faster and more affordable.`,
+      categories: ['Energy', 'Community', 'Education'],
+      tags: ['solar-energy', 'renewable', 'workshop', 'knowledge-sharing'],
+      published: true,
+    },
+    {
+      title: 'Organic Farming Success: Damday Farmers Share Their Journey',
+      slug: 'organic-farming-success-stories',
+      excerpt: 'Local farmers discuss the transition to organic methods and the positive impact on yields and income.',
+      content: `Five years ago, Damday Village made a collective decision to transition to 100% organic farming. Today, our farmers share their experiences and the remarkable results of this journey.
+
+Farmer Testimonials:
+
+Ramesh Singh, vegetable farmer: "Initially, we were skeptical. But after the first season, we noticed healthier soil and stronger plants. Our tomatoes now fetch premium prices in organic markets."
+
+Kamla Devi, dairy farmer: "Organic feed improved our cows' health significantly. Milk quality increased, and we reduced veterinary costs by 60%."
+
+Prakash Negi, apple orchardist: "Chemical-free methods attract more birds and beneficial insects. Our apple trees are more resilient, and fruit quality has never been better."
+
+Key Benefits Observed:
+- 30% increase in premium market prices
+- Improved soil fertility and water retention
+- Reduced input costs (no expensive chemicals)
+- Better produce taste and shelf life
+- Increased biodiversity on farms
+
+The transition required patience and learning, but support from agricultural experts and the community made it possible. We now produce 26 varieties of organic products for our marketplace.
+
+Our success proves that organic farming is not only environmentally responsible but also economically viable. We welcome visitors to our farms to see these practices in action.`,
+      categories: ['Agriculture', 'Success Stories', 'Economy'],
+      tags: ['organic-farming', 'farmers', 'sustainable-agriculture', 'testimonials'],
+      published: true,
+    },
+  ]
+
+  let postCount = 0
+  for (const postData of blogPosts) {
+    const post = await prisma.post.upsert({
+      where: { slug: postData.slug },
+      update: {},
+      create: {
+        ...postData,
+        authorId: admin.id,
+        categories: JSON.stringify(postData.categories),
+        tags: JSON.stringify(postData.tags),
+      },
+    })
+    postCount++
+  }
+
+  console.log(`✅ Created ${postCount} blog posts`)
+
+  console.log('\n📝 Blog Data:')
+  console.log(`   Total Posts: ${postCount}`)
+  console.log(`   Published Posts: ${blogPosts.filter(p => p.published).length}`)
 }
 
 main()
