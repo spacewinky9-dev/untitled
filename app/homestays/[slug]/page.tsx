@@ -23,7 +23,7 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
     take: 3,
   })
 
-  const amenities = (homestay.amenities as string[]) || []
+  const amenities = homestay.amenities ? JSON.parse(homestay.amenities as string) : []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -77,7 +77,7 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold mb-4">Amenities</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {amenities.map((amenity, index) => (
+                    {amenities.map((amenity: string, index: number) => (
                       <div key={index} className="flex items-center">
                         <Check className="h-5 w-5 mr-2 text-green-600" />
                         <span>{amenity}</span>
