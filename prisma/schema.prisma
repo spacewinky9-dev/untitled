@@ -20,8 +20,23 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  profile       Profile?
 
   @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  phone     String?
+  address   String?
+  city      String?
+  country   String?
+  updatedAt DateTime @updatedAt
+  
+  @@map("profiles")
 }
 
 model Settings {

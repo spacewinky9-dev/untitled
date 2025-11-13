@@ -26,14 +26,21 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link href="/admin/login">
+            <Link href="/login">
               <Button size="lg" className="w-full sm:w-auto">
+                User Login
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                Register
+              </Button>
+            </Link>
+            <Link href="/admin/login">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                 Admin Portal
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto" disabled>
-              Public Portal (Coming Soon)
-            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
