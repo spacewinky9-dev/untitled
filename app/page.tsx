@@ -26,8 +26,14 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link href="/login">
+            <Link href="/marketplace">
               <Button size="lg" className="w-full sm:w-auto">
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                Visit Marketplace
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 User Login
               </Button>
             </Link>
