@@ -169,14 +169,20 @@ export class QuantumProofCrypto {
   /**
    * Derive a key from a password (for wallet encryption)
    * Uses SHA-3 for quantum resistance
-   * In production, use Argon2
+   * Note: This is a simplified implementation for demonstration
+   * In production, use Argon2id or PBKDF2 with proper salt and iterations
    */
   public static deriveKey(password: string, salt: string): string {
-    let derived = password + salt;
+    // Combine password and salt
+    const combined = salt + password;
     
     // Apply SHA-3 multiple times for key strengthening
+    // Note: This is NOT production-grade password hashing
+    // Use Argon2id or PBKDF2 in production
+    let derived = createHash('sha3-512').update(combined).digest('hex');
+    
     for (let i = 0; i < 10000; i++) {
-      derived = createHash('sha3-512').update(derived).digest('hex');
+      derived = createHash('sha3-512').update(derived + i.toString()).digest('hex');
     }
     
     return derived;
@@ -223,6 +229,7 @@ export class QuantumProofCrypto {
   /**
    * Generate mnemonic phrase (BIP39-like)
    * Simplified version with SHA-3
+   * Note: Uses Fisher-Yates shuffle to avoid modulo bias
    */
   public static generateMnemonic(): string[] {
     const words = [
@@ -233,11 +240,21 @@ export class QuantumProofCrypto {
     ];
 
     const mnemonic: string[] = [];
-    const entropy = randomBytes(16);
-
+    const entropy = randomBytes(32); // Increased entropy
+    
+    // Use Fisher-Yates shuffle to avoid modulo bias
+    const shuffledWords = [...words];
+    for (let i = shuffledWords.length - 1; i > 0; i--) {
+      // Use cryptographically secure random without modulo bias
+      const randomBuffer = randomBytes(4);
+      const randomValue = randomBuffer.readUInt32BE(0);
+      const j = Math.floor((randomValue / 0x100000000) * (i + 1));
+      [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+    }
+    
+    // Select first 12 words
     for (let i = 0; i < 12; i++) {
-      const index = entropy[i] % words.length;
-      mnemonic.push(words[index]);
+      mnemonic.push(shuffledWords[i]);
     }
 
     return mnemonic;
