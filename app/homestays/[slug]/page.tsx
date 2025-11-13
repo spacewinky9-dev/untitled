@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { MapPin, Users, Star, Home, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import BookingForm from '@/components/BookingForm'
 
 export default async function HomestayDetailPage({ params }: { params: { slug: string } }) {
   const homestay = await prisma.homestay.findUnique({
@@ -23,7 +24,7 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
     take: 3,
   })
 
-  const amenities = (homestay.amenities as string[]) || []
+  const amenities = homestay.amenities ? JSON.parse(homestay.amenities as string) : []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -77,7 +78,7 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold mb-4">Amenities</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {amenities.map((amenity, index) => (
+                    {amenities.map((amenity: string, index: number) => (
                       <div key={index} className="flex items-center">
                         <Check className="h-5 w-5 mr-2 text-green-600" />
                         <span>{amenity}</span>
@@ -90,36 +91,14 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
           </div>
 
           <div className="lg:col-span-1">
-            <Card className="sticky top-6">
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <div className="text-3xl font-bold mb-2">₹{homestay.pricePerNight}</div>
-                  <div className="text-gray-600">per night</div>
-                </div>
-
-                <Button className="w-full mb-3 bg-gradient-to-r from-orange-500 to-green-600 hover:from-orange-600 hover:to-green-700">
-                  Book Now
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Check Availability
-                </Button>
-
-                <div className="mt-6 pt-6 border-t space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Max Guests:</span>
-                    <span className="font-semibold">{homestay.maxGuests}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Rooms:</span>
-                    <span className="font-semibold">{homestay.rooms}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Rating:</span>
-                    <span className="font-semibold">{(homestay.rating || 0).toFixed(1)} ⭐</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="sticky top-6">
+              <BookingForm
+                homestayId={homestay.id}
+                homestayName={homestay.name}
+                pricePerNight={homestay.pricePerNight}
+                maxGuests={homestay.maxGuests}
+              />
+            </div>
           </div>
         </div>
 

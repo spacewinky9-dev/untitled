@@ -1,102 +1,272 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { TreePine, Users, Home, ShoppingBag } from 'lucide-react'
+import { TreePine, Users, Home as HomeIcon, ShoppingBag, Award, TrendingUp, MapPin, Star, ChevronRight, Bell, Calendar, Activity } from 'lucide-react'
+import Header from '@/components/Header'
+import ParticleBackground from '@/components/ParticleBackground'
+import LeadershipSection from '@/components/LeadershipSection'
 
 export default function HomePage() {
+  const stats = [
+    { icon: TreePine, label: 'Trees Planted', value: '12,500', target: '25,000', color: 'green' },
+    { icon: ShoppingBag, label: 'Products', value: '26', trend: '+4', color: 'orange' },
+    { icon: HomeIcon, label: 'Homestays', value: '5', capacity: '27 guests', color: 'blue' },
+    { icon: Users, label: 'Community', value: '500+', growth: '↑ 15%', color: 'purple' },
+  ]
+
+  const features = [
+    {
+      title: 'Organic Marketplace',
+      description: 'Fresh Himalayan products directly from local farmers',
+      icon: ShoppingBag,
+      href: '/marketplace',
+      gradient: 'from-orange-500 to-yellow-500',
+    },
+    {
+      title: 'Cultural Homestays',
+      description: 'Authentic village experience in traditional homes',
+      icon: HomeIcon,
+      href: '/homestays',
+      gradient: 'from-blue-500 to-cyan-500',
+    },
+    {
+      title: 'Carbon Credits',
+      description: 'Track and trade verified carbon offset tokens',
+      icon: TreePine,
+      href: '/carbon',
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: 'Community Hub',
+      description: 'Connect, collaborate and contribute to village initiatives',
+      icon: Users,
+      href: '/community',
+      gradient: 'from-purple-500 to-pink-500',
+    },
+  ]
+
+  const recentActivities = [
+    { icon: TreePine, text: 'New tree plantation drive started', time: '2 hours ago' },
+    { icon: ShoppingBag, text: '5 new organic products added', time: '5 hours ago' },
+    { icon: Award, text: 'Damday wins Green Village Award', time: '1 day ago' },
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-green-50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-4xl mx-auto">
-          <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-4xl shadow-lg">
-              DV
-            </div>
-          </div>
-          
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Damday Village
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-600 mb-4">
-            Smart Carbon-Free Village
-          </p>
-          
-          <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            A pioneering smart village in the Himalayan Devbhumi region of India, integrating sustainable development, carbon neutrality, and cultural preservation through technology.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link href="/marketplace">
-              <Button size="lg" className="w-full sm:w-auto">
-                <ShoppingBag className="w-5 h-5 mr-2" />
-                Visit Marketplace
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                User Login
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Register
-              </Button>
-            </Link>
-            <Link href="/admin/login">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
-                Admin Portal
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <TreePine className="h-12 w-12 text-green-600 mb-4 mx-auto" />
-              <h3 className="font-semibold mb-2">Carbon Credits</h3>
-              <p className="text-sm text-gray-600">25,000 tree planting goal</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <ShoppingBag className="h-12 w-12 text-orange-600 mb-4 mx-auto" />
-              <h3 className="font-semibold mb-2">Marketplace</h3>
-              <p className="text-sm text-gray-600">22+ organic products</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <Home className="h-12 w-12 text-blue-600 mb-4 mx-auto" />
-              <h3 className="font-semibold mb-2">Homestays</h3>
-              <p className="text-sm text-gray-600">Cultural tourism</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <Users className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
-              <h3 className="font-semibold mb-2">Community</h3>
-              <p className="text-sm text-gray-600">Engagement platform</p>
-            </div>
-          </div>
-
-          <div className="mt-16 p-6 bg-white rounded-lg shadow-sm border">
-            <h2 className="text-2xl font-bold mb-4">Development Progress</h2>
-            <div className="text-left max-w-2xl mx-auto">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-green-600">✅</span>
-                  <span>PR #1: Documentation Foundation</span>
+    <>
+      <Header />
+      <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-white to-green-50 overflow-hidden">
+        <ParticleBackground />
+        
+        {/* Hero Section */}
+        <section className="relative py-20 lg:py-32">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="text-center lg:text-left space-y-8">
+                <div className="inline-flex items-center bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border border-orange-200">
+                  <MapPin className="w-4 h-4 text-orange-600 mr-2" />
+                  <span className="text-sm font-medium text-gray-700">Himalayan Devbhumi, Uttarakhand</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-600">✅</span>
-                  <span>PR #2: Admin Panel Core (In Progress)</span>
+                
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                  <span className="bg-gradient-to-r from-orange-600 via-yellow-600 to-green-600 bg-clip-text text-transparent">
+                    Damday Village
+                  </span>
+                </h1>
+                
+                <p className="text-2xl md:text-3xl font-semibold text-gray-800">
+                  India&apos;s First Smart Carbon-Free Village
+                </p>
+                
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xl">
+                  A pioneering initiative integrating sustainable development, carbon neutrality, 
+                  and cultural preservation through cutting-edge technology in the heart of the Himalayas.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/marketplace">
+                    <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-green-600 hover:from-orange-600 hover:to-green-700 shadow-lg">
+                      <ShoppingBag className="w-5 h-5 mr-2" />
+                      Explore Marketplace
+                      <ChevronRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link href="/homestays">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 hover:bg-green-50">
+                      <HomeIcon className="w-5 h-5 mr-2" />
+                      Book Homestay
+                    </Button>
+                  </Link>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">⏳</span>
-                  <span className="text-gray-600">PR #3: User Panel & Authentication</span>
+
+                {/* Quick Stats */}
+                <div className="flex flex-wrap gap-6 pt-4">
+                  {stats.slice(0, 2).map((stat) => (
+                    <div key={stat.label} className="flex items-center gap-2">
+                      <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
+                      <div>
+                        <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                        <div className="text-xs text-gray-600">{stat.label}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">⏳</span>
-                  <span className="text-gray-600">PR #4-12: Remaining modules</span>
+              </div>
+
+              {/* Right Sidebar - Quick Access */}
+              <div className="space-y-4">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Quick Access</h3>
+                    <Bell className="w-5 h-5 text-orange-600" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link href="/login">
+                      <Button variant="outline" className="w-full">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button className="w-full bg-gradient-to-r from-orange-500 to-green-600">
+                        Register
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t">
+                    <Link href="/admin/login">
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Activity className="w-4 h-4 mr-2" />
+                        Admin Portal
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Recent Activity Widget */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-green-100 p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Activity className="w-5 h-5 text-green-600" />
+                    <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {recentActivities.map((activity, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-2 hover:bg-green-50 rounded-lg transition-colors">
+                        <activity.icon className="w-4 h-4 text-green-600 mt-1 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700">{activity.text}</p>
+                          <p className="text-xs text-gray-500">{activity.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Statistics Section */}
+        <section className="py-16 bg-white/50 backdrop-blur-sm">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="bg-white rounded-xl shadow-lg p-6 border-l-4 hover:shadow-xl transition-shadow"
+                  style={{ borderColor: `var(--color-${stat.color}-500)` }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <stat.icon className={`w-10 h-10 text-${stat.color}-600`} />
+                    {stat.trend && (
+                      <span className="text-green-600 text-sm font-semibold">{stat.trend}</span>
+                    )}
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                  <div className="text-sm text-gray-600 mb-2">{stat.label}</div>
+                  {stat.target && (
+                    <div className="text-xs text-gray-500">Target: {stat.target}</div>
+                  )}
+                  {stat.capacity && (
+                    <div className="text-xs text-gray-500">{stat.capacity}</div>
+                  )}
+                  {stat.growth && (
+                    <div className="text-xs text-green-600 font-medium">{stat.growth}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Explore Our Initiatives
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover how Damday Village is pioneering sustainable development
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((feature) => (
+                <Link
+                  key={feature.title}
+                  href={feature.href}
+                  className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 border border-gray-100 hover:border-orange-200 hover:-translate-y-1"
+                >
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md`}>
+                    <feature.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">{feature.description}</p>
+                  <div className="flex items-center text-orange-600 font-medium text-sm group-hover:gap-2 transition-all">
+                    <span>Learn more</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Leadership Section */}
+        <LeadershipSection />
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-r from-orange-500 via-yellow-500 to-green-600 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center max-w-3xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Join the Green Revolution
+              </h2>
+              <p className="text-xl mb-8 text-white/90">
+                Be part of India&apos;s journey towards sustainable living and carbon neutrality
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/register">
+                  <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 shadow-xl">
+                    Get Started Today
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/marketplace">
+                  <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
+                    Explore Products
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   )
 }
