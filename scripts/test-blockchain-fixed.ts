@@ -303,7 +303,7 @@ async function runTests() {
     const txsForPacking = [
       { id: 'tx1', gasPrice: 100n, gasLimit: 21000n, value: 1n },
       { id: 'tx2', gasPrice: 200n, gasLimit: 50000n, value: 2n },
-      { id: 'tx3', gasPrice: 150n, gasLimit: 30000n, value: 1.5n }
+      { id: 'tx3', gasPrice: 150n, gasLimit: 30000n, value: 2n }
     ];
     
     const packed = aiOptimization.optimizeBlockPacking(txsForPacking, 100000n);
