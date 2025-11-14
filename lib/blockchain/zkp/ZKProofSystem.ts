@@ -257,8 +257,8 @@ export class SNARKProver {
       evaluations: polynomials.map((poly, i) => poly.evaluate(challenges[i % challenges.length])),
       openingProofs: polynomials.map((poly, i) => {
         const challenge = challenges[i % challenges.length];
-        const eval = poly.evaluate(challenge);
-        return poly.generateOpeningProof(challenge, eval);
+        const evalResult = poly.evaluate(challenge);
+        return poly.generateOpeningProof(challenge, evalResult);
       }),
     };
 
