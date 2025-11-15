@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,24 +21,17 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      // Call the NextAuth API endpoint directly
-      const res = await fetch('/api/auth/callback/credentials', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
       })
 
-      if (res.ok) {
-        // Successfully logged in, redirect to admin
-        window.location.href = '/admin'
-      } else {
-        const data = await res.json().catch(() => ({}))
-        setError(data.error || 'Invalid email or password')
+      if (result?.error) {
+        setError('Invalid email or password')
+      } else if (result?.ok) {
+        router.push('/admin')
+        router.refresh()
       }
     } catch (error) {
       console.error('Login error:', error)
