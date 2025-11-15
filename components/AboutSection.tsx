@@ -19,13 +19,13 @@ export default function AboutSection() {
           
           <div className="space-y-4 text-center">
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed">
-              Damday Village stands as India's pioneering carbon-neutral village, harmoniously blending ancient wisdom with modern innovation. 
+              Damday Village stands as India&apos;s pioneering carbon-neutral village, harmoniously blending ancient wisdom with modern innovation. 
               Nestled in the pristine Himalayas of Uttarakhand, we are committed to preserving our environment while empowering our community.
             </p>
             
             <p className="text-base sm:text-lg text-white/70 leading-relaxed">
               Through sustainable practices, eco-tourism, and the revolutionary DamChain blockchain technology, 
-              we're creating a model for rural development that honors tradition while embracing the future. 
+              we&apos;re creating a model for rural development that honors tradition while embracing the future. 
               Our mission is to inspire communities worldwide to adopt sustainable living practices that benefit both people and planet.
             </p>
             

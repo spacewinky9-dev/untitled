@@ -81,6 +81,7 @@ function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
         <div className="flex flex-col items-center text-center">
           <div className="relative w-40 h-40 mb-4 rounded-full overflow-hidden ring-4 ring-orange-300/50 shadow-xl group-hover:ring-orange-400/70 transition-all">
             {!imageError ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={leader.imageUrl}
                 alt={leader.name}

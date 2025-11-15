@@ -48,19 +48,19 @@ export default function GramPradhanSection() {
                 <Quote className="absolute -top-2 -left-2 h-10 w-10 text-orange-400/30" />
                 <blockquote className="relative pl-8 space-y-4">
                   <p className="text-lg sm:text-xl text-white/90 leading-relaxed italic">
-                    "Climate change is not just an environmental challenge—it's a test of our civilization's will to survive and thrive. 
-                    Every small action we take today shapes the world our children will inherit tomorrow."
+                    &ldquo;Climate change is not just an environmental challenge—it&apos;s a test of our civilization&apos;s will to survive and thrive. 
+                    Every small action we take today shapes the world our children will inherit tomorrow.&rdquo;
                   </p>
                   
                   <p className="text-base sm:text-lg text-white/80 leading-relaxed">
-                    "Through unity, innovation, and unwavering commitment to sustainability, we are proving that rural communities 
+                    &ldquo;Through unity, innovation, and unwavering commitment to sustainability, we are proving that rural communities 
                     can lead the way in creating a harmonious balance between development and environmental preservation. 
-                    Our journey is a testament to the power of positive action and collective responsibility."
+                    Our journey is a testament to the power of positive action and collective responsibility.&rdquo;
                   </p>
                   
                   <p className="text-base sm:text-lg text-white/70 leading-relaxed font-medium">
-                    "Let us work together to build a future where prosperity and planet protection go hand in hand, 
-                    where tradition meets technology, and where every life flourishes in harmony with nature."
+                    &ldquo;Let us work together to build a future where prosperity and planet protection go hand in hand, 
+                    where tradition meets technology, and where every life flourishes in harmony with nature.&rdquo;
                   </p>
                 </blockquote>
               </div>
