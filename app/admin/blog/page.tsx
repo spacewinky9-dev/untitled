@@ -92,7 +92,17 @@ export default async function AdminBlogPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {posts.map((post) => {
-                    const categories = post.categories ? JSON.parse(post.categories as string) : []
+                    // Safely parse categories
+                    let categories: string[] = []
+                    try {
+                      if (post.categories) {
+                        const parsed = JSON.parse(post.categories as string)
+                        categories = Array.isArray(parsed) ? parsed : []
+                      }
+                    } catch {
+                      categories = []
+                    }
+                    
                     return (
                       <tr key={post.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">

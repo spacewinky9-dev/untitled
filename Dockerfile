@@ -30,7 +30,7 @@ ENV NODE_ENV=production
 
 # ✅ FIX 3: Set a dummy DATABASE_URL for build time (Prisma needs it)
 # Real DATABASE_URL will be used at runtime
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV DATABASE_URL="file:./prisma/dev.db"
 
 # Generate Prisma Client
 RUN npx prisma generate
@@ -70,6 +70,9 @@ COPY --from=builder /app/package.json ./package.json
 # Copy entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Create data directory for SQLite database
+RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app

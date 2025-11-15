@@ -5,9 +5,12 @@ echo "🚀 Starting Damday application..."
 
 # Check if DATABASE_URL is set
 if [ -z "$DATABASE_URL" ]; then
-  echo "❌ ERROR: DATABASE_URL environment variable is not set"
-  exit 1
+  echo "⚠️  WARNING: DATABASE_URL not set, using default SQLite database"
+  export DATABASE_URL="file:/app/data/production.db"
 fi
+
+# Ensure data directory exists for SQLite
+mkdir -p /app/data
 
 echo "📦 Generating Prisma Client..."
 node /app/node_modules/prisma/build/index.js generate
@@ -22,9 +25,17 @@ else
   echo "✅ Schema pushed successfully"
 fi
 
-echo "🌱 Seeding database (if needed)..."
-# Only seed if needed, ignore errors if already seeded
-npm run db:seed 2>/dev/null || echo "⚠️  Seeding skipped or already done"
+# Only seed if database is empty
+echo "🌱 Checking if database needs seeding..."
+if node /app/node_modules/prisma/build/index.js db execute --stdin <<EOF 2>/dev/null
+SELECT COUNT(*) FROM users;
+EOF
+then
+  echo "✅ Database already has data, skipping seed"
+else
+  echo "📝 Seeding database..."
+  npm run db:seed 2>&1 || echo "⚠️  Seeding failed or already done"
+fi
 
 echo "✅ Database setup complete!"
 echo "🎯 Starting Next.js server..."

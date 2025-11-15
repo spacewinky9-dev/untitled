@@ -64,6 +64,20 @@ export const authOptions: NextAuthConfig = {
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
+  // Add CSRF protection configuration
+  cookies: {
+    csrfToken: {
+      name: 'next-auth.csrf-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    },
+  },
+  // Enable debug mode for troubleshooting
+  debug: process.env.NODE_ENV === 'development',
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authOptions)

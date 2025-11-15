@@ -20,7 +20,16 @@ export default async function BlogPage() {
     take: 20,
   })
 
-  const categories = [...new Set(posts.flatMap(p => p.categories ? JSON.parse(p.categories as string) : []))]
+  // Safely parse categories from all posts
+  const categories = [...new Set(posts.flatMap(p => {
+    if (!p.categories) return []
+    try {
+      const parsed = JSON.parse(p.categories as string)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }))]
 
   return (
     <>
@@ -44,8 +53,27 @@ export default async function BlogPage() {
             <div className="lg:col-span-3">
               <div className="space-y-8">
                 {posts.map((post) => {
-                  const categories = post.categories ? JSON.parse(post.categories as string) : []
-                  const tags = post.tags ? JSON.parse(post.tags as string) : []
+                  // Safely parse categories and tags
+                  let categories: string[] = []
+                  let tags: string[] = []
+                  
+                  try {
+                    if (post.categories) {
+                      const parsed = JSON.parse(post.categories as string)
+                      categories = Array.isArray(parsed) ? parsed : []
+                    }
+                  } catch {
+                    categories = []
+                  }
+                  
+                  try {
+                    if (post.tags) {
+                      const parsed = JSON.parse(post.tags as string)
+                      tags = Array.isArray(parsed) ? parsed : []
+                    }
+                  } catch {
+                    tags = []
+                  }
                   
                   return (
                     <article
