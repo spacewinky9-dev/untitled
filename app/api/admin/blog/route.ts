@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 
+// Force dynamic rendering for authentication
+export const dynamic = 'force-dynamic'
+
 // POST /api/admin/blog - Create new blog post
 export async function POST(request: NextRequest) {
   try {

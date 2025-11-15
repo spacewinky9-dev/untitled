@@ -2,6 +2,9 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
+// Force dynamic rendering for authentication
+export const dynamic = 'force-dynamic'
+
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
