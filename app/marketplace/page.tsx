@@ -1,7 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import StatsSidebar from '@/components/StatsSidebar'
-import LeadershipSection from '@/components/LeadershipSection'
 import ParticleBackground from '@/components/ParticleBackground'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
@@ -58,13 +57,6 @@ export default async function MarketplacePage() {
                   <StatsSidebar />
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Leadership Section */}
-          <section className="py-12 px-6">
-            <div className="container mx-auto">
-              <LeadershipSection />
             </div>
           </section>
 

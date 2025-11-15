@@ -5,7 +5,6 @@ import Header from '@/components/Header'
 import ParticleBackground from '@/components/ParticleBackground'
 import Footer from '@/components/Footer'
 import StatsSidebar from '@/components/StatsSidebar'
-import LeadershipSection from '@/components/LeadershipSection'
 
 export default function ToursPage() {
   const tours = [
@@ -130,13 +129,6 @@ export default function ToursPage() {
                   <StatsSidebar />
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Leadership Section */}
-          <section className="py-12 px-6">
-            <div className="container mx-auto">
-              <LeadershipSection />
             </div>
           </section>
 

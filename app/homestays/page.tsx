@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import StatsSidebar from '@/components/StatsSidebar'
-import LeadershipSection from '@/components/LeadershipSection'
 import ParticleBackground from '@/components/ParticleBackground'
 
 export const dynamic = 'force-dynamic'
@@ -68,13 +67,6 @@ export default async function HomestaysPage() {
                   <StatsSidebar />
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Leadership Section */}
-          <div className="py-12 px-6">
-            <div className="container mx-auto">
-              <LeadershipSection />
             </div>
           </div>
 
