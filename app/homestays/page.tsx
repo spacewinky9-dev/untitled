@@ -4,6 +4,8 @@ import { MapPin, Users, Star, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomestaysPage() {
   const homestays = await prisma.homestay.findMany({
     where: { active: true },
