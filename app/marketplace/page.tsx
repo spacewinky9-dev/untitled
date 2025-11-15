@@ -18,9 +18,9 @@ export default async function MarketplacePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-emerald-900 overflow-hidden relative">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden relative">
         <ParticleBackground />
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-green-500/10 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-purple-900/15 to-emerald-600/20 z-[1]" />
         
         <div className="relative z-10">
           {/* Hero Section */}
@@ -32,8 +32,8 @@ export default async function MarketplacePage() {
                     <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-6">
                       <ShoppingBag className="h-10 w-10 text-white" />
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Local Marketplace</h1>
-                    <p className="text-xl text-white/70 mb-8">
+                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">Local Marketplace</h1>
+                    <p className="text-xl text-white/80 mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                       Discover authentic organic products directly from Damday Village artisans
                     </p>
                     <div className="flex flex-wrap gap-4">

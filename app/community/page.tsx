@@ -86,9 +86,9 @@ export default function CommunityPage() {
   return (
     <>
       <Header />
-      <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-pink-900 overflow-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
         <ParticleBackground />
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-purple-900/15 to-emerald-600/20 z-[1]" />
         
         <div className="relative z-10">
           {/* Hero Section */}
@@ -102,11 +102,11 @@ export default function CommunityPage() {
                       <span className="text-sm font-medium text-white">Join 500+ Active Members</span>
                     </div>
                     
-                    <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 text-white">
+                    <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                       Community Hub
                     </h1>
                     
-                    <p className="text-xl text-white/70 leading-relaxed mb-8">
+                    <p className="text-xl text-white/80 leading-relaxed mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                       Connect with like-minded individuals, collaborate on sustainability projects, 
                       and be part of India&apos;s first smart carbon-free village revolution.
                     </p>
