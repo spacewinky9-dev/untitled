@@ -25,111 +25,120 @@ export default function ParticleBackground() {
           events: {
             onClick: {
               enable: true,
-              mode: ['push', 'bubble'],
+              mode: ['push', 'bubble', 'repulse'],
             },
             onHover: {
               enable: true,
-              mode: ['grab', 'connect'],
+              mode: ['grab', 'bubble'],
             },
             resize: true,
           },
           modes: {
             push: {
-              quantity: 4,
+              quantity: 5,
             },
             grab: {
-              distance: 200,
+              distance: 250,
               links: {
-                opacity: 0.5,
-                color: '#00ff88',
+                opacity: 0.7,
+                color: '#FFD700',
               },
             },
             connect: {
-              distance: 150,
-              radius: 200,
+              distance: 200,
+              radius: 250,
               links: {
-                opacity: 0.5,
+                opacity: 0.6,
               },
             },
             bubble: {
-              distance: 250,
-              size: 8,
-              duration: 2,
-              opacity: 0.8,
+              distance: 300,
+              size: 10,
+              duration: 2.5,
+              opacity: 1,
+              color: {
+                value: ['#FF9933', '#FFD700'],
+              },
             },
             repulse: {
-              distance: 120,
-              duration: 0.4,
+              distance: 150,
+              duration: 0.6,
             },
           },
         },
         particles: {
           color: {
-            value: ['#FF9933', '#138808', '#00d4ff', '#FFD700', '#ff00ff', '#00ff88'],
+            value: ['#FF9933', '#138808', '#00d4ff', '#FFD700', '#ff6b6b', '#4ecdc4', '#95e1d3'],
           },
           links: {
             color: {
-              value: ['#FF9933', '#138808', '#00d4ff'],
+              value: '#FF9933',
             },
-            distance: 180,
+            distance: 150,
             enable: true,
-            opacity: 0.35,
-            width: 1.5,
+            opacity: 0.25,
+            width: 1.2,
             triangles: {
               enable: true,
-              opacity: 0.05,
+              opacity: 0.08,
+              color: '#138808',
             },
           },
           move: {
             direction: 'none',
             enable: true,
             outModes: {
-              default: 'out',
-              bottom: 'out',
-              left: 'out',
-              right: 'out',
-              top: 'out',
+              default: 'bounce',
+              bottom: 'bounce',
+              left: 'bounce',
+              right: 'bounce',
+              top: 'bounce',
             },
             random: true,
-            speed: 2,
+            speed: 1.5,
             straight: false,
             attract: {
               enable: true,
               rotate: {
-                x: 600,
-                y: 1200,
+                x: 800,
+                y: 1600,
               },
             },
+            bounce: true,
+            decay: 0.01,
           },
           number: {
             density: {
               enable: true,
-              area: 900,
+              area: 800,
             },
-            value: 80,
+            value: 100,
           },
           opacity: {
-            value: { min: 0.3, max: 0.7 },
+            value: { min: 0.3, max: 0.8 },
             animation: {
               enable: true,
-              speed: 1,
-              minimumValue: 0.1,
+              speed: 0.8,
+              minimumValue: 0.2,
               sync: false,
             },
           },
           shape: {
-            type: ['circle', 'triangle', 'polygon'],
+            type: ['circle', 'triangle', 'polygon', 'star'],
             options: {
               polygon: {
                 sides: 6,
               },
+              star: {
+                sides: 5,
+              },
             },
           },
           size: {
-            value: { min: 1, max: 5 },
+            value: { min: 1, max: 6 },
             animation: {
               enable: true,
-              speed: 2,
+              speed: 3,
               minimumValue: 0.5,
               sync: false,
             },
@@ -137,8 +146,17 @@ export default function ParticleBackground() {
           twinkle: {
             particles: {
               enable: true,
-              frequency: 0.05,
+              frequency: 0.08,
               opacity: 1,
+            },
+          },
+          rotate: {
+            value: 0,
+            direction: 'clockwise',
+            animation: {
+              enable: true,
+              speed: 5,
+              sync: false,
             },
           },
         },
