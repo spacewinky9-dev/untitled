@@ -534,7 +534,7 @@ function ManualEntry({ indicators, editingIndicator, onIndicatorAdded, onCancel 
           </CardHeader>
           <CardContent className="text-sm space-y-2 text-muted-foreground">
             <p>Manually define your custom indicator by specifying its parameters and output buffers.</p>
-            <p>This is useful when you don't have access to the source code but know the indicator's structure.</p>
+            <p>This is useful when you don&apos;t have access to the source code but know the indicator&apos;s structure.</p>
           </CardContent>
         </Card>
 

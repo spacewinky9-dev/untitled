@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -81,9 +81,9 @@ export function CommandPalette({ open, onOpenChange, actions }: CommandPalettePr
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, selectedIndex, filteredActions])
+  }, [open, selectedIndex, filteredActions, executeAction])
 
-  const executeAction = (action: CommandAction) => {
+  const executeAction = useCallback((action: CommandAction) => {
     action.action()
     
     // Add to recent commands
@@ -95,7 +95,7 @@ export function CommandPalette({ open, onOpenChange, actions }: CommandPalettePr
     
     onOpenChange(false)
     setSearch('')
-  }
+  }, [onOpenChange])
 
   // Load recent commands from localStorage
   useEffect(() => {

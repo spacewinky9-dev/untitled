@@ -1,6 +1,7 @@
 import Layout from '@/components/Layout'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingBag, Leaf, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -51,7 +52,7 @@ export default async function MarketplacePage() {
                   <div className="group bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 hover:bg-white/15 transition-all hover:scale-105 cursor-pointer">
                     <div className="aspect-square bg-gradient-to-br from-orange-500/20 to-green-500/20 rounded-2xl mb-4 flex items-center justify-center overflow-hidden">
                       {product.images && product.images.length > 0 ? (
-                        <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                        <Image src={product.images[0]} alt={product.name} width={400} height={400} className="w-full h-full object-cover" />
                       ) : (
                         <ShoppingBag className="h-16 w-16 text-white/40" />
                       )}

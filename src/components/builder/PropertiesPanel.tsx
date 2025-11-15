@@ -86,7 +86,7 @@ export function PropertiesPanel({ selectedNode, onClose }: PropertiesPanelProps)
         setHistoryIndex(0)
       }
     }
-  }, [selectedNode])
+  }, [selectedNode, history.length])
 
   if (!selectedNode) {
     return (
