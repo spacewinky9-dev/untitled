@@ -24,7 +24,16 @@ export default async function HomestayDetailPage({ params }: { params: { slug: s
     take: 3,
   })
 
-  const amenities = homestay.amenities ? JSON.parse(homestay.amenities as string) : []
+  // Safely parse amenities
+  let amenities: string[] = []
+  try {
+    if (homestay.amenities) {
+      const parsed = JSON.parse(homestay.amenities as string)
+      amenities = Array.isArray(parsed) ? parsed : []
+    }
+  } catch {
+    amenities = []
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

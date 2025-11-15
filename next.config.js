@@ -8,6 +8,15 @@ const nextConfig = {
         hostname: 'upload.wikimedia.org',
       },
     ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Handle image errors gracefully
+    unoptimized: false,
+  },
+  // Disable image optimization errors in production
+  experimental: {
+    // Allow fallback for failed remote images
   },
 }
 

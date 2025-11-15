@@ -22,8 +22,27 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound()
   }
 
-  const categories = post.categories ? JSON.parse(post.categories as string) : []
-  const tags = post.tags ? JSON.parse(post.tags as string) : []
+  // Safely parse categories and tags
+  let categories: string[] = []
+  let tags: string[] = []
+  
+  try {
+    if (post.categories) {
+      const parsed = JSON.parse(post.categories as string)
+      categories = Array.isArray(parsed) ? parsed : []
+    }
+  } catch {
+    categories = []
+  }
+  
+  try {
+    if (post.tags) {
+      const parsed = JSON.parse(post.tags as string)
+      tags = Array.isArray(parsed) ? parsed : []
+    }
+  } catch {
+    tags = []
+  }
 
   // Get related posts
   const relatedPosts = await prisma.post.findMany({
