@@ -69,40 +69,15 @@ export class DRC721Token implements DRC721Interface {
     return this._balances.get(address) || 0;
   }
 
-  public transferFrom(from: string, to: string, tokenId: string, caller: string): void {
-    const owner = this.ownerOf(tokenId);
-
-    if (owner !== from) {
-      throw new Error('Transfer from incorrect owner');
-    }
-
-    // Check if caller is authorized
-    if (caller !== owner && !this.isApprovedOrOwner(caller, tokenId)) {
-      throw new Error('Caller is not owner nor approved');
-    }
-
-    // Clear approvals
-    this._tokenApprovals.delete(tokenId);
-
-    // Update balances
-    const fromBalance = this.balanceOf(from);
-    this._balances.set(from, fromBalance - 1);
-
-    const toBalance = this.balanceOf(to);
-    this._balances.set(to, toBalance + 1);
-
-    // Transfer ownership
-    this._owners.set(tokenId, to);
+  public transferFrom(from: string, to: string, tokenId: string): void {
+    // In production, caller would be msg.sender from transaction context
+    // For now, throw error
+    throw new Error('transferFrom must be called with transaction context');
   }
 
-  public approve(to: string, tokenId: string, caller: string): void {
-    const owner = this.ownerOf(tokenId);
-
-    if (caller !== owner && !this.isApprovedForAll(owner, caller)) {
-      throw new Error('Caller is not owner nor approved for all');
-    }
-
-    this._tokenApprovals.set(tokenId, to);
+  public approve(to: string, tokenId: string): void {
+    // In production, caller would be msg.sender from transaction context
+    throw new Error('approve must be called with transaction context');
   }
 
   public getApproved(tokenId: string): string {
@@ -112,17 +87,9 @@ export class DRC721Token implements DRC721Interface {
     return this._tokenApprovals.get(tokenId) || '';
   }
 
-  public setApprovalForAll(operator: string, approved: boolean, owner: string): void {
-    if (!this._operatorApprovals.has(owner)) {
-      this._operatorApprovals.set(owner, new Set());
-    }
-
-    const operators = this._operatorApprovals.get(owner)!;
-    if (approved) {
-      operators.add(operator);
-    } else {
-      operators.delete(operator);
-    }
+  public setApprovalForAll(operator: string, approved: boolean): void {
+    // In production, owner would be msg.sender from transaction context
+    throw new Error('setApprovalForAll must be called with transaction context');
   }
 
   public isApprovedForAll(owner: string, operator: string): boolean {
