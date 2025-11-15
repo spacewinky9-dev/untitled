@@ -17,11 +17,27 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Set build-time environment variables (these are NOT included in final image)
+# CapRover automatically passes environment variables during build
+ARG DATABASE_URL
+ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
+ARG NODE_ENV=production
+
+# Make environment variables available during build
+ENV DATABASE_URL=$DATABASE_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV NODE_ENV=$NODE_ENV
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Run database migrations (this will create tables)
+RUN npx prisma migrate deploy || npx prisma db push || true
+
 # Build Next.js application
-ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
 # Production image, copy all the files and run next
