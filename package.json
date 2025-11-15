@@ -12,7 +12,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "verify": "bash scripts/verify-deployment.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
