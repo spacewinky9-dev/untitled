@@ -4,8 +4,8 @@ FROM node:18-alpine AS base
 # Install dependencies only when needed
 FROM base AS deps
 
-# ✅ FIX 1: Add OpenSSL 1.1 compatibility for Prisma
-RUN apk add --no-cache libc6-compat openssl openssl1.1-compat
+# ✅ FIX 1: Add OpenSSL compatibility for Prisma
+RUN apk add --no-cache libc6-compat openssl
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN npm ci
 FROM base AS builder
 
 # ✅ FIX 2: Install OpenSSL in builder stage too
-RUN apk add --no-cache openssl openssl1.1-compat
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -42,7 +42,7 @@ RUN npm run build
 FROM base AS runner
 
 # ✅ FIX 4: Install OpenSSL in runtime stage
-RUN apk add --no-cache openssl openssl1.1-compat curl
+RUN apk add --no-cache openssl curl
 
 WORKDIR /app
 
