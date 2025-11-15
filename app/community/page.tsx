@@ -4,6 +4,7 @@ import { Users, MessageSquare, Calendar, Trophy, Heart, Share2, UserPlus, Trendi
 import Header from '@/components/Header'
 import ParticleBackground from '@/components/ParticleBackground'
 import Footer from '@/components/Footer'
+import StatsSidebar from '@/components/StatsSidebar'
 
 export default function CommunityPage() {
   const stats = [
@@ -85,91 +86,102 @@ export default function CommunityPage() {
   return (
     <>
       <Header />
-      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-pink-900 overflow-hidden">
         <ParticleBackground />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 z-[1]" />
         
-        {/* Hero Section */}
-        <section className="relative py-20 lg:py-32">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-4xl mx-auto mb-12">
-              <div className="inline-flex items-center bg-white/80 backdrop-blur-sm px-6 py-2 rounded-full shadow-md border border-purple-200 mb-6">
-                <Users className="w-5 h-5 text-purple-600 mr-2" />
-                <span className="text-sm font-medium text-gray-700">Join 500+ Active Members</span>
-              </div>
-              
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-                <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-                  Community Hub
-                </span>
-              </h1>
-              
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Connect with like-minded individuals, collaborate on sustainability projects, 
-                and be part of India&apos;s first smart carbon-free village revolution.
-              </p>
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <section className="pt-24 pb-12 px-6">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-8">
+                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
+                    <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full border border-white/30 mb-6">
+                      <Users className="w-5 h-5 text-purple-300 mr-2" />
+                      <span className="text-sm font-medium text-white">Join 500+ Active Members</span>
+                    </div>
+                    
+                    <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 text-white">
+                      Community Hub
+                    </h1>
+                    
+                    <p className="text-xl text-white/70 leading-relaxed mb-8">
+                      Connect with like-minded individuals, collaborate on sustainability projects, 
+                      and be part of India&apos;s first smart carbon-free village revolution.
+                    </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/register">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg">
-                    <UserPlus className="w-5 h-5 mr-2" />
-                    Join Community
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-                <Link href="/blog">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 hover:bg-purple-50">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Read Stories
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Statistics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 border-l-4 hover:shadow-xl transition-shadow"
-                  style={{ borderColor: `var(--color-${stat.color}-500)` }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <stat.icon className={`w-10 h-10 text-${stat.color}-600`} />
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Link href="/register">
+                        <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg">
+                          <UserPlus className="w-5 h-5 mr-2" />
+                          Join Community
+                          <ChevronRight className="w-5 h-5 ml-2" />
+                        </Button>
+                      </Link>
+                      <Link href="/blog">
+                        <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
+                          <MessageSquare className="w-5 h-5 mr-2" />
+                          Read Stories
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                  <div className="text-sm text-gray-600 mb-2">{stat.label}</div>
-                  <div className="text-xs text-gray-500">{stat.subtitle}</div>
                 </div>
-              ))}
+                
+                <div className="lg:col-span-4">
+                  <StatsSidebar />
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Features Grid */}
-        <section className="py-16 bg-white/50 backdrop-blur-sm">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                Community Features
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Collaborate, contribute, and make a difference together
-              </p>
+          {/* Statistics */}
+          <section className="py-12 px-6">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:scale-105 transition-all"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <stat.icon className="w-10 h-10 text-purple-300" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                    <div className="text-sm text-white/70 mb-2">{stat.label}</div>
+                    <div className="text-xs text-white/50">{stat.subtitle}</div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </section>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Features Grid */}
+          <section className="py-12 px-6">
+            <div className="container mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  Community Features
+                </h2>
+                <p className="text-lg text-white/70 max-w-2xl mx-auto">
+                  Collaborate, contribute, and make a difference together
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 border border-gray-100 hover:border-purple-200 hover:-translate-y-1"
+                  className="group bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:scale-105 transition-all"
                 >
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md`}>
                     <feature.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-gray-600">{feature.description}</p>
+                  <p className="text-sm text-white/60">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -177,27 +189,27 @@ export default function CommunityPage() {
         </section>
 
         {/* Upcoming Events */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
+        <section className="py-12 px-6">
+          <div className="container mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4">
                 Upcoming Events
               </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-white/70 max-w-2xl mx-auto">
                 Join exciting events and workshops happening in Damday Village
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {upcomingEvents.map((event) => (
-                <div key={event.title} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
+                <div key={event.title} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:scale-105 transition-all">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                      <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                        event.category === 'Environment' ? 'bg-green-100 text-green-700' :
-                        event.category === 'Education' ? 'bg-blue-100 text-blue-700' :
-                        event.category === 'Culture' ? 'bg-purple-100 text-purple-700' :
+                        event.category === 'Environment' ? 'bg-green-500/30 text-green-200' :
+                        event.category === 'Education' ? 'bg-blue-500/30 text-blue-200' :
+                        event.category === 'Culture' ? 'bg-purple-500/30 text-purple-200' :
                         'bg-orange-100 text-orange-700'
                       }`}>
                         {event.category}
@@ -205,7 +217,7 @@ export default function CommunityPage() {
                     </div>
                   </div>
                   
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <div className="space-y-2 text-sm text-white/70 mb-4">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2" />
                       <span>{event.date}</span>
@@ -220,12 +232,12 @@ export default function CommunityPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                    <div className="flex items-center text-sm text-white/70">
                       <Users className="w-4 h-4 mr-2" />
                       <span>{event.participants} participants</span>
                     </div>
-                    <Button size="sm" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50">
+                    <Button size="sm" variant="outline" className="border-purple-300 text-white hover:bg-white/10">
                       Join Event
                     </Button>
                   </div>
@@ -236,29 +248,29 @@ export default function CommunityPage() {
         </section>
 
         {/* Top Contributors */}
-        <section className="py-16 bg-white/50 backdrop-blur-sm">
-          <div className="container mx-auto px-4">
+        <section className="py-12 px-6">
+          <div className="container mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4">
                 Top Contributors
               </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-white/70 max-w-2xl mx-auto">
                 Meet our amazing community members making a difference
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
               {communityMembers.map((member) => (
-                <div key={member.name} className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center">
+                <div key={member.name} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:scale-105 transition-all text-center">
                   <div className="text-6xl mb-4">{member.avatar}</div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{member.role}</p>
+                  <h3 className="text-lg font-bold text-white mb-1">{member.name}</h3>
+                  <p className="text-sm text-white/60 mb-3">{member.role}</p>
                   
-                  <div className="pt-4 border-t">
-                    <div className="flex items-center justify-center text-purple-600">
+                  <div className="pt-4 border-t border-white/20">
+                    <div className="flex items-center justify-center text-purple-300">
                       <Award className="w-4 h-4 mr-2" />
                       <span className="font-bold">{member.contributions}</span>
-                      <span className="text-xs ml-1 text-gray-500">contributions</span>
+                      <span className="text-xs ml-1 text-white/50">contributions</span>
                     </div>
                   </div>
                 </div>
@@ -268,9 +280,9 @@ export default function CommunityPage() {
         </section>
 
         {/* Impact Section */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600 rounded-3xl shadow-2xl p-12 text-white text-center">
+        <section className="py-12 px-6">
+          <div className="container mx-auto">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12 text-white text-center">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 Make Your Impact Today
               </h2>
@@ -312,6 +324,7 @@ export default function CommunityPage() {
             </div>
           </div>
         </section>
+        </div>
       </div>
       
       <Footer />
