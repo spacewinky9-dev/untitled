@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Home, ShoppingBag, Building2, BookOpen, TreePine, Users } from 'lucide-react'
+import { Menu, X, Home, ShoppingBag, Building2, BookOpen, TreePine, Users, MapPin, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface NavItem {
@@ -19,10 +19,12 @@ export default function Header() {
   // Navigation items - will be fetched from database in admin panel
   const navItems: NavItem[] = [
     { id: '1', label: 'Home', href: '/', icon: 'Home', order: 1 },
-    { id: '2', label: 'Marketplace', href: '/marketplace', icon: 'ShoppingBag', order: 2 },
-    { id: '3', label: 'Homestays', href: '/homestays', icon: 'Building2', order: 3 },
-    { id: '4', label: 'Community', href: '/community', icon: 'Users', order: 4 },
-    { id: '5', label: 'Carbon Credits', href: '/carbon', icon: 'TreePine', order: 5 },
+    { id: '2', label: 'Homestays', href: '/homestays', icon: 'Building2', order: 2 },
+    { id: '3', label: 'Tours', href: '/tours', icon: 'MapPin', order: 3 },
+    { id: '4', label: 'Marketplace', href: '/marketplace', icon: 'ShoppingBag', order: 4 },
+    { id: '5', label: 'Community', href: '/community', icon: 'Users', order: 5 },
+    { id: '6', label: 'Carbon Credits', href: '/carbon', icon: 'TreePine', order: 6 },
+    { id: '7', label: 'Contact', href: '/contact', icon: 'MessageSquare', order: 7 },
   ]
 
   const getIcon = (iconName: string) => {
@@ -33,6 +35,8 @@ export default function Header() {
       Users: <Users className="h-4 w-4" />,
       TreePine: <TreePine className="h-4 w-4" />,
       BookOpen: <BookOpen className="h-4 w-4" />,
+      MapPin: <MapPin className="h-4 w-4" />,
+      MessageSquare: <MessageSquare className="h-4 w-4" />,
     }
     return icons[iconName] || null
   }
