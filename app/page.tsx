@@ -8,6 +8,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import StatsSidebar from '@/components/StatsSidebar'
 import LeadershipSection from '@/components/LeadershipSection'
+import AboutSection from '@/components/AboutSection'
+import GramPradhanSection from '@/components/GramPradhanSection'
 import ParticleBackground from '@/components/ParticleBackground'
 
 export default function HomePage() {
@@ -20,16 +22,18 @@ export default function HomePage() {
         
         <div className="relative z-10">
 
-        <section className="pt-24 pb-20 px-4 sm:px-6">
+        {/* Hero Section with Golden Ratio (1:1.618) */}
+        <section className="pt-24 pb-16 px-4 sm:px-6">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              <div className="lg:col-span-8 space-y-8">
+              {/* Main content area: ~62% (golden ratio) */}
+              <div className="lg:col-span-7 space-y-8">
                 <div className="space-y-6 animate-fade-in">
                   <div className="inline-block bg-gradient-to-r from-orange-500/20 to-green-500/20 backdrop-blur-sm border border-orange-500/30 rounded-full px-4 sm:px-6 py-2 animate-bounce-subtle">
                     <p className="text-sm sm:text-base text-orange-300 font-semibold">🌱 India&#39;s First Carbon Neutral Village</p>
                   </div>
                   
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-tight">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight">
                     Welcome to
                     <span className="block bg-gradient-to-r from-orange-400 via-yellow-300 to-green-400 bg-clip-text text-transparent mt-2 animate-pulse-soft">
                       Damday Village
@@ -57,7 +61,8 @@ export default function HomePage() {
                 </div>
               </div>
               
-              <div className="lg:col-span-4">
+              {/* Sidebar area: ~38% (golden ratio complement) */}
+              <div className="lg:col-span-5">
                 <StatsSidebar />
               </div>
             </div>
@@ -65,11 +70,17 @@ export default function HomePage() {
         </section>
 
         {/* Leadership Section */}
-        <section className="py-16 px-6">
+        <section className="py-12 px-6">
           <div className="container mx-auto">
             <LeadershipSection />
           </div>
         </section>
+
+        {/* About Section */}
+        <AboutSection />
+
+        {/* Gram Pradhan Section */}
+        <GramPradhanSection />
 
         <section className="py-16 sm:py-20 px-4 sm:px-6">
           <div className="container mx-auto">

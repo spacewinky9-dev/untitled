@@ -15,19 +15,19 @@ export default function LeadershipSection() {
     {
       name: 'Smt. Droupadi Murmu',
       title: 'Hon\'ble President of India',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Droupadi_Murmu_official_portrait.jpg/440px-Droupadi_Murmu_official_portrait.jpg',
+      imageUrl: 'https://github.com/user-attachments/assets/4eff0c94-a647-4f83-aa35-b6a6ce2f7c59',
       description: 'Inspiring India\'s vision for environmental conservation and sustainable development.',
     },
     {
       name: 'Shri Narendra Modi',
       title: 'Hon\'ble Prime Minister of India',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Narendra_Modi_official_portrait_2024_%28cropped%29.jpg',
+      imageUrl: 'https://github.com/user-attachments/assets/6923e12b-f0e3-4252-9a84-fa9dfde16a64',
       description: 'Leading India\'s vision for sustainable development and carbon neutrality.',
     },
     {
       name: 'Shri Pushkar Singh Dhami',
       title: 'Hon\'ble Chief Minister of Uttarakhand',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Pushkar_Singh_Dhami.jpg',
+      imageUrl: 'https://github.com/user-attachments/assets/263e4687-4d39-4baf-84b2-2c37126729bc',
       description: 'Championing Devbhumi\'s journey towards environmental conservation and rural development.',
     },
   ]
@@ -79,14 +79,12 @@ function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
     >
       <div className="p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="relative w-32 h-32 mb-4 rounded-full overflow-hidden ring-4 ring-orange-300/50 shadow-xl group-hover:ring-orange-400/70 transition-all">
+          <div className="relative w-40 h-40 mb-4 rounded-full overflow-hidden ring-4 ring-orange-300/50 shadow-xl group-hover:ring-orange-400/70 transition-all">
             {!imageError ? (
-              <Image
+              <img
                 src={leader.imageUrl}
                 alt={leader.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 128px"
+                className="object-cover w-full h-full"
                 onError={() => setImageError(true)}
               />
             ) : (

@@ -1,0 +1,78 @@
+'use client'
+
+import Image from 'next/image'
+import { useState } from 'react'
+import { Quote } from 'lucide-react'
+
+export default function GramPradhanSection() {
+  const [imageError, setImageError] = useState(false)
+  
+  return (
+    <section className="py-12 px-4 sm:px-6">
+      <div className="container mx-auto">
+        <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden hover:scale-[1.01] transition-all">
+          <div className="grid md:grid-cols-2 gap-8 items-center p-8 sm:p-12">
+            {/* Image Section */}
+            <div className="flex justify-center md:justify-start">
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden ring-4 ring-orange-400/50 shadow-2xl">
+                {!imageError ? (
+                  <Image
+                    src="/images/gram-pradhan.jpg"
+                    alt="Shiwani Vishwakarma - Gram Pradhan"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 256px, 320px"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-orange-400 to-green-500 flex flex-col items-center justify-center">
+                    <span className="text-6xl font-bold text-white mb-2">SV</span>
+                    <span className="text-white text-sm">Gram Pradhan</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Quote Section */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                  Shiwani Vishwakarma
+                </h3>
+                <p className="text-base sm:text-lg text-orange-300 font-medium">
+                  Gram Pradhan, Damday Village
+                </p>
+              </div>
+              
+              <div className="relative">
+                <Quote className="absolute -top-2 -left-2 h-10 w-10 text-orange-400/30" />
+                <blockquote className="relative pl-8 space-y-4">
+                  <p className="text-lg sm:text-xl text-white/90 leading-relaxed italic">
+                    "Climate change is not just an environmental challenge—it's a test of our civilization's will to survive and thrive. 
+                    Every small action we take today shapes the world our children will inherit tomorrow."
+                  </p>
+                  
+                  <p className="text-base sm:text-lg text-white/80 leading-relaxed">
+                    "Through unity, innovation, and unwavering commitment to sustainability, we are proving that rural communities 
+                    can lead the way in creating a harmonious balance between development and environmental preservation. 
+                    Our journey is a testament to the power of positive action and collective responsibility."
+                  </p>
+                  
+                  <p className="text-base sm:text-lg text-white/70 leading-relaxed font-medium">
+                    "Let us work together to build a future where prosperity and planet protection go hand in hand, 
+                    where tradition meets technology, and where every life flourishes in harmony with nature."
+                  </p>
+                </blockquote>
+              </div>
+              
+              <div className="flex items-center space-x-2 pt-4">
+                <div className="h-1 w-20 bg-gradient-to-r from-orange-400 to-green-500 rounded-full"></div>
+                <span className="text-sm text-white/60">Leading with Vision & Purpose</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
