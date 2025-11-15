@@ -85,7 +85,7 @@ function LeaderCard({ leader, index }: { leader: Leader; index: number }) {
               <img
                 src={leader.imageUrl}
                 alt={leader.name}
-                className="object-cover w-full h-full"
+                className="object-cover object-top w-full h-full scale-110"
                 onError={() => setImageError(true)}
               />
             ) : (

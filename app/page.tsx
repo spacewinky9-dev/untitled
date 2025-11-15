@@ -20,54 +20,53 @@ export default function HomePage() {
         
         <div className="relative z-10">
 
-        {/* Hero Section with Golden Ratio (1:1.618) */}
+        {/* Hero Section - Full Width */}
         <section className="pt-24 pb-16 px-4 sm:px-6">
-          <div className="container mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              {/* Main content area: ~62% (golden ratio) */}
-              <div className="lg:col-span-7 space-y-8">
-                <div className="space-y-6 animate-fade-in">
-                  <div className="inline-block bg-gradient-to-r from-orange-500/30 to-green-500/30 backdrop-blur-sm border border-orange-500/40 rounded-full px-4 sm:px-6 py-2 animate-bounce-subtle shadow-lg shadow-orange-500/20">
-                    <p className="text-sm sm:text-base text-orange-200 font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">🌱 India&#39;s First Carbon Neutral Village</p>
-                  </div>
-                  
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-                    Welcome to
-                    <span className="block bg-gradient-to-r from-orange-400 via-yellow-300 to-green-400 bg-clip-text text-transparent mt-2 animate-pulse-soft drop-shadow-[0_4px_12px_rgba(255,153,51,0.6)]">
-                      Damday Village
-                    </span>
-                  </h1>
-                  
-                  <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-2xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                    Experience sustainable living, authentic culture, and eco-tourism in the heart of Uttarakhand&#39;s pristine mountains
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <Link href="/register">
-                      <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full shadow-2xl hover:scale-105 transition-transform">
-                        <Sparkles className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
-                        Join Our Mission
-                      </Button>
-                    </Link>
-                    <Link href="/marketplace">
-                      <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full hover:scale-105 transition-transform">
-                        <ShoppingBag className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
-                        Explore Marketplace
-                      </Button>
-                    </Link>
-                  </div>
+          <div className="container mx-auto max-w-5xl">
+            <div className="space-y-8 text-center">
+              <div className="space-y-6 animate-fade-in">
+                <div className="inline-block bg-gradient-to-r from-orange-500/30 to-green-500/30 backdrop-blur-sm border border-orange-500/40 rounded-full px-4 sm:px-6 py-2 animate-bounce-subtle shadow-lg shadow-orange-500/20">
+                  <p className="text-sm sm:text-base text-orange-200 font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">🌱 India&#39;s First Carbon Neutral Village</p>
                 </div>
-              </div>
-              
-              {/* Compact Sidebar area: ~38% (golden ratio complement) */}
-              <div className="lg:col-span-5">
-                <StatsSidebar />
+                
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                  Welcome to
+                  <span className="block bg-gradient-to-r from-orange-400 via-yellow-300 to-green-400 bg-clip-text text-transparent mt-2 animate-pulse-soft drop-shadow-[0_4px_12px_rgba(255,153,51,0.6)]">
+                    Damday Village
+                  </span>
+                </h1>
+                
+                <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                  Experience sustainable living, authentic culture, and eco-tourism in the heart of Uttarakhand&#39;s pristine mountains
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
+                  <Link href="/register">
+                    <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full shadow-2xl hover:scale-105 transition-transform">
+                      <Sparkles className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                      Join Our Mission
+                    </Button>
+                  </Link>
+                  <Link href="/marketplace">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-full hover:scale-105 transition-transform">
+                      <ShoppingBag className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                      Explore Marketplace
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* About Section */}
+        {/* Leadership Section - Right after hero */}
+        <section className="py-12 px-4 sm:px-6 bg-black/30 backdrop-blur-md">
+          <div className="container mx-auto">
+            <LeadershipSection />
+          </div>
+        </section>
+
+        {/* About Section with Stats Sidebar */}
         <AboutSection />
 
         {/* Gram Pradhan Section */}
@@ -105,12 +104,6 @@ export default function HomePage() {
                 link="/tours"
               />
             </div>
-          </div>
-        </section>
-
-        <section className="py-16 sm:py-20 px-4 sm:px-6 bg-black/30 backdrop-blur-md">
-          <div className="container mx-auto">
-            <LeadershipSection />
           </div>
         </section>
 
