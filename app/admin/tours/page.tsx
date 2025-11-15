@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Map, Users, Star, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import TourActions from '@/components/admin/TourActions'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export default async function AdminToursPage() {
   const session = await auth()

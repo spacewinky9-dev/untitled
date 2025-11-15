@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export const dynamic = 'force-dynamic'
 

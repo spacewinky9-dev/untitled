@@ -13,7 +13,13 @@ import {
   ShoppingBag,
   Home,
   Newspaper,
-  Map
+  Map,
+  ShoppingCart,
+  Calendar,
+  Menu,
+  Image,
+  BarChart3,
+  Activity
 } from 'lucide-react'
 
 const navItems = [
@@ -33,6 +39,11 @@ const navItems = [
     icon: ShoppingBag,
   },
   {
+    title: 'Orders',
+    href: '/admin/orders',
+    icon: ShoppingCart,
+  },
+  {
     title: 'Homestays',
     href: '/admin/homestays',
     icon: Home,
@@ -43,15 +54,45 @@ const navItems = [
     icon: Map,
   },
   {
+    title: 'Bookings',
+    href: '/admin/bookings',
+    icon: Calendar,
+  },
+  {
+    title: 'Blog',
+    href: '/admin/blog',
+    icon: Newspaper,
+  },
+  {
+    title: 'Blockchain',
+    href: '/admin/blockchain',
+    icon: TreePine,
+  },
+  {
+    title: 'Navigation',
+    href: '/admin/navigation',
+    icon: Menu,
+  },
+  {
+    title: 'Media',
+    href: '/admin/media',
+    icon: Image,
+  },
+  {
+    title: 'Reports',
+    href: '/admin/reports',
+    icon: BarChart3,
+  },
+  {
+    title: 'System',
+    href: '/admin/system',
+    icon: Activity,
+  },
+  {
     title: 'Settings',
     href: '/admin/settings',
     icon: Settings,
   },
-]
-
-const futureModules = [
-  { title: 'Blog', icon: Newspaper, status: 'Coming in PR #6' },
-  { title: 'Carbon Credits', icon: TreePine, status: 'Coming in PR #7' },
 ]
 
 export default function AdminSidebar() {
@@ -71,50 +112,26 @@ export default function AdminSidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
-        <div className="mb-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Main Menu
-          </p>
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-orange-50 text-orange-600'
-                    : 'text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                <Icon className="h-5 w-5" />
-                {item.title}
-              </Link>
-            )
-          })}
-        </div>
-
-        <div className="pt-4 border-t">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Future Modules
-          </p>
-          {futureModules.map((item) => {
-            const Icon = item.icon
-            return (
-              <div
-                key={item.title}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-gray-400"
-                title={item.status}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{item.title}</span>
-              </div>
-            )
-          })}
-        </div>
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {navItems.map((item) => {
+          const Icon = item.icon
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                isActive
+                  ? 'bg-orange-50 text-orange-600'
+                  : 'text-gray-700 hover:bg-gray-50'
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              {item.title}
+            </Link>
+          )
+        })}
       </nav>
 
       <div className="p-4 border-t border-gray-200">

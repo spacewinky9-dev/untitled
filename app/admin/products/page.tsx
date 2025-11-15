@@ -2,9 +2,11 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ProductActions from '@/components/admin/ProductActions'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export default async function AdminProductsPage() {
   const session = await auth()
@@ -141,21 +143,10 @@ export default async function AdminProductsPage() {
                       </div>
                     </td>
                     <td className="p-3">
-                      <div className="flex space-x-2">
-                        <Link href={`/admin/products/${product.id}`}>
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                        <Link href={`/admin/products/${product.id}/edit`}>
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                        <Button variant="outline" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      <ProductActions 
+                        productId={product.id}
+                        productName={product.name}
+                      />
                     </td>
                   </tr>
                 ))}

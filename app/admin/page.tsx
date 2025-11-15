@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,41 +17,80 @@ export default async function AdminDashboard() {
     redirect('/')
   }
 
+  // Comprehensive stats
   const userCount = await prisma.user.count()
   const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
+  const productCount = await prisma.product.count()
+  const orderCount = await prisma.order.count()
+  const homestayCount = await prisma.homestay.count()
+  const tourCount = await prisma.tour.count()
+  const postCount = await prisma.post.count()
+  const bookingCount = await prisma.booking.count()
 
   const stats = [
     {
       title: 'Total Users',
       value: userCount.toString(),
       icon: Users,
-      description: 'Registered users in the system',
+      description: 'Registered users',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
-      title: 'Admin Users',
-      value: adminCount.toString(),
-      icon: SettingsIcon,
-      description: 'System administrators',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
-    },
-    {
       title: 'Products',
-      value: '22',
+      value: productCount.toString(),
       icon: ShoppingCart,
-      description: 'Local organic products',
+      description: 'Marketplace items',
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
-      title: 'Trees Planted',
-      value: '0 / 25,000',
+      title: 'Orders',
+      value: orderCount.toString(),
+      icon: ShoppingCart,
+      description: 'Total orders',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
+    },
+    {
+      title: 'Homestays',
+      value: homestayCount.toString(),
       icon: TreePine,
-      description: 'Carbon credit goal',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-100',
+      description: 'Available homestays',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+    },
+    {
+      title: 'Tours',
+      value: tourCount.toString(),
+      icon: TreePine,
+      description: 'Tour packages',
+      color: 'text-teal-600',
+      bgColor: 'bg-teal-100',
+    },
+    {
+      title: 'Blog Posts',
+      value: postCount.toString(),
+      icon: Users,
+      description: 'Published posts',
+      color: 'text-pink-600',
+      bgColor: 'bg-pink-100',
+    },
+    {
+      title: 'Bookings',
+      value: bookingCount.toString(),
+      icon: SettingsIcon,
+      description: 'Total bookings',
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-100',
+    },
+    {
+      title: 'Admins',
+      value: adminCount.toString(),
+      icon: SettingsIcon,
+      description: 'System admins',
+      color: 'text-gray-600',
+      bgColor: 'bg-gray-100',
     },
   ]
 
@@ -89,37 +129,101 @@ export default async function AdminDashboard() {
               })}
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Start Guide</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="font-semibold">✅ Completed</h3>
-                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    <li>Next.js 14 project initialized</li>
-                    <li>Database configured with Prisma ORM</li>
-                    <li>Authentication system with NextAuth.js</li>
-                    <li>Admin user created and seeded</li>
-                  </ul>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-semibold">📋 Next Steps (PR #3-#12)</h3>
-                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    <li>User Panel & Public Authentication (PR #3)</li>
-                    <li>Marketplace Module (PR #4)</li>
-                    <li>Homestay & Tour Booking (PR #5)</li>
-                    <li>Blog & News Hub (PR #6)</li>
-                    <li>Blockchain Carbon Credits (PR #7)</li>
-                    <li>Carbon Marketplace (PR #8)</li>
-                    <li>Sustainability Tracker (PR #9)</li>
-                    <li>Community Hub (PR #10)</li>
-                    <li>UI/UX Enhancement (PR #11)</li>
-                    <li>Final Documentation (PR #12)</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Admin Panel Features</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Complete User Management</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Products & Marketplace</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Orders Management</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Homestays & Tours</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Blog Management</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Bookings Calendar</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Blockchain Integration</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Navigation Builder</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Media Library</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Reports & Analytics</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ System Health Monitor</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">✅ Settings & Configuration</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Link href="/admin/products/new" className="block">
+                    <div className="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-blue-700">+ Add New Product</span>
+                    </div>
+                  </Link>
+                  <Link href="/admin/homestays/new" className="block">
+                    <div className="p-3 bg-green-50 hover:bg-green-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-green-700">+ Add New Homestay</span>
+                    </div>
+                  </Link>
+                  <Link href="/admin/tours/new" className="block">
+                    <div className="p-3 bg-purple-50 hover:bg-purple-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-purple-700">+ Add New Tour</span>
+                    </div>
+                  </Link>
+                  <Link href="/admin/blog/new" className="block">
+                    <div className="p-3 bg-orange-50 hover:bg-orange-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-orange-700">+ Write New Post</span>
+                    </div>
+                  </Link>
+                  <Link href="/admin/orders" className="block">
+                    <div className="p-3 bg-pink-50 hover:bg-pink-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-pink-700">→ View All Orders</span>
+                    </div>
+                  </Link>
+                  <Link href="/admin/reports" className="block">
+                    <div className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg cursor-pointer transition-colors">
+                      <span className="text-sm font-medium text-indigo-700">→ View Reports</span>
+                    </div>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </main>

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export default async function AdminBookingsPage() {
   const session = await auth()

@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Building2, Users, Star, Bed } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import HomestayActions from '@/components/admin/HomestayActions'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export default async function AdminHomestaysPage() {
   const session = await auth()

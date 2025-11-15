@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import AdminSidebar from '@/components/admin/Sidebar'
 
 export default async function AdminNavigationPage() {
   const session = await auth()

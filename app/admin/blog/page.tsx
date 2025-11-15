@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import AdminSidebar from '@/components/admin/Sidebar'
+import BlogActions from '@/components/admin/BlogActions'
 
 export default async function AdminBlogPage() {
   const session = await auth()
