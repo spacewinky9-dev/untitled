@@ -2,16 +2,15 @@
 
 import Link from 'next/link'
 import { Home, Store, MapPin, ChevronRight } from 'lucide-react'
-import StatsSidebar from './StatsSidebar'
 
 export default function AboutSection() {
   return (
     <section className="py-12 px-4 sm:px-6">
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
-          {/* About Content - 80% */}
-          <div className="lg:col-span-4">
-            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 hover:scale-[1.02] transition-all h-full">
+      <div className="container mx-auto max-w-7xl">
+        <div className="w-full">
+          {/* About Content - Full Width */}
+          <div className="w-full">
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-12 lg:p-16 hover:scale-[1.01] transition-all h-full">
               <div className="mb-6">
                 <div className="inline-block mb-3">
                   <div className="flex items-center space-x-2 bg-gradient-to-r from-orange-500/20 to-green-500/20 backdrop-blur-sm border border-orange-300/30 rounded-full px-6 py-2">
@@ -86,11 +85,6 @@ export default function AboutSection() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Stats Sidebar - 20% */}
-          <div className="lg:col-span-1">
-            <StatsSidebar />
           </div>
         </div>
       </div>
