@@ -28,9 +28,9 @@ export default async function HomestaysPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-emerald-900 overflow-hidden relative">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden relative">
         <ParticleBackground />
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-green-500/10 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-purple-900/15 to-emerald-600/20 z-[1]" />
         
         <div className="relative z-10">
           {/* Hero Header */}
@@ -43,8 +43,8 @@ export default async function HomestaysPage() {
                       <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-6">
                         <Home className="h-10 w-10 text-white" />
                       </div>
-                      <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Damday Village Homestays</h1>
-                      <p className="text-xl text-white/70 mb-8">Experience authentic Himalayan hospitality in our traditional homestays</p>
+                      <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">Damday Village Homestays</h1>
+                      <p className="text-xl text-white/80 mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">Experience authentic Himalayan hospitality in our traditional homestays</p>
                       <div className="flex flex-wrap gap-8 text-white">
                         <div className="text-center">
                           <div className="text-3xl font-bold text-orange-300">{stats.total}</div>
