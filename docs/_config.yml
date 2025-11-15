@@ -1,0 +1,8 @@
+# GitHub Pages Configuration
+title: ForexFlow Documentation
+description: Visual Forex Bot Builder - Complete Documentation
+theme: jekyll-theme-cayman
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
