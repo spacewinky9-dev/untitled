@@ -281,7 +281,7 @@ export class SNARKProver {
   /**
    * Verify SNARK proof
    */
-  async verifyProof(proof: ZKProof, verificationKey: VerificationKey): boolean {
+  async verifyProof(proof: ZKProof, verificationKey: VerificationKey): Promise<boolean> {
     if (proof.type !== 'SNARK') {
       return false;
     }
@@ -407,7 +407,7 @@ export class ZKProofSystem {
   /**
    * Verify proof of any type
    */
-  async verifyProof(proof: ZKProof, verificationKey: VerificationKey): boolean {
+  async verifyProof(proof: ZKProof, verificationKey: VerificationKey): Promise<boolean> {
     if (proof.type === 'SNARK') {
       return await this.snarkProver.verifyProof(proof, verificationKey);
     }

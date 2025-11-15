@@ -106,7 +106,9 @@ export class Wallet {
   static fromMnemonic(mnemonic: string | string[], label?: string): Wallet {
     // Convert array to string if needed
     const mnemonicStr = Array.isArray(mnemonic) ? mnemonic.join(' ') : mnemonic;
-    const privateKey = QuantumProofCrypto.deriveKey(mnemonicStr);
+    // Use first word as salt for demonstration
+    const salt = mnemonicStr.split(' ')[0];
+    const privateKey = QuantumProofCrypto.deriveKey(mnemonicStr, salt);
     const keyPair = QuantumProofCrypto.generateKeyPair(); // Get format
     const publicKey = keyPair.publicKey;
     const address = QuantumProofCrypto.publicKeyToAddress(publicKey);
@@ -140,6 +142,9 @@ export class Wallet {
     }
 
     const decryptedKey = QuantumProofCrypto.decrypt(this.privateKey, password);
+    if (!decryptedKey) {
+      throw new Error("Failed to decrypt wallet - incorrect password");
+    }
     this.privateKey = decryptedKey;
     this.encrypted = false;
   }
@@ -175,7 +180,11 @@ export class Wallet {
     let privateKey: string;
 
     if (data.encryptedPrivateKey && password) {
-      privateKey = QuantumProofCrypto.decrypt(data.encryptedPrivateKey, password);
+      const decrypted = QuantumProofCrypto.decrypt(data.encryptedPrivateKey, password);
+      if (!decrypted) {
+        throw new Error('Failed to decrypt wallet - incorrect password');
+      }
+      privateKey = decrypted;
     } else if (data.privateKey) {
       privateKey = data.privateKey;
     } else {
@@ -210,7 +219,7 @@ export class Wallet {
       gasLimit: options?.gasLimit || 21000n,
       nonce: options?.nonce || 0n,
       data: options?.data,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     });
 
     // Sign transaction
@@ -228,14 +237,18 @@ export class Wallet {
       throw new Error('Wallet is encrypted. Please decrypt before signing.');
     }
 
-    return QuantumProofCrypto.sign(data, this.privateKey);
+    const signature = QuantumProofCrypto.sign(data, this.privateKey);
+    // Convert signature object to string
+    return JSON.stringify(signature);
   }
 
   /**
    * Verify signature
    */
   verify(data: string, signature: string): boolean {
-    return QuantumProofCrypto.verify(data, signature, this.publicKey);
+    // Parse signature from JSON string
+    const signatureObj = JSON.parse(signature);
+    return QuantumProofCrypto.verify(data, signatureObj, this.publicKey);
   }
 
   /**

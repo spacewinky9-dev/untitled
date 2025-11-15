@@ -5,5 +5,3 @@ export {
   DistributedKeyGeneration,
   AdvancedSignatureManager,
 } from './AdvancedSignatures';
-
-export default AdvancedSignatureManager;

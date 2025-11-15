@@ -20,67 +20,176 @@ export default function ParticleBackground() {
             value: 'transparent',
           },
         },
-        fpsLimit: 60,
+        fpsLimit: 120,
         interactivity: {
           events: {
             onClick: {
               enable: true,
-              mode: 'push',
+              mode: ['push', 'bubble'],
             },
             onHover: {
               enable: true,
-              mode: 'repulse',
+              mode: ['grab', 'connect'],
             },
             resize: true,
           },
           modes: {
             push: {
-              quantity: 2,
+              quantity: 4,
+            },
+            grab: {
+              distance: 200,
+              links: {
+                opacity: 0.5,
+                color: '#00ff88',
+              },
+            },
+            connect: {
+              distance: 150,
+              radius: 200,
+              links: {
+                opacity: 0.5,
+              },
+            },
+            bubble: {
+              distance: 250,
+              size: 8,
+              duration: 2,
+              opacity: 0.8,
             },
             repulse: {
-              distance: 100,
+              distance: 120,
               duration: 0.4,
             },
           },
         },
         particles: {
           color: {
-            value: ['#FF9933', '#138808', '#FFD700'],
+            value: ['#FF9933', '#138808', '#00d4ff', '#FFD700', '#ff00ff', '#00ff88'],
           },
           links: {
-            color: '#FF9933',
-            distance: 150,
+            color: {
+              value: ['#FF9933', '#138808', '#00d4ff'],
+            },
+            distance: 180,
             enable: true,
-            opacity: 0.3,
-            width: 1,
+            opacity: 0.35,
+            width: 1.5,
+            triangles: {
+              enable: true,
+              opacity: 0.05,
+            },
           },
           move: {
             direction: 'none',
             enable: true,
             outModes: {
-              default: 'bounce',
+              default: 'out',
+              bottom: 'out',
+              left: 'out',
+              right: 'out',
+              top: 'out',
             },
-            random: false,
-            speed: 1,
+            random: true,
+            speed: 2,
             straight: false,
+            attract: {
+              enable: true,
+              rotate: {
+                x: 600,
+                y: 1200,
+              },
+            },
           },
           number: {
             density: {
               enable: true,
-              area: 800,
+              area: 900,
             },
-            value: 40,
+            value: 80,
           },
           opacity: {
-            value: 0.4,
+            value: { min: 0.3, max: 0.7 },
+            animation: {
+              enable: true,
+              speed: 1,
+              minimumValue: 0.1,
+              sync: false,
+            },
           },
           shape: {
-            type: 'circle',
+            type: ['circle', 'triangle', 'polygon'],
+            options: {
+              polygon: {
+                sides: 6,
+              },
+            },
           },
           size: {
-            value: { min: 1, max: 3 },
+            value: { min: 1, max: 5 },
+            animation: {
+              enable: true,
+              speed: 2,
+              minimumValue: 0.5,
+              sync: false,
+            },
+          },
+          twinkle: {
+            particles: {
+              enable: true,
+              frequency: 0.05,
+              opacity: 1,
+            },
           },
         },
+        emitters: [
+          {
+            position: {
+              x: 0,
+              y: 50,
+            },
+            rate: {
+              quantity: 2,
+              delay: 0.5,
+            },
+            size: {
+              width: 0,
+              height: 0,
+            },
+            particles: {
+              move: {
+                direction: 'right',
+                speed: 3,
+              },
+              color: {
+                value: '#FFD700',
+              },
+            },
+          },
+          {
+            position: {
+              x: 100,
+              y: 50,
+            },
+            rate: {
+              quantity: 2,
+              delay: 0.5,
+            },
+            size: {
+              width: 0,
+              height: 0,
+            },
+            particles: {
+              move: {
+                direction: 'left',
+                speed: 3,
+              },
+              color: {
+                value: '#00ff88',
+              },
+            },
+          },
+        ],
         detectRetina: true,
       }}
       className="absolute inset-0 -z-10"

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { 
   Shield, Lock, Zap, Network, Activity, TrendingUp, 
   Server, Database, Cpu, Check, AlertCircle, ArrowRight
@@ -248,6 +249,9 @@ export default function BlockchainDashboard() {
           </div>
         </section>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </>
   );
 }

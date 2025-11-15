@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { blockchainAPI } from '@/lib/blockchain/api/BlockchainAPI';
+import { blockchainAPI } from '@/lib/blockchain/api';
 
 export async function POST(request: NextRequest) {
   try {

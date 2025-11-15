@@ -60,7 +60,7 @@ export class JSONRPCHandler {
   private blockchain: Blockchain;
   private consensus: ConsensusEngine;
 
-  constructor(blockchain: Chain, consensus: ConsensusEngine) {
+  constructor(blockchain: Blockchain, consensus: ConsensusEngine) {
     this.blockchain = blockchain;
     this.consensus = consensus;
   }
@@ -96,7 +96,7 @@ export class JSONRPCHandler {
     switch (method) {
       // Network methods
       case 'dam_getBlockNumber':
-        return this.blockchain.chain.length - 1;
+        return this.blockchain.getLength() - 1;
 
       case 'dam_getBlockByNumber':
         return this.getBlockByNumber(params[0]);
@@ -149,7 +149,15 @@ export class JSONRPCHandler {
         }));
 
       case 'dam_getConsensusStats':
-        return this.consensus.getNetworkStats();
+        // Return basic consensus stats
+        const validators = this.consensus.getActiveValidators();
+        return {
+          activeValidators: validators.length,
+          totalStake: validators.reduce((sum, v) => sum + v.stake, 0n).toString(),
+          averageReputation: validators.length > 0 
+            ? validators.reduce((sum, v) => sum + v.reputation, 0) / validators.length 
+            : 0
+        };
 
       default:
         throw new Error(`Method ${method} not supported`);
@@ -157,40 +165,40 @@ export class JSONRPCHandler {
   }
 
   private getBlockByNumber(number: number): any {
-    const block = this.blockchain.chain[number];
+    const block = this.blockchain.getBlock(BigInt(number));
     if (!block) return null;
 
     return {
       number: number,
       hash: block.hash,
       parentHash: block.previousHash,
-      timestamp: block.timestamp.toISOString(),
+      timestamp: new Date(block.timestamp).toISOString(),
       transactions: block.transactions.map(tx => tx.hash),
       transactionCount: block.transactions.length,
       validator: block.validator,
-      proof: block.proof,
+      proof: block.mathematicalProof,
     };
   }
 
   private getBlockByHash(hash: string): any {
-    const block = this.blockchain.chain.find(b => b.hash === hash);
+    const block = this.blockchain.getChain().find(b => b.hash === hash);
     if (!block) return null;
 
     return {
-      number: this.blockchain.chain.indexOf(block),
+      number: this.blockchain.getChain().indexOf(block),
       hash: block.hash,
       parentHash: block.previousHash,
-      timestamp: block.timestamp.toISOString(),
+      timestamp: new Date(block.timestamp).toISOString(),
       transactions: block.transactions.map(tx => tx.hash),
       transactionCount: block.transactions.length,
       validator: block.validator,
-      proof: block.proof,
+      proof: block.mathematicalProof,
     };
   }
 
   private getTransactionByHash(hash: string): any {
     // Search in all blocks
-    for (const block of this.blockchain.chain) {
+    for (const block of this.blockchain.getChain()) {
       const tx = block.transactions.find(t => t.hash === hash);
       if (tx) {
         return {
@@ -202,13 +210,13 @@ export class JSONRPCHandler {
           gasLimit: tx.gasLimit.toString(),
           nonce: tx.nonce.toString(),
           blockHash: block.hash,
-          blockNumber: this.blockchain.chain.indexOf(block),
+          blockNumber: this.blockchain.getChain().indexOf(block),
         };
       }
     }
 
     // Check pending transactions
-    const pendingTx = this.blockchain.pendingTransactions.find(t => t.hash === hash);
+    const pendingTx = this.blockchain.getPendingTransactions().find(t => t.hash === hash);
     if (pendingTx) {
       return {
         hash: pendingTx.hash,
@@ -235,7 +243,7 @@ export class JSONRPCHandler {
       gasLimit: BigInt(txData.gasLimit || 21000),
       nonce: BigInt(txData.nonce || 0),
       data: txData.data,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     });
 
     this.blockchain.addTransaction(tx);
@@ -249,13 +257,13 @@ export class JSONRPCHandler {
   }
 
   private getTransactionReceipt(hash: string): any {
-    for (const block of this.blockchain.chain) {
+    for (const block of this.blockchain.getChain()) {
       const tx = block.transactions.find(t => t.hash === hash);
       if (tx) {
         return {
           transactionHash: tx.hash,
           blockHash: block.hash,
-          blockNumber: this.blockchain.chain.indexOf(block),
+          blockNumber: this.blockchain.getChain().indexOf(block),
           from: tx.from,
           to: tx.to,
           gasUsed: tx.gasLimit.toString(),
@@ -285,7 +293,7 @@ export class RESTAPIHandler {
   private blockchain: Blockchain;
   private consensus: ConsensusEngine;
 
-  constructor(blockchain: Chain, consensus: ConsensusEngine) {
+  constructor(blockchain: Blockchain, consensus: ConsensusEngine) {
     this.blockchain = blockchain;
     this.consensus = consensus;
   }
@@ -298,10 +306,10 @@ export class RESTAPIHandler {
       success: true,
       data: {
         chainId: 1,
-        blockHeight: this.blockchain.chain.length - 1,
-        totalTransactions: this.blockchain.chain.reduce((sum, block) => 
+        blockHeight: this.blockchain.getLength() - 1,
+        totalTransactions: this.blockchain.getChain().reduce((sum, block) => 
           sum + block.transactions.length, 0),
-        pendingTransactions: this.blockchain.pendingTransactions.length,
+        pendingTransactions: this.blockchain.getPendingTransactions().length,
       },
       timestamp: new Date().toISOString(),
     };
@@ -311,12 +319,12 @@ export class RESTAPIHandler {
    * Get latest blocks
    */
   getLatestBlocks(limit: number = 10): APIResponse {
-    const blocks = this.blockchain.chain.slice(-limit).reverse().map((block, idx) => ({
-      number: this.blockchain.chain.length - 1 - idx,
+    const blocks = this.blockchain.getChain().slice(-limit).reverse().map((block, idx) => ({
+      number: this.blockchain.getLength() - 1 - idx,
       hash: block.hash,
       timestamp: typeof block.timestamp === 'number' 
         ? new Date(block.timestamp).toISOString()
-        : block.timestamp.toISOString(),
+        : new Date(block.timestamp).toISOString(),
       transactionCount: block.transactions.length,
       validator: block.validator,
     }));
@@ -334,8 +342,8 @@ export class RESTAPIHandler {
   getRecentTransactions(limit: number = 10): APIResponse {
     const allTxs: any[] = [];
     
-    for (let i = this.blockchain.chain.length - 1; i >= 0 && allTxs.length < limit; i--) {
-      const block = this.blockchain.chain[i];
+    for (let i = this.blockchain.getLength() - 1; i >= 0 && allTxs.length < limit; i--) {
+      const block = this.blockchain.getChain()[i];
       for (const tx of block.transactions) {
         if (allTxs.length >= limit) break;
         allTxs.push({
@@ -344,7 +352,7 @@ export class RESTAPIHandler {
           to: tx.to,
           value: tx.value.toString(),
           blockNumber: i,
-          timestamp: block.timestamp.toISOString(),
+          timestamp: new Date(block.timestamp).toISOString(),
         });
       }
     }
@@ -379,18 +387,16 @@ export class RESTAPIHandler {
    * Get network statistics
    */
   getNetworkStats(): APIResponse {
-    const stats = this.consensus.getNetworkStats?.() || {
-      totalBlocks: 0,
-      totalTransactions: 0,
-      totalStake: 0n,
-    };
+    const validators = this.consensus.getActiveValidators();
+    const totalStake = validators.reduce((sum, v) => sum + v.stake, 0n);
 
     return {
       success: true,
       data: {
-        totalBlocks: this.blockchain.chain.length,
-        ...(stats || {}),
-        activeValidators: this.consensus.getActiveValidators().length,
+        totalBlocks: this.blockchain.getLength(),
+        totalTransactions: 0, // Would track in production
+        totalStake: totalStake.toString(),
+        activeValidators: validators.length,
       },
       timestamp: new Date().toISOString(),
     };
@@ -405,19 +411,19 @@ export class RESTAPIHandler {
     let type: string = 'unknown';
 
     // Check if block hash
-    const block = this.blockchain.chain.find(b => b.hash === query);
+    const block = this.blockchain.getChain().find(b => b.hash === query);
     if (block) {
       result = {
-        number: this.blockchain.chain.indexOf(block),
+        number: this.blockchain.getChain().indexOf(block),
         hash: block.hash,
-        timestamp: block.timestamp.toISOString(),
+        timestamp: new Date(block.timestamp).toISOString(),
       };
       type = 'block';
     }
 
     // Check if transaction hash
     if (!result) {
-      for (const block of this.blockchain.chain) {
+      for (const block of this.blockchain.getChain()) {
         const tx = block.transactions.find(t => t.hash === query);
         if (tx) {
           result = {
@@ -514,7 +520,7 @@ export class WebSocketHandler {
     const subscribers = this.broadcast('newBlock', {
       number: 0, // Would get from blockchain
       hash: block.hash,
-      timestamp: block.timestamp.toISOString(),
+      timestamp: new Date(block.timestamp).toISOString(),
       transactionCount: block.transactions.length,
     });
   }
@@ -540,7 +546,7 @@ export class BlockchainAPI {
   private rest: RESTAPIHandler;
   private ws: WebSocketHandler;
 
-  constructor(blockchain: Chain, consensus: ConsensusEngine) {
+  constructor(blockchain: Blockchain, consensus: ConsensusEngine) {
     this.jsonRPC = new JSONRPCHandler(blockchain, consensus);
     this.rest = new RESTAPIHandler(blockchain, consensus);
     this.ws = new WebSocketHandler();
