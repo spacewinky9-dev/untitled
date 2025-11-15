@@ -2,11 +2,10 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Sparkles, MapPin, ShoppingBag, ChevronRight, TrendingUp, Users, Store, Home, Award, Heart } from 'lucide-react'
+import { Sparkles, ShoppingBag } from 'lucide-react'
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import StatsSidebar from '@/components/StatsSidebar'
 import LeadershipSection from '@/components/LeadershipSection'
 import AboutSection from '@/components/AboutSection'
 import GramPradhanSection from '@/components/GramPradhanSection'
@@ -66,46 +65,11 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* About Section with Stats Sidebar */}
+        {/* About Section with Discover Paradise */}
         <AboutSection />
 
         {/* Gram Pradhan Section */}
         <GramPradhanSection />
-
-        <section className="py-16 sm:py-20 px-4 sm:px-6">
-          <div className="container mx-auto">
-            <div className="text-center mb-12 sm:mb-16 animate-fade-in">
-              <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">Discover Paradise</h2>
-              <p className="text-lg sm:text-xl text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">Experience the perfect blend of nature, culture and sustainability</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-              <FeatureCard
-                icon={<Home className="h-10 w-10 sm:h-12 sm:w-12" />}
-                title="Eco Homestays"
-                description="Stay in carbon-neutral homes with modern amenities and traditional charm"
-                color="from-orange-500 to-red-600"
-                link="/homestays"
-              />
-              
-              <FeatureCard
-                icon={<Store className="h-10 w-10 sm:h-12 sm:w-12" />}
-                title="Local Marketplace"
-                description="Buy authentic organic products directly from village artisans"
-                color="from-green-500 to-emerald-600"
-                link="/marketplace"
-              />
-              
-              <FeatureCard
-                icon={<MapPin className="h-10 w-10 sm:h-12 sm:w-12" />}
-                title="Cultural Tours"
-                description="Explore pristine Himalayan landscapes and rich village heritage"
-                color="from-blue-500 to-cyan-600"
-                link="/tours"
-              />
-            </div>
-          </div>
-        </section>
 
         <section className="py-16 sm:py-20 px-4 sm:px-6">
           <div className="container mx-auto text-center">
@@ -138,23 +102,5 @@ export default function HomePage() {
       </div>
     </main>
     </>
-  )
-}
-
-function FeatureCard({ icon, title, description, color, link }: any) {
-  return (
-    <Link href={link}>
-      <div className="group relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 sm:p-8 hover:bg-white/15 transition-all hover:scale-105 cursor-pointer animate-scale-in shadow-xl shadow-black/30">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className={`bg-gradient-to-br ${color} w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-2xl group-hover:scale-110 transition-transform`}>
-          <div className="text-white">{icon}</div>
-        </div>
-        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 group-hover:text-orange-300 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">{title}</h3>
-        <p className="text-sm sm:text-base text-white/80 mb-3 sm:mb-4 leading-relaxed group-hover:text-white/95 transition-colors drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">{description}</p>
-        <div className="flex items-center text-orange-400 font-semibold group-hover:translate-x-2 transition-transform drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-          Explore <ChevronRight className="ml-1 h-5 w-5" />
-        </div>
-      </div>
-    </Link>
   )
 }
