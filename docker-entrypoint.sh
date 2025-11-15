@@ -24,7 +24,7 @@ fi
 
 echo "🌱 Seeding database (if needed)..."
 # Only seed if needed, ignore errors if already seeded
-node /app/node_modules/prisma/build/index.js db seed 2>/dev/null || echo "⚠️  Seeding skipped or already done"
+npm run db:seed 2>/dev/null || echo "⚠️  Seeding skipped or already done"
 
 echo "✅ Database setup complete!"
 echo "🎯 Starting Next.js server..."

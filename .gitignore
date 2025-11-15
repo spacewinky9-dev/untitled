@@ -37,3 +37,16 @@ next-env.d.ts
 node_modules/
 .next/
 .env
+
+# database
+*.db
+*.db-journal
+prisma/dev.db
+prisma/*.db
+prisma/*.db-journal
+
+# temporary files
+/tmp/
+*.tmp
+*-original.tsx
+*-original.ts
