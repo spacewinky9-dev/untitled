@@ -19,7 +19,8 @@ import {
   Menu,
   Image,
   BarChart3,
-  Activity
+  Activity,
+  Mail
 } from 'lucide-react'
 
 const navItems = [
@@ -67,6 +68,11 @@ const navItems = [
     title: 'Blockchain',
     href: '/admin/blockchain',
     icon: TreePine,
+  },
+  {
+    title: 'Marketing',
+    href: '/admin/marketing',
+    icon: Mail,
   },
   {
     title: 'Navigation',
