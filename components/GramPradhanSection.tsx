@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import { useState } from 'react'
 import { Quote } from 'lucide-react'
 
 export default function GramPradhanSection() {
   const [imageError, setImageError] = useState(false)
+  const imageUrl = 'https://github.com/user-attachments/assets/6ccb032f-a39c-4b0d-988b-f196784e1940'
   
   return (
     <section className="py-12 px-4 sm:px-6">
@@ -16,12 +16,11 @@ export default function GramPradhanSection() {
             <div className="flex justify-center md:justify-start">
               <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden ring-4 ring-orange-400/50 shadow-2xl">
                 {!imageError ? (
-                  <Image
-                    src="/images/gram-pradhan.jpg"
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={imageUrl}
                     alt="Shiwani Vishwakarma - Gram Pradhan"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 256px, 320px"
+                    className="object-cover w-full h-full"
                     onError={() => setImageError(true)}
                   />
                 ) : (
