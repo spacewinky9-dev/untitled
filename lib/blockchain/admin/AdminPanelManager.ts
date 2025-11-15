@@ -8,8 +8,8 @@ import { ConsensusEngine } from '../consensus/ConsensusEngine';
 import { Validator } from '../consensus/Validator';
 import { MultiDimensionalNetwork } from '../network/MultiDimensionalNetwork';
 import { TokenFactory } from '../tokens/TokenFactory';
-import { DRC20 } from '../tokens/DRC20';
-import { DRC721 } from '../tokens/DRC721';
+import { DRC20Token } from '../tokens/DRC20';
+import { DRC721Token } from '../tokens/DRC721';
 import { ContractVM } from '../contracts/ContractVM';
 import { SmartContract } from '../contracts/SmartContract';
 
@@ -58,7 +58,7 @@ export interface ValidatorStats {
   totalRewards: bigint;
   slashCount: number;
   uptime: number; // percentage
-  votingPower: number;
+  votingPower: bigint;
 }
 
 /**
@@ -298,7 +298,7 @@ export class AdminPanelManager {
       address: validator.address,
       stake: validator.stake,
       reputation: validator.reputation,
-      blocksProduced: validator.blocksProduced,
+      blocksProduced: validator.totalBlocks,
       missedBlocks: 0, // Would track in production
       totalRewards: validator.totalRewards,
       slashCount: validator.slashCount,
@@ -331,7 +331,7 @@ export class AdminPanelManager {
     maxSupply?: bigint;
     mintable?: boolean;
     burnable?: boolean;
-  }): { address: string; token: DRC20 } {
+  }): { address: string; token: DRC20Token } {
     const result = this.tokenFactory.createDRC20(params);
     return result;
   }
@@ -344,7 +344,7 @@ export class AdminPanelManager {
     symbol: string;
     creator: string;
     baseURI?: string;
-  }): { address: string; token: DRC721 } {
+  }): { address: string; token: DRC721Token } {
     const result = this.tokenFactory.createDRC721(params);
     return result;
   }
@@ -575,22 +575,21 @@ export class AdminPanelManager {
    */
   private updateNetworkStats(): void {
     const validators = this.consensus.getActiveValidators();
-    const consensusStats = this.consensus.getNetworkStats?.() || {
-      totalBlocks: 0,
-      totalTransactions: 0,
-      totalStake: 0n,
-    };
+    
+    // Calculate basic stats
+    const totalStake = validators.reduce((sum, v) => sum + v.stake, 0n);
+    const totalBlocks = this.blockchain.getLength();
 
     this.networkStats = {
-      totalBlocks: this.blockchain.chain.length,
-      totalTransactions: consensusStats.totalTransactions || 0,
+      totalBlocks: totalBlocks,
+      totalTransactions: 0, // Would count from blockchain
       activeValidators: validators.length,
       virtualNodes: 1000, // From network simulation
       currentTPS: 200, // Per dimension
       averageTPS: 2000, // Total theoretical
-      totalValueLocked: validators.reduce((sum, v) => sum + v.stake, 0n),
-      activeAddresses: consensusStats.totalTransactions || 0, // Approximation
-      pendingTransactions: this.blockchain.pendingTransactions?.length || 0,
+      totalValueLocked: totalStake,
+      activeAddresses: 0, // Would track in production
+      pendingTransactions: 0, // Would track in production
       networkHashRate: 0, // Virtual, no actual hashing
     };
   }
@@ -599,8 +598,8 @@ export class AdminPanelManager {
    * Get all token information
    */
   getAllTokens(): TokenInfo[] {
-    const stats = this.tokenFactory.getStatistics();
-    return []; // Would return actual token list
+    // Would return actual token list from token registry in production
+    return [];
   }
 
   /**

@@ -157,7 +157,7 @@ export class ConsensusEngine {
     };
 
     return {
-      algorithm: 'ec-discrete-log-modular-exp',
+      algorithm: 'discrete-log',
       challenge,
       response,
       verificationData: proofData,
