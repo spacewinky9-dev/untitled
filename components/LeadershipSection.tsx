@@ -10,6 +10,12 @@ interface Leader {
 export default function LeadershipSection() {
   const leaders: Leader[] = [
     {
+      name: 'Smt. Droupadi Murmu',
+      title: 'Hon\'ble President of India',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Droupadi_Murmu_official_portrait.jpg/440px-Droupadi_Murmu_official_portrait.jpg',
+      description: 'Inspiring India\'s vision for environmental conservation and sustainable development.',
+    },
+    {
       name: 'Shri Narendra Modi',
       title: 'Hon\'ble Prime Minister of India',
       imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Narendra_Modi_official_portrait_2024_%28cropped%29.jpg',
@@ -24,42 +30,42 @@ export default function LeadershipSection() {
   ]
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-12 bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
             Leadership & Vision
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
             Under the visionary leadership of our national and state leaders, 
             Damday Village is pioneering sustainable development in the Himalayas
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {leaders.map((leader) => (
             <div
               key={leader.name}
-              className="bg-gradient-to-br from-orange-50 to-green-50 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-orange-100"
+              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden hover:bg-white/15 hover:scale-105 transition-all"
             >
               <div className="p-6">
                 <div className="flex flex-col items-center text-center">
-                  <div className="relative w-40 h-40 mb-4 rounded-full overflow-hidden ring-4 ring-orange-200 shadow-lg">
+                  <div className="relative w-32 h-32 mb-4 rounded-full overflow-hidden ring-4 ring-orange-300/50 shadow-xl">
                     <Image
                       src={leader.imageUrl}
                       alt={leader.name}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 160px"
+                      sizes="(max-width: 768px) 100vw, 128px"
                     />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-lg font-bold text-white mb-1">
                     {leader.name}
                   </h3>
-                  <p className="text-sm font-medium text-orange-600 mb-3">
+                  <p className="text-xs font-medium text-orange-300 mb-3">
                     {leader.title}
                   </p>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs text-white/60 leading-relaxed">
                     {leader.description}
                   </p>
                 </div>
@@ -68,10 +74,10 @@ export default function LeadershipSection() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-green-600 text-white rounded-full shadow-md">
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500/20 to-green-600/20 backdrop-blur-sm border border-orange-300/30 text-white rounded-full shadow-md">
             <span className="text-sm font-medium">
-              🇮🇳 Empowering Rural India through Digital Innovation
+              🇮🇳 Empowering Rural India through Digital Innovation & Sustainability
             </span>
           </div>
         </div>

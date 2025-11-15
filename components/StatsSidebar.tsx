@@ -1,58 +1,35 @@
 'use client'
 
-import { Card } from '@/components/ui/card'
-import { TrendingUp, Users, Leaf, Building } from 'lucide-react'
-
-interface Stat {
-  label: string
-  value: string
-  icon: any
-  color: string
-}
+import { ChevronRight, TrendingUp, Users, Store, Home, Award, Heart, Leaf } from 'lucide-react'
 
 export default function StatsSidebar() {
-  const stats: Stat[] = [
-    { label: 'Carbon Neutral', value: '100%', icon: Leaf, color: 'text-green-600' },
-    { label: 'Villagers', value: '2,500+', icon: Users, color: 'text-blue-600' },
-    { label: 'Homestays', value: '15+', icon: Building, color: 'text-purple-600' },
-    { label: 'Growth', value: '25%', icon: TrendingUp, color: 'text-orange-600' },
+  const stats = [
+    { icon: <Users className="h-6 w-6" />, value: '2,500+', label: 'Community Members', color: 'from-orange-500 to-red-500' },
+    { icon: <Store className="h-6 w-6" />, value: '150+', label: 'Local Products', color: 'from-green-500 to-emerald-500' },
+    { icon: <Home className="h-6 w-6" />, value: '25+', label: 'Eco Homestays', color: 'from-blue-500 to-cyan-500' },
+    { icon: <TrendingUp className="h-6 w-6" />, value: '100%', label: 'Carbon Neutral', color: 'from-purple-500 to-pink-500' },
+    { icon: <Award className="h-6 w-6" />, value: '#1', label: 'Green Village', color: 'from-yellow-500 to-orange-500' },
+    { icon: <Heart className="h-6 w-6" />, value: '5000+', label: 'Happy Visitors', color: 'from-red-500 to-rose-500' },
   ]
 
   return (
-    <div className="sticky top-24 space-y-4">
-      <Card className="p-6 bg-gradient-to-br from-orange-500 to-green-600 text-white">
-        <h3 className="text-xl font-bold mb-4">Village Stats</h3>
-        <div className="space-y-4">
-          {stats.map((stat, idx) => {
-            const Icon = stat.icon
-            return (
-              <div key={idx} className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-sm opacity-90">{stat.label}</div>
-                </div>
+    <div className="sticky top-24 space-y-3">
+      {stats.map((stat, idx) => (
+        <div key={idx} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition-all hover:scale-105 cursor-pointer">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`bg-gradient-to-br ${stat.color} p-2 rounded-xl shadow-lg`}>
+                <div className="text-white">{stat.icon}</div>
               </div>
-            )
-          })}
-        </div>
-      </Card>
-      
-      <Card className="p-6">
-        <h4 className="font-bold mb-3">Latest Updates</h4>
-        <div className="space-y-3 text-sm">
-          <div className="border-l-2 border-orange-500 pl-3">
-            <div className="font-medium">New Homestay</div>
-            <div className="text-gray-600">Opened this month</div>
-          </div>
-          <div className="border-l-2 border-green-500 pl-3">
-            <div className="font-medium">Carbon Goal</div>
-            <div className="text-gray-600">Achieved 100%</div>
+              <div>
+                <p className="text-2xl font-bold text-white">{stat.value}</p>
+                <p className="text-sm text-white/60">{stat.label}</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-white/40" />
           </div>
         </div>
-      </Card>
+      ))}
     </div>
   )
 }
