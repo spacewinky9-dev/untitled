@@ -3,7 +3,10 @@ FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat openssl
+
+# ✅ FIX 1: Add OpenSSL 1.1 compatibility for Prisma
+RUN apk add --no-cache libc6-compat openssl openssl1.1-compat
+
 WORKDIR /app
 
 # Copy package files
@@ -13,35 +16,34 @@ RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
+
+# ✅ FIX 2: Install OpenSSL in builder stage too
+RUN apk add --no-cache openssl openssl1.1-compat
+
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set build-time environment variables (these are NOT included in final image)
-# CapRover automatically passes environment variables during build
-ARG DATABASE_URL
-ARG NEXTAUTH_SECRET
-ARG NEXTAUTH_URL
-ARG NODE_ENV=production
-
-# Make environment variables available during build
-ENV DATABASE_URL=$DATABASE_URL
-ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-ENV NEXTAUTH_URL=$NEXTAUTH_URL
-ENV NODE_ENV=$NODE_ENV
+# Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# ✅ FIX 3: Set a dummy DATABASE_URL for build time (Prisma needs it)
+# Real DATABASE_URL will be used at runtime
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Run database migrations (this will create tables)
-RUN npx prisma migrate deploy || npx prisma db push || true
-
-# Build Next.js application
+# Build Next.js app
 RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
+
+# ✅ FIX 4: Install OpenSSL in runtime stage
+RUN apk add --no-cache openssl openssl1.1-compat curl
+
 WORKDIR /app
 
 ENV NODE_ENV production
@@ -54,8 +56,8 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma ./prisma
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
@@ -64,11 +66,11 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
 CMD ["node", "server.js"]

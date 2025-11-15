@@ -4,6 +4,8 @@ import { format } from 'date-fns'
 import { Calendar, User, Tag, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 
+export const dynamic = 'force-dynamic'
+
 export default async function BlogPage() {
   const posts = await prisma.post.findMany({
     where: { published: true },
