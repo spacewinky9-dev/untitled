@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Leaf, MapPin, ShoppingBag, ChevronRight, TrendingUp, Users, Store, Home, Award, Heart } from 'lucide-react'
+import { Sparkles, MapPin, ShoppingBag, ChevronRight, TrendingUp, Users, Store, Home, Award, Heart } from 'lucide-react'
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -10,14 +10,12 @@ import StatsSidebar from '@/components/StatsSidebar'
 import LeadershipSection from '@/components/LeadershipSection'
 import AboutSection from '@/components/AboutSection'
 import GramPradhanSection from '@/components/GramPradhanSection'
-import ParticleBackground from '@/components/ParticleBackground'
 
 export default function HomePage() {
   return (
     <>
       <Header />
       <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden relative">
-        <ParticleBackground />
         <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-purple-900/15 to-emerald-600/20 z-[1]" />
         
         <div className="relative z-10">
@@ -61,18 +59,11 @@ export default function HomePage() {
                 </div>
               </div>
               
-              {/* Sidebar area: ~38% (golden ratio complement) */}
+              {/* Compact Sidebar area: ~38% (golden ratio complement) */}
               <div className="lg:col-span-5">
                 <StatsSidebar />
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Leadership Section */}
-        <section className="py-12 px-6">
-          <div className="container mx-auto">
-            <LeadershipSection />
           </div>
         </section>
 
@@ -119,12 +110,7 @@ export default function HomePage() {
 
         <section className="py-16 sm:py-20 px-4 sm:px-6 bg-black/30 backdrop-blur-md">
           <div className="container mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-              <ImpactStat value="100%" label="Carbon Neutral" icon={<Leaf />} />
-              <ImpactStat value="500+" label="Happy Visitors" icon={<Users />} />
-              <ImpactStat value="50+" label="Local Products" icon={<Store />} />
-              <ImpactStat value="10+" label="Eco Homestays" icon={<Home />} />
-            </div>
+            <LeadershipSection />
           </div>
         </section>
 
@@ -177,17 +163,5 @@ function FeatureCard({ icon, title, description, color, link }: any) {
         </div>
       </div>
     </Link>
-  )
-}
-
-function ImpactStat({ value, label, icon }: any) {
-  return (
-    <div className="text-center group cursor-pointer animate-scale-in">
-      <div className="bg-gradient-to-br from-orange-500/30 to-green-500/30 backdrop-blur-md border border-white/30 rounded-2xl p-4 sm:p-6 mb-2 sm:mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-black/30">
-        <div className="text-white mb-1 sm:mb-2 flex justify-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{icon}</div>
-        <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 group-hover:text-orange-300 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">{value}</p>
-      </div>
-      <p className="text-sm sm:text-base text-white/90 font-medium group-hover:text-white transition-colors drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">{label}</p>
-    </div>
   )
 }
