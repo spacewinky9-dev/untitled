@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, Star } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export const dynamic = 'force-dynamic'
 
@@ -116,6 +117,9 @@ export default async function MarketplacePage() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

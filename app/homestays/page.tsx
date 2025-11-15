@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { MapPin, Users, Star, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Footer from '@/components/Footer'
 
 export default async function HomestaysPage() {
   const homestays = await prisma.homestay.findMany({
@@ -160,6 +161,9 @@ export default async function HomestaysPage() {
           </Link>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

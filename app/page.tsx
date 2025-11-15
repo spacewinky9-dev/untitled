@@ -4,6 +4,7 @@ import { TreePine, Users, Home as HomeIcon, ShoppingBag, Award, TrendingUp, MapP
 import Header from '@/components/Header'
 import ParticleBackground from '@/components/ParticleBackground'
 import LeadershipSection from '@/components/LeadershipSection'
+import Footer from '@/components/Footer'
 
 export default function HomePage() {
   const stats = [
@@ -236,6 +237,100 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* DamChain Blockchain Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+          <ParticleBackground />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center max-w-4xl mx-auto mb-16">
+              <div className="inline-flex items-center bg-gradient-to-r from-cyan-500 to-purple-500 px-6 py-2 rounded-full mb-6">
+                <span className="text-sm font-bold">⚡ POWERED BY DAMCHAIN</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                World&apos;s Most Advanced Blockchain
+              </h2>
+              <p className="text-xl text-gray-300 leading-relaxed">
+                Million times faster and more secure than Bitcoin. Powered by quantum-resistant cryptography, 
+                AI optimization, and zero-knowledge proofs. The future of decentralized finance.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-6">
+                <div className="text-4xl font-bold text-cyan-400 mb-2">100K+</div>
+                <div className="text-gray-300 font-medium">Transactions/Second</div>
+                <div className="text-xs text-gray-400 mt-2">1M+ with sharding</div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-purple-500/30 rounded-xl p-6">
+                <div className="text-4xl font-bold text-purple-400 mb-2">&lt;0.00001</div>
+                <div className="text-gray-300 font-medium">kWh per Transaction</div>
+                <div className="text-xs text-gray-400 mt-2">99.999% less than Bitcoin</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30 rounded-xl p-6">
+                <div className="text-4xl font-bold text-green-400 mb-2">256-bit</div>
+                <div className="text-gray-300 font-medium">Quantum Security</div>
+                <div className="text-xs text-gray-400 mt-2">Post-quantum cryptography</div>
+              </div>
+              <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-6">
+                <div className="text-4xl font-bold text-yellow-400 mb-2">95%+</div>
+                <div className="text-gray-300 font-medium">Gas Cost Reduction</div>
+                <div className="text-xs text-gray-400 mt-2">AI-powered optimization</div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:border-cyan-500/50 transition-all">
+                <div className="text-cyan-400 text-4xl mb-4">🔒</div>
+                <h3 className="text-xl font-bold mb-3">Zero-Knowledge Proofs</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Complete privacy with zk-SNARKs and zk-STARKs. Verify transactions without revealing data.
+                </p>
+                <ul className="space-y-2 text-sm text-gray-400">
+                  <li>✓ Private transactions</li>
+                  <li>✓ Recursive proofs</li>
+                  <li>✓ STARK verification</li>
+                </ul>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:border-purple-500/50 transition-all">
+                <div className="text-purple-400 text-4xl mb-4">🌐</div>
+                <h3 className="text-xl font-bold mb-3">Cross-Chain Swaps</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Seamless interoperability with Ethereum, Bitcoin, Polkadot, and Cosmos networks.
+                </p>
+                <ul className="space-y-2 text-sm text-gray-400">
+                  <li>✓ Atomic swaps (HTLC)</li>
+                  <li>✓ Bridge protocols</li>
+                  <li>✓ Multi-chain support</li>
+                </ul>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:border-green-500/50 transition-all">
+                <div className="text-green-400 text-4xl mb-4">🛡️</div>
+                <h3 className="text-xl font-bold mb-3">MEV Protection</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Protected from front-running attacks with encrypted mempool and fair ordering.
+                </p>
+                <ul className="space-y-2 text-sm text-gray-400">
+                  <li>✓ Encrypted mempool</li>
+                  <li>✓ Fair transaction ordering</li>
+                  <li>✓ PBS (Proposer-Builder Separation)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Link href="/blockchain">
+                <Button size="lg" className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 text-white border-0 shadow-2xl shadow-purple-500/50">
+                  <Activity className="w-5 h-5 mr-2" />
+                  Explore DamChain Blockchain
+                  <ChevronRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Leadership Section */}
         <LeadershipSection />
 
@@ -267,6 +362,9 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </>
   )
 }
