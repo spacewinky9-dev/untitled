@@ -34,8 +34,8 @@ export default async function HomestaysPage() {
         
         <div className="relative z-10">
           {/* Hero Header */}
-          <div className="pt-24 pb-12 px-6">
-            <div className="container mx-auto">
+          <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-8">
                   <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
@@ -70,7 +70,7 @@ export default async function HomestaysPage() {
             </div>
           </div>
 
-          <div className="container mx-auto px-6 py-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-12">
             {/* Featured Homestays */}
             {featuredHomestays.length > 0 && (
               <div className="mb-16">
