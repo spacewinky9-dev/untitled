@@ -24,8 +24,8 @@ export default async function MarketplacePage() {
         
         <div className="relative z-10">
           {/* Hero Section */}
-          <section className="pt-24 pb-12 px-6">
-            <div className="container mx-auto">
+          <section className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-8">
                   <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12">
@@ -37,13 +37,13 @@ export default async function MarketplacePage() {
                       Discover authentic organic products directly from Damday Village artisans
                     </p>
                     <div className="flex flex-wrap gap-4">
-                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3">
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-3">
                         <div className="flex items-center space-x-2 text-white">
                           <Leaf className="h-5 w-5 text-green-400" />
                           <span className="font-semibold">100% Organic</span>
                         </div>
                       </div>
-                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3">
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-3">
                         <div className="flex items-center space-x-2 text-white">
                           <MapPin className="h-5 w-5 text-orange-400" />
                           <span className="font-semibold">Locally Sourced</span>
@@ -61,8 +61,8 @@ export default async function MarketplacePage() {
           </section>
 
           {/* Products Grid */}
-          <section className="py-12 px-6">
-            <div className="container mx-auto">
+          <section className="py-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
               <h2 className="text-3xl font-bold text-white mb-6">Featured Products</h2>
               {products.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,8 +104,8 @@ export default async function MarketplacePage() {
           </section>
 
           {/* Categories */}
-          <section className="py-12 px-6">
-            <div className="container mx-auto">
+          <section className="py-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+            <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
               <h2 className="text-3xl font-bold text-white mb-6">Shop by Category</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {['Organic Food', 'Handicrafts', 'Textiles', 'Herbs & Spices'].map((category, idx) => (

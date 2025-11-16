@@ -20,8 +20,8 @@ export default function HomePage() {
         <div className="relative z-10">
 
         {/* Hero Section - Full Width */}
-        <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="container mx-auto max-w-7xl">
+        <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+          <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
             <div className="space-y-8 text-center">
               <div className="space-y-6 animate-fade-in">
                 <div className="inline-block bg-gradient-to-r from-orange-500/30 to-green-500/30 backdrop-blur-sm border border-orange-500/40 rounded-full px-4 sm:px-6 py-2 animate-bounce-subtle shadow-lg shadow-orange-500/20">
@@ -59,8 +59,8 @@ export default function HomePage() {
         </section>
 
         {/* Leadership Section - Right after hero */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-black/30 backdrop-blur-md">
-          <div className="container mx-auto max-w-7xl">
+        <section className="py-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-black/30 backdrop-blur-md">
+          <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
             <LeadershipSection />
           </div>
         </section>
@@ -71,8 +71,8 @@ export default function HomePage() {
         {/* Gram Pradhan Section */}
         <GramPradhanSection />
 
-        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
-          <div className="container mx-auto text-center max-w-6xl">
+        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+          <div className="container mx-auto text-center max-w-full 2xl:max-w-[1400px]">
             <div className="bg-gradient-to-r from-orange-500/30 to-green-500/30 backdrop-blur-xl border border-white/30 rounded-3xl p-8 sm:p-12 lg:p-16 hover:scale-[1.01] transition-transform shadow-2xl shadow-orange-500/20">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                 Ready to Experience Sustainable Living?

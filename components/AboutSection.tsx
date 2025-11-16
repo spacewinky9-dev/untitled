@@ -5,8 +5,8 @@ import { Home, Store, MapPin, ChevronRight } from 'lucide-react'
 
 export default function AboutSection() {
   return (
-    <section className="py-12 px-4 sm:px-6">
-      <div className="container mx-auto max-w-7xl">
+    <section className="py-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
         <div className="w-full">
           {/* About Content - Full Width */}
           <div className="w-full">

@@ -51,7 +51,7 @@ export default function LeadershipSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-full 2xl:max-w-[1600px] mx-auto">
           {leaders.map((leader, index) => (
             <LeaderCard key={leader.name} leader={leader} index={index} />
           ))}

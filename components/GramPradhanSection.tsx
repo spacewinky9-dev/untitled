@@ -8,8 +8,8 @@ export default function GramPradhanSection() {
   const imageUrl = 'https://github.com/user-attachments/assets/6ccb032f-a39c-4b0d-988b-f196784e1940'
   
   return (
-    <section className="py-12 px-4 sm:px-6">
-      <div className="container mx-auto">
+    <section className="py-12 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      <div className="container mx-auto max-w-full 2xl:max-w-[1800px]">
         <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden hover:scale-[1.01] transition-all">
           <div className="grid md:grid-cols-2 gap-8 items-center p-8 sm:p-12">
             {/* Image Section */}
