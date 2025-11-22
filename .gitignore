@@ -50,3 +50,37 @@ prisma/*.db-journal
 *.tmp
 *-original.tsx
 *-original.ts
+
+# Security - prevent backend exposure
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Sensitive files
+/lib/secrets/
+/config/secrets/
+*-secret.ts
+*-secret.js
+
+# Build artifacts
+.next/
+out/
+build/
+dist/
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+.nyc_output/
