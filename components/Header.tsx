@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Home, ShoppingBag, Building2, BookOpen, TreePine, Users, MapPin, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import CartButton from '@/components/cart/CartButton'
 
 interface NavItem {
   id: string
@@ -70,6 +71,7 @@ export default function Header() {
 
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center space-x-2 ml-auto">
+          <CartButton />
           <Link href="/login">
             <Button variant="ghost" size="sm">
               Login
@@ -88,16 +90,19 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden ml-auto p-2 hover:bg-gray-100 rounded-md"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
+        <div className="md:hidden ml-auto flex items-center gap-2">
+          <CartButton />
+          <button
+            className="p-2 hover:bg-gray-100 rounded-md"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

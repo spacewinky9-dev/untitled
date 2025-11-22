@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from '@/components/Providers'
+import CartDrawer from '@/components/cart/CartDrawer'
 
 export const metadata: Metadata = {
   title: 'Damday Village - Smart Carbon-Free Village',
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <CartDrawer />
+        </Providers>
       </body>
     </html>
   )
